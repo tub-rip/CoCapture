@@ -10,12 +10,9 @@
 #include <pangolin/display/default_font.h>
 #include <pangolin/handler/handler.h>
 
-
-void setImageData(unsigned char * imageArray, int size){
-    for(int i = 0 ; i < size;i++) {
-        imageArray[i] = (unsigned char)(rand()/(RAND_MAX/255.0));
-    }
-}
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
 
 
 int main() {
@@ -42,16 +39,16 @@ int main() {
             .SetLayout(pangolin::LayoutEqual)
             .AddDisplay(d_image);
 
-    const int width =  64;
-    const int height = 48;
-    unsigned char* imageArray = new unsigned char[3*width*height];
-    pangolin::GlTexture imageTexture(width,height,GL_RGB,false,0,GL_RGB,GL_UNSIGNED_BYTE);
+    cv::Mat image = cv::imread("DSC00220.JPG");
+    cv::flip(image, image, 0);
+
+    unsigned char* imageArray = new unsigned char[3 * image.cols * image.rows];
+    pangolin::GlTexture imageTexture(image.cols,image.rows,GL_RGB,false,0,GL_RGB,GL_UNSIGNED_BYTE);
 
     while(!pangolin::ShouldQuit()) {
 
         // Image
-        setImageData(imageArray,3*width*height);
-        imageTexture.Upload(imageArray,GL_RGB,GL_UNSIGNED_BYTE);
+        imageTexture.Upload(image.data,GL_RGB,GL_UNSIGNED_BYTE);
         d_image.Activate();
         glColor3f(1.0,1.0,1.0);
         imageTexture.RenderToViewport();
