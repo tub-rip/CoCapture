@@ -11,6 +11,8 @@ set(MetavisionSDK_DIR "/home/friedhelm/env/openeb/build/generated/share/cmake/Me
 set(MetavisionHAL_DIR "/home/friedhelm/env/openeb/build/generated/share/cmake/MetavisionHALCMakePackagesFilesDir")
 find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
 
+find_package(Threads REQUIRED)
+
 
 
 add_executable(${PROJECT_NAME} app/main.cpp lib/prophesee_interface.cpp lib/prophesee_interface.h lib/event_visualizer.cpp lib/event_visualizer.h)
@@ -20,4 +22,5 @@ target_link_libraries(${PROJECT_NAME}
         MetavisionSDK::core
         MetavisionSDK::driver
         MetavisionSDK::ui
-        Metavision::HAL_discovery)
+        Metavision::HAL_discovery
+        Threads::Threads)

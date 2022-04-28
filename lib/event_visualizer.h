@@ -20,9 +20,9 @@ private:
     std::mutex m;
 
     // Display colors
-    cv::Vec3b color_bg_ = cv::Vec3b(52, 37, 30);
-    cv::Vec3b color_on_ = cv::Vec3b(236, 223, 216);
-    cv::Vec3b color_off_ = cv::Vec3b(201, 126, 64);
+    cv::Vec3b color_bg_ = cv::Vec3b(30, 37, 52);
+    cv::Vec3b color_on_ = cv::Vec3b(216, 223, 236);
+    cv::Vec3b color_off_ = cv::Vec3b(64, 126, 201);
 };
 
 
