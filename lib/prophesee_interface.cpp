@@ -29,7 +29,6 @@ PropheseeInterface::PropheseeInterface()
     i_device_control_->set_mode_master();
     i_device_control_->start();
     i_events_stream_->start();
-
 }
 
 

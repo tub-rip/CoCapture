@@ -12,6 +12,36 @@
 #include "../lib/prophesee_interface.h"
 
 
+std::unique_ptr<Metavision::Device> make_device(std::string serial) {
+    std::cout << "Opening Prophesee Camera" << serial << std::endl;
+    std::unique_ptr<Metavision::Device> device;
+    try {
+        device = Metavision::DeviceDiscovery::open(serial);
+    } catch (Metavision::HalException &e) { std::cout << "Error exception: " << e.what() << std::endl; }
+
+    if (!device) {
+        std::cerr << "Camera opening failed." << std::endl;
+    }
+    std::cout << "Camera open." << std::endl;
+
+    // Decode in additional thread
+    auto i_device_control = device->get_facility<Metavision::I_DeviceControl>();
+    if (!i_device_control) {
+        std::cerr << "Could not get Device Control facility." << std::endl;
+    }
+
+    auto i_events_stream = device->get_facility<Metavision::I_EventsStream>();
+    if (!i_events_stream) {
+        std::cerr << "Could not initialize events stream." << std::endl;
+    }
+
+    i_device_control->start();
+    i_events_stream->start();
+
+    return device;
+}
+
+
 int main() {
 
     // #########################################################################
@@ -29,6 +59,9 @@ int main() {
         return false;
     }
 
+    std::unique_ptr<Metavision::Device> device = make_device(v.front());
+
+    /*
     std::cout << "Opening Prophesee Camera.." << std::endl;
     std::unique_ptr<Metavision::Device> device;
     try {
@@ -40,6 +73,7 @@ int main() {
         return false;
     }
     std::cout << "Camera open." << std::endl;
+     */
 
     // Register callback function
     auto *i_cddecoder =
@@ -69,15 +103,19 @@ int main() {
         std::cerr << "Could not retrieve geometry." << std::endl;
     }
 
-    event_visualizer.setup_display(i_geometry->get_width(), i_geometry->get_height());
-
+    /*
     i_device_control->start();
     i_events_stream->start();
+
+    */
 
     auto *i_decoder = device->get_facility<Metavision::I_Decoder>();
     bool stop_decoding = false;
     bool stop_application = false;
     i_events_stream->start();
+
+    event_visualizer.setup_display(i_geometry->get_width(), i_geometry->get_height());
+
     std::thread decoding_loop([&]() {
         using namespace std::chrono;
         milliseconds last_update_monitoring = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -150,6 +188,8 @@ int main() {
         // Necessary
         pangolin::FinishFrame();
     }
+
+    decoding_loop.join();
 
     return 0;
 }
