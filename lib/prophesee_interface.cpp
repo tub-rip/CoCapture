@@ -5,7 +5,7 @@
 #include "prophesee_interface.h"
 
 namespace prophesee {
-    std::shared_ptr<Metavision::Device> make_device(std::string serial) {
+    std::shared_ptr<Metavision::Device> make_device(const std::string serial) {
         std::cout << "Opening Prophesee Camera" << serial << std::endl;
         std::shared_ptr<Metavision::Device> device;
         try {

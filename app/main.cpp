@@ -6,6 +6,8 @@
 #include <pangolin/display/view.h>
 #include <pangolin/display/widgets.h>
 #include <pangolin/display/default_font.h>
+#include <pangolin/handler/handler.h>
+#include <pangolin/var/varextra.h>
 
 #include <opencv2/core.hpp>
 
@@ -27,10 +29,11 @@ int main() {
 
     if (v.empty()) {
         std::cout << "No Prophesee Camera detected" << std::endl;
-        return false;
+        return 1;
     }
 
     std::shared_ptr<Metavision::Device> device = prophesee::make_device(v.front());
+    auto i_events_stream = device->get_facility<Metavision::I_EventsStream>();
 
     // Register callback function
     auto *i_cddecoder =
@@ -50,21 +53,25 @@ int main() {
     std::thread decoding_thread(prophesee::decoding_loop, device);
 
     // #########################################################################
-    // PANGOLIN
+    // GUI
     // #########################################################################
     pangolin::CreateWindowAndBind("Main",640,480);
 
     // Panel
-    const int UI_WIDTH = 20* pangolin::default_font().MaxWidth();
+    const int UI_WIDTH = 20 * pangolin::default_font().MaxWidth();
     pangolin::CreatePanel("ui")
             .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_WIDTH));
-    pangolin::Var<bool> a_button("ui.A_Button",false,false);
+    pangolin::Var<bool> start_recording("ui.Start-Recording",false,false);
+    pangolin::Var<bool> stop_recording("ui.Stop-Recording",false,false);
+    bool is_recording = false;
+    /*
     pangolin::Var<double> a_double("ui.A_Double",3,0,5);
     pangolin::Var<int> an_int("ui.An_Int",2,0,5);
     pangolin::Var<double> a_double_log("ui.Log_scale",3,1,1E4, true);
     pangolin::Var<bool> a_checkbox("ui.A_Checkbox",false,true);
     pangolin::Var<int> an_int_no_input("ui.An_Int_No_Input",2);
-    pangolin::Var<std::string> a_string("ui.A_String", "Edit ME!");
+    pangolin::Var<std::string> recording_status("ui.recording_status", "Ready");
+     */
 
     // Image
     pangolin::View& d_image = pangolin::Display("image")
@@ -92,11 +99,36 @@ int main() {
             imageTexture.RenderToViewport();
         }
 
+        // GUI
+        if( pangolin::Pushed(start_recording) ) {
+
+            if (!is_recording) {
+                std::string out_file_path("events.raw");
+                i_events_stream->log_raw_data(out_file_path);
+                is_recording = true;
+                std::cout << "Start recording to:\n" << out_file_path << std::endl;
+            } else {
+                std::cout << "Recording is running already" << std::endl;
+            }
+        }
+        if( pangolin::Pushed(stop_recording) ) {
+            if (is_recording) {
+                i_events_stream->stop_log_raw_data();
+                is_recording = false;
+                std::cout << "Stopped recording";
+            }
+            else {
+                std::cout << "Cannot stop recording, because it's not running" << std::endl;
+            }
+        }
+
+
+
+
         // Necessary
         pangolin::FinishFrame();
     }
 
     decoding_thread.join();
-
     return 0;
 }
