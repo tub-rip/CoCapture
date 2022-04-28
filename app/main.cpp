@@ -10,8 +10,15 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgcodecs.hpp>
 
+#include "../lib/prophesee_interface.h"
+#include "../lib/event_visualizer.h"
+
 
 int main() {
+
+    // #########################################################################
+    // PANGOLIN
+    // #########################################################################
     pangolin::CreateWindowAndBind("Main",640,480);
 
     // Panel
@@ -37,6 +44,14 @@ int main() {
     cv::Mat image = cv::imread("DSC00220.JPG");
     cv::flip(image, image, 0);
     pangolin::GlTexture imageTexture(image.cols,image.rows,GL_RGB,false,0,GL_RGB,GL_UNSIGNED_BYTE);
+
+    // #########################################################################
+    // PROPHESEE
+    // #########################################################################
+
+    PropheseeInterface prophesee_handle;
+    EventVisualizer event_visualizer;
+
 
     while(!pangolin::ShouldQuit()) {
 

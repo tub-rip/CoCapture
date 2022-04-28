@@ -13,7 +13,7 @@ find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
 
 
 
-add_executable(${PROJECT_NAME} app/main.cpp lib/prophesee_interface.cpp lib/prophesee_interface.h)
+add_executable(${PROJECT_NAME} app/main.cpp lib/prophesee_interface.cpp lib/prophesee_interface.h lib/event_visualizer.cpp lib/event_visualizer.h)
 target_link_libraries(${PROJECT_NAME}
         pango_display
         ${OpenCV_LIBRARIES}
