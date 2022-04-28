@@ -15,7 +15,7 @@ find_package(Threads REQUIRED)
 
 
 
-add_executable(${PROJECT_NAME} app/main.cpp lib/prophesee_interface.cpp lib/prophesee_interface.h lib/event_visualizer.cpp lib/event_visualizer.h)
+add_executable(${PROJECT_NAME} app/main.cpp lib/event_visualizer.cpp lib/event_visualizer.h lib/prophesee_interface.cpp lib/prophesee_interface.h)
 target_link_libraries(${PROJECT_NAME}
         pango_display
         ${OpenCV_LIBRARIES}
