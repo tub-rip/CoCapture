@@ -34,11 +34,8 @@ int main() {
             .SetBounds(0.0, 1.0, pangolin::Attach::Pix(UI_WIDTH), 1.0)
             .SetLayout(pangolin::LayoutEqual)
             .AddDisplay(d_image);
-
     cv::Mat image = cv::imread("DSC00220.JPG");
     cv::flip(image, image, 0);
-
-    unsigned char* imageArray = new unsigned char[3 * image.cols * image.rows];
     pangolin::GlTexture imageTexture(image.cols,image.rows,GL_RGB,false,0,GL_RGB,GL_UNSIGNED_BYTE);
 
     while(!pangolin::ShouldQuit()) {
