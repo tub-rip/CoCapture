@@ -75,7 +75,7 @@ int main() {
 
     // Image
     pangolin::View& d_image = pangolin::Display("image")
-            .SetAspect(640.0f/480.0f);
+            .SetAspect((double)i_geometry->get_width()/ (double)i_geometry->get_height());
 
     pangolin::Display("multi")
             .SetBounds(0.0, 1.0, pangolin::Attach::Pix(UI_WIDTH), 1.0)
