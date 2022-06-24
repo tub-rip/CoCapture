@@ -43,6 +43,8 @@ int main() {
     // #########################################################################
 
     auto prophesee_camera = Metavision::Camera::from_first_available();
+    std::cout << "Opening Prophesee Camera: " << prophesee_camera.get_camera_configuration().serial_number << std::endl;
+
     auto &geometry = prophesee_camera.geometry();
     int prophesee_width = geometry.width();
     int prophesee_height = geometry.height();
