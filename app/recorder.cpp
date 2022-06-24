@@ -27,7 +27,7 @@ int main(int argc, const char *argv[]) {
     Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
     std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
 
-    auto basler_event_handler = new basler::BaslerEventHandler();
+    auto basler_event_handler = new basler::BaslerEventHandler(app_parameter.do_warp);
 
     basler_camera.RegisterImageEventHandler(basler_event_handler,
                                             Pylon::RegistrationMode_ReplaceAll,
@@ -111,9 +111,8 @@ int main(int argc, const char *argv[]) {
 
         // Get images from the two cameras
         basler_event_handler->get_display_frame(basler_display);
-        cv::flip(basler_display, basler_display, 0);
         event_visualizer.get_display_frame(prophesee_display);
-        cv::flip(prophesee_display, prophesee_display, 0);
+
 
         // Image
         if (!display.empty()) {

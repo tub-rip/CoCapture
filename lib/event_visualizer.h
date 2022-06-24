@@ -22,7 +22,7 @@ public:
             std::swap(img_, img_swap_);
             img_.setTo(color_bg_);
         }
-        img_swap_.copyTo(display);
+        cv::flip(img_swap_, display, 0);
     }
     void process_events(const Metavision::EventCD *begin,
                         const Metavision::EventCD *end) {

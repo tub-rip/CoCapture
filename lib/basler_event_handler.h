@@ -10,12 +10,14 @@ namespace basler {
 
 class BaslerEventHandler : public Pylon::CImageEventHandler {
 public:
-    BaslerEventHandler() = default;
+    BaslerEventHandler(bool do_warp) {
+
+    }
     ~BaslerEventHandler() override = default;
 
     void get_display_frame(cv::Mat & display) {
         std::unique_lock<std::mutex> lock(m_);
-        img_.copyTo(display);
+        cv::flip(img_, display, 0);
     }
 
     virtual void OnImageGrabbed(Pylon::CInstantCamera& camera,
@@ -36,6 +38,7 @@ public:
 private:
     cv::Mat img_;
     std::mutex m_;
+    bool do_warp_;
 };
 
 } // basler
