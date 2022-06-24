@@ -9,10 +9,30 @@ class EventVisualizer {
 public:
     EventVisualizer() = default;
     ~EventVisualizer() = default;
-    void setup_display(int width, int height);
-    void get_display_frame(cv::Mat &display);
+
+    void setup_display(const int width, const int height) {
+        img_ = cv::Mat(height, width, CV_8UC3);
+        img_swap_ = cv::Mat(height, width, CV_8UC3);
+        img_.setTo(color_bg_);
+    }
+
+    void get_display_frame(cv::Mat &display) {
+        {
+            std::unique_lock<std::mutex> lock(m_);
+            std::swap(img_, img_swap_);
+            img_.setTo(color_bg_);
+        }
+        img_swap_.copyTo(display);
+    }
     void process_events(const Metavision::EventCD *begin,
-                        const Metavision::EventCD *end);
+                        const Metavision::EventCD *end) {
+        {
+            std::unique_lock<std::mutex> lock(m_);
+            for (auto it = begin; it != end; ++it) {
+                img_.at<cv::Vec3b>(it->y, it->x) = (it->p) ? color_on_ : color_off_;
+            }
+        }
+    }
 
 private:
     cv::Mat img_;

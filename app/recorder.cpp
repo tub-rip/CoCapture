@@ -21,8 +21,6 @@ namespace po = boost::program_options;
 
 
 int main() {
-    //
-
 
     // Setup Basler Camera
     Pylon::PylonInitialize();
@@ -40,7 +38,6 @@ int main() {
                                 Pylon::GrabLoop_ProvidedByInstantCamera);
 
     // Setup Prophesee Camera
-
     auto prophesee_camera = Metavision::Camera::from_first_available();
     std::cout << "Opening Prophesee Camera: " << prophesee_camera.get_camera_configuration().serial_number << std::endl;
 
