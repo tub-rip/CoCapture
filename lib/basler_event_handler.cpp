@@ -9,7 +9,6 @@ namespace basler {
 
     void BaslerEventHandler::OnImageGrabbed(Pylon::CInstantCamera &camera,
                                             const Pylon::CGrabResultPtr &grab_result) {
-        // TODO: include if grab succeeded
         if (grab_result->GrabSucceeded()) {
             std::unique_lock<std::mutex> lock(m_);
             cv::Mat frame(grab_result->GetHeight(), grab_result->GetWidth(),
