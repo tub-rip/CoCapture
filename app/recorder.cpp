@@ -12,15 +12,15 @@
 #include <pylon/BaslerUniversalInstantCamera.h>
 #include <metavision/sdk/driver/camera.h>
 #include <metavision/sdk/base/utils/log.h>
-#include <boost/program_options.hpp>
 
 #include "../lib/event_visualizer.h"
 #include "../lib/basler_event_handler.h"
+#include "../lib/utils.h"
 
-namespace po = boost::program_options;
 
-
-int main() {
+int main(int argc, const char *argv[]) {
+    Parameters app_parameter;
+    parse_comman_line(argc, argv, app_parameter);
 
     // Setup Basler Camera
     Pylon::PylonInitialize();
@@ -95,8 +95,8 @@ int main() {
                                      GL_RGB, false, 0, GL_RGB, GL_UNSIGNED_BYTE);
 
     // Initialize container for depicting the image. This will contain the prophesee and the basler frames
-    int rows = basler_camera.Height.GetValue() + prophesee_height;
-    int cols = basler_camera.Width.GetValue();
+    long rows = basler_camera.Height.GetValue() + prophesee_height;
+    long cols = basler_camera.Width.GetValue();
     cv::Mat display(rows, cols, CV_8UC3, cv::Vec3b(0, 0, 0));
     cv::Mat prophesee_display(display,
                               cv::Rect(0, 0,
