@@ -13,6 +13,7 @@
 
 #include "../lib/prophesee_interface.h"
 #include "../lib/event_visualizer.h"
+#include "../lib/basler_event_handler.h"
 
 
 int main() {
@@ -25,10 +26,15 @@ int main() {
     Pylon::CBaslerUniversalInstantCamera basler_camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
     std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
 
-    basler_camera.MaxNumBuffer = 5;
-    Pylon::CGrabResultPtr grab_result;
+    auto basler_event_handler = new basler::BaslerEventHandler();
+
+    basler_camera.RegisterImageEventHandler(basler_event_handler,
+                                            Pylon::RegistrationMode_ReplaceAll,
+                                            Pylon::Cleanup_Delete);
+
     basler_camera.Open();
-    basler_camera.StartGrabbing();
+    basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
+                                Pylon::GrabLoop_ProvidedByInstantCamera);
 
     // #########################################################################
     // PROPHESEE
@@ -115,16 +121,8 @@ int main() {
 
     while(!pangolin::ShouldQuit()) {
 
-        // Get image from Basler camera
-        basler_camera.RetrieveResult(5000, grab_result, Pylon::TimeoutHandling_ThrowException);
-        if (grab_result->GrabSucceeded()) {
-            int height = grab_result->GetHeight();
-            int width = grab_result->GetWidth();
-
-            cv::Mat latest_frame(height, width, CV_8UC1, (uint8_t*)grab_result->GetBuffer());
-            cv::flip(latest_frame, latest_frame, 0);
-            cv::cvtColor(latest_frame, basler_display, cv::COLOR_GRAY2RGB);
-        }
+        basler_event_handler->get_display_frame(basler_display);
+        cv::flip(basler_display, basler_display, 0);
 
         // Get image from Prophesee camera
         event_visualizer.get_display_frame(prophesee_display);
@@ -166,6 +164,7 @@ int main() {
         pangolin::FinishFrame();
     }
 
+    Pylon::PylonTerminate();
     decoding_thread.join();
     return 0;
 }
