@@ -22,21 +22,6 @@ int main(int argc, const char *argv[]) {
     Parameters app_parameter;
     parse_comman_line(argc, argv, app_parameter);
 
-    // Setup Basler Camera
-    Pylon::PylonInitialize();
-    Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
-    std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
-
-    auto basler_event_handler = new basler::BaslerEventHandler(app_parameter.do_warp);
-
-    basler_camera.RegisterImageEventHandler(basler_event_handler,
-                                            Pylon::RegistrationMode_ReplaceAll,
-                                            Pylon::Cleanup_Delete);
-
-    basler_camera.Open();
-    basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
-                                Pylon::GrabLoop_ProvidedByInstantCamera);
-
     // Setup Prophesee Camera
     auto prophesee_camera = Metavision::Camera::from_first_available();
     std::cout << "Opening Prophesee Camera: " << prophesee_camera.get_camera_configuration().serial_number << std::endl;
@@ -44,6 +29,8 @@ int main(int argc, const char *argv[]) {
     auto &geometry = prophesee_camera.geometry();
     int prophesee_width = geometry.width();
     int prophesee_height = geometry.height();
+    app_parameter.target_width = prophesee_width;
+    app_parameter.target_height = prophesee_height;
 
     EventVisualizer event_visualizer;
     event_visualizer.setup_display(prophesee_width, prophesee_height);
@@ -59,6 +46,21 @@ int main(int argc, const char *argv[]) {
             });
 
     prophesee_camera.start();
+
+    // Setup Basler Camera
+    Pylon::PylonInitialize();
+    Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
+    std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
+
+    auto basler_event_handler = new basler::BaslerEventHandler(app_parameter.do_warp, app_parameter);
+
+    basler_camera.RegisterImageEventHandler(basler_event_handler,
+                                            Pylon::RegistrationMode_ReplaceAll,
+                                            Pylon::Cleanup_Delete);
+
+    basler_camera.Open();
+    basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
+                                Pylon::GrabLoop_ProvidedByInstantCamera);
 
     // Define GUI
 
@@ -80,8 +82,12 @@ int main(int argc, const char *argv[]) {
      */
 
     // Image
+    int basler_display_height = app_parameter.do_warp ? prophesee_height :
+            basler_camera.Height.GetValue();
+    int display_height = prophesee_height + basler_display_height;
+
     double aspect = (double) basler_camera.Width.GetValue() /
-                    (double) (prophesee_height + basler_camera.Height.GetValue());
+                    (double) display_height;
     pangolin::View &d_image = pangolin::Display("image")
             .SetAspect(aspect);
 
@@ -91,13 +97,12 @@ int main(int argc, const char *argv[]) {
             .AddDisplay(d_image);
 
     pangolin::GlTexture imageTexture(prophesee_width,
-                                     prophesee_height + basler_camera.Height.GetValue(),
+                                     display_height,
                                      GL_RGB, false, 0, GL_RGB, GL_UNSIGNED_BYTE);
 
     // Initialize container for depicting the image. This will contain the prophesee and the basler frames
-    long rows = basler_camera.Height.GetValue() + prophesee_height;
-    long cols = basler_camera.Width.GetValue();
-    cv::Mat display(rows, cols, CV_8UC3, cv::Vec3b(0, 0, 0));
+    cv::Mat display(display_height, basler_camera.Width.GetValue(),
+                    CV_8UC3, cv::Vec3b(0, 0, 0));
     cv::Mat prophesee_display(display,
                               cv::Rect(0, 0,
                                        prophesee_width,
@@ -105,7 +110,7 @@ int main(int argc, const char *argv[]) {
     cv::Mat basler_display(display,
                            cv::Rect(0, prophesee_height,
                                     basler_camera.Width.GetValue(),
-                                    basler_camera.Height.GetValue()));
+                                    basler_display_height));
 
     while (!pangolin::ShouldQuit()) {
 

@@ -10,6 +10,8 @@
 struct Parameters {
     cv::Matx33d homography;
     bool do_warp;
+    int target_width;
+    int target_height;
 };
 
 
