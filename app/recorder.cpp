@@ -113,8 +113,6 @@ int main() {
                                     basler_camera.Width.GetValue(),
                                     basler_camera.Height.GetValue()));
 
-    cv::namedWindow("Debug", cv::WINDOW_KEEPRATIO);
-
     while(!pangolin::ShouldQuit()) {
 
         // Get image from Basler camera
@@ -124,18 +122,13 @@ int main() {
             int width = grab_result->GetWidth();
 
             cv::Mat latest_frame(height, width, CV_8UC1, (uint8_t*)grab_result->GetBuffer());
-            cv::Mat converted;
-            cv::cvtColor(latest_frame, converted, cv::COLOR_GRAY2RGB);
-            converted.copyTo(basler_display);
-            //cv::imshow("Debug", basler_frame);
-            //cv::waitKey(1);
+            cv::flip(latest_frame, latest_frame, 0);
+            cv::cvtColor(latest_frame, basler_display, cv::COLOR_GRAY2RGB);
         }
 
         // Get image from Prophesee camera
-        cv::Mat tmp;
-        event_visualizer.get_display_frame(tmp);
-        cv::flip(tmp, tmp, 0);
-        tmp.copyTo(prophesee_display);
+        event_visualizer.get_display_frame(prophesee_display);
+        cv::flip(prophesee_display, prophesee_display, 0);
 
         // Image
         if (!display.empty()) {
@@ -174,7 +167,5 @@ int main() {
     }
 
     decoding_thread.join();
-
-    cv::destroyWindow("Debug");
     return 0;
 }
