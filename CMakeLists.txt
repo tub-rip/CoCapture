@@ -25,8 +25,6 @@ add_executable(recorder
         app/recorder.cpp
         lib/event_visualizer.cpp
         lib/event_visualizer.h
-        lib/prophesee_interface.cpp
-        lib/prophesee_interface.h
         lib/basler_event_handler.cpp
         lib/basler_event_handler.h)
 

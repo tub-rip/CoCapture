@@ -12,8 +12,8 @@
 #include <pylon/BaslerUniversalInstantCamera.h>
 
 #include <metavision/sdk/driver/camera.h>
+#include <metavision/sdk/base/utils/log.h>
 
-#include "../lib/prophesee_interface.h"
 #include "../lib/event_visualizer.h"
 #include "../lib/basler_event_handler.h"
 
@@ -42,13 +42,6 @@ int main() {
     // PROPHESEE
     // #########################################################################
 
-    auto v = Metavision::DeviceDiscovery::list();
-
-    if (v.empty()) {
-        std::cout << "No Prophesee Camera detected" << std::endl;
-        return 1;
-    }
-
     auto prophesee_camera = Metavision::Camera::from_first_available();
     auto &geometry = prophesee_camera.geometry();
     int prophesee_width = geometry.width();
@@ -76,7 +69,7 @@ int main() {
     pangolin::CreateWindowAndBind("Main", 640, 480);
 
     // Panel
-    const int UI_WIDTH = 20 * pangolin::default_font().MaxWidth();
+    const int UI_WIDTH = 20 * (int)pangolin::default_font().MaxWidth();
     pangolin::CreatePanel("ui")
             .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_WIDTH));
     pangolin::Var<bool> start_recording("ui.Start-Recording", false, false);
