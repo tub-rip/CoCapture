@@ -10,7 +10,7 @@ void EventVisualizer::setup_display(const int width, const int height) {
 
 void EventVisualizer::get_display_frame(cv::Mat &display) {
     {
-        std::unique_lock<std::mutex> lock(m);
+        std::unique_lock<std::mutex> lock(m_);
         std::swap(img_, img_swap_);
         img_.setTo(color_bg_);
     }
@@ -21,7 +21,7 @@ void EventVisualizer::get_display_frame(cv::Mat &display) {
 void EventVisualizer::process_events(const Metavision::EventCD *begin,
                                      const Metavision::EventCD *end) {
     {
-        std::unique_lock<std::mutex> lock(m);
+        std::unique_lock<std::mutex> lock(m_);
         for (auto it = begin; it != end; ++it) {
             img_.at<cv::Vec3b>(it->y, it->x) = (it->p) ? color_on_ : color_off_;
         }

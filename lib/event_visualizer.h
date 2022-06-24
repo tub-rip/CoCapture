@@ -17,7 +17,7 @@ public:
 private:
     cv::Mat img_;
     cv::Mat img_swap_;
-    std::mutex m;
+    std::mutex m_;
 
     // Display colors
     cv::Vec3b color_bg_ = cv::Vec3b(30, 37, 52);
