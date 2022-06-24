@@ -9,6 +9,7 @@
 #include <pangolin/var/varextra.h>
 #include <opencv2/core.hpp>
 #include <pylon/PylonIncludes.h>
+#include <pylon/BaslerUniversalInstantCamera.h>
 
 #include "../lib/prophesee_interface.h"
 #include "../lib/event_visualizer.h"
@@ -21,22 +22,19 @@ int main() {
     // #########################################################################
 
     Pylon::PylonInitialize();
-    Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
-    std::cout << "Using device " << camera.GetDeviceInfo().GetModelName() << std::endl;
+    Pylon::CBaslerUniversalInstantCamera basler_camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
+    std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
 
-    camera.MaxNumBuffer = 5;
+    basler_camera.MaxNumBuffer = 5;
     Pylon::CGrabResultPtr grab_result;
-    camera.Open();
-    camera.StartGrabbing();
-    int basler_width = 1280;
-    int basler_height = 1024;
+    basler_camera.Open();
+    basler_camera.StartGrabbing();
 
     // #########################################################################
     // PROPHESEE
     // #########################################################################
 
     EventVisualizer event_visualizer;
-    cv::Mat display;
 
     // Opening Camera
     auto v = Metavision::DeviceDiscovery::list();
@@ -88,8 +86,10 @@ int main() {
      */
 
     // Image
+    double aspect = (double)basler_camera.Width.GetValue() /
+            (double)(i_geometry->get_height() + basler_camera.Height.GetValue());
     pangolin::View& d_image = pangolin::Display("image")
-            .SetAspect((double)i_geometry->get_width()/ (double)i_geometry->get_height());
+            .SetAspect(aspect);
 
     pangolin::Display("multi")
             .SetBounds(0.0, 1.0, pangolin::Attach::Pix(UI_WIDTH), 1.0)
@@ -97,30 +97,45 @@ int main() {
             .AddDisplay(d_image);
 
     pangolin::GlTexture imageTexture(i_geometry->get_width(),
-                                     i_geometry->get_height(),
+                                     i_geometry->get_height() + basler_camera.Height.GetValue(),
                                      GL_RGB,false,0,GL_RGB,GL_UNSIGNED_BYTE);
+
+    // Initialize container for depicting the image. This will contain the prophesee and the basler frames
+    int rows = basler_camera.Height.GetValue() + i_geometry->get_height();
+    int cols = basler_camera.Width.GetValue();
+    cv::Mat display(rows, cols, CV_8UC3, cv::Vec3b(0, 0, 0));
+    cv::Mat prophesee_display(display,
+                              cv::Rect(0, 0,
+                                       i_geometry->get_width(),
+                                       i_geometry->get_height()));
+    cv::Mat basler_display(display,
+                           cv::Rect(0, i_geometry->get_height(),
+                                    basler_camera.Width.GetValue(),
+                                    basler_camera.Height.GetValue()));
 
     cv::namedWindow("Debug", cv::WINDOW_KEEPRATIO);
 
     while(!pangolin::ShouldQuit()) {
 
         // Get image from Basler camera
-        camera.RetrieveResult(5000, grab_result, Pylon::TimeoutHandling_ThrowException);
+        basler_camera.RetrieveResult(5000, grab_result, Pylon::TimeoutHandling_ThrowException);
         if (grab_result->GrabSucceeded()) {
             int height = grab_result->GetHeight();
             int width = grab_result->GetWidth();
 
-            std::cout << "size_x: " << grab_result->GetWidth() << std::endl;
-            std::cout << "size_y: " << grab_result->GetHeight() << std::endl;
-
-            cv::Mat display(height, width, CV_8UC1, (uint8_t*)grab_result->GetBuffer());
-            cv::imshow("Debug", display);
-            cv::waitKey(1);
+            cv::Mat latest_frame(height, width, CV_8UC1, (uint8_t*)grab_result->GetBuffer());
+            cv::Mat converted;
+            cv::cvtColor(latest_frame, converted, cv::COLOR_GRAY2RGB);
+            converted.copyTo(basler_display);
+            //cv::imshow("Debug", basler_frame);
+            //cv::waitKey(1);
         }
 
         // Get image from Prophesee camera
-        event_visualizer.get_display_frame(display);
-        cv::flip(display, display, 0);
+        cv::Mat tmp;
+        event_visualizer.get_display_frame(tmp);
+        cv::flip(tmp, tmp, 0);
+        tmp.copyTo(prophesee_display);
 
         // Image
         if (!display.empty()) {
