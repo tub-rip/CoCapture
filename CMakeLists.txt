@@ -31,9 +31,3 @@ target_link_libraries(recorder
         Metavision::HAL_discovery
         Threads::Threads
         ${Pylon_LIBRARIES})
-
-add_executable(visualizer app/visualizer.cpp lib/event_queue.cpp lib/event_queue.h)
-target_link_libraries(visualizer
-        MetavisionSDK::core
-        MetavisionSDK::driver
-)
