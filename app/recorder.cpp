@@ -10,20 +10,21 @@
 #include <opencv2/core.hpp>
 #include <pylon/PylonIncludes.h>
 #include <pylon/BaslerUniversalInstantCamera.h>
-
 #include <metavision/sdk/driver/camera.h>
 #include <metavision/sdk/base/utils/log.h>
+#include <boost/program_options.hpp>
 
 #include "../lib/event_visualizer.h"
 #include "../lib/basler_event_handler.h"
 
+namespace po = boost::program_options;
+
 
 int main() {
+    //
 
-    // #########################################################################
-    // Basler
-    // #########################################################################
 
+    // Setup Basler Camera
     Pylon::PylonInitialize();
     Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
     std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
@@ -38,9 +39,7 @@ int main() {
     basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
                                 Pylon::GrabLoop_ProvidedByInstantCamera);
 
-    // #########################################################################
-    // PROPHESEE
-    // #########################################################################
+    // Setup Prophesee Camera
 
     auto prophesee_camera = Metavision::Camera::from_first_available();
     std::cout << "Opening Prophesee Camera: " << prophesee_camera.get_camera_configuration().serial_number << std::endl;
@@ -64,14 +63,11 @@ int main() {
 
     prophesee_camera.start();
 
-    // #########################################################################
-    // GUI
-    // #########################################################################
+    // Define GUI
 
     pangolin::CreateWindowAndBind("Main", 640, 480);
 
-    // Panel
-    const int UI_WIDTH = 20 * (int)pangolin::default_font().MaxWidth();
+    const int UI_WIDTH = 20 * (int) pangolin::default_font().MaxWidth();
     pangolin::CreatePanel("ui")
             .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_WIDTH));
     pangolin::Var<bool> start_recording("ui.Start-Recording", false, false);
@@ -116,10 +112,9 @@ int main() {
 
     while (!pangolin::ShouldQuit()) {
 
+        // Get images from the two cameras
         basler_event_handler->get_display_frame(basler_display);
         cv::flip(basler_display, basler_display, 0);
-
-        // Get image from Prophesee camera
         event_visualizer.get_display_frame(prophesee_display);
         cv::flip(prophesee_display, prophesee_display, 0);
 

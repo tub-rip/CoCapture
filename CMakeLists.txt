@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
 
+set (boost_components_to_find program_options filesystem timer chrono thread)
+find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
+
 find_package(Pangolin 0.4 REQUIRED)
 include_directories(${Pangolin_INCLUDE_DIRS})
 
@@ -31,6 +34,7 @@ add_executable(recorder
 target_link_libraries(recorder
         pango_display
         ${OpenCV_LIBRARIES}
+        Boost::program_options
         MetavisionSDK::core
         MetavisionSDK::driver
         MetavisionSDK::ui
