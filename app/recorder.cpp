@@ -85,9 +85,9 @@ int main(int argc, const char *argv[]) {
     int basler_display_height = app_parameter.do_warp ? prophesee_height :
             basler_camera.Height.GetValue();
     int display_height = prophesee_height + basler_display_height;
+    int display_width = prophesee_width;
 
-    double aspect = (double) basler_camera.Width.GetValue() /
-                    (double) display_height;
+    double aspect = (double) display_width / (double) display_height;
     pangolin::View &d_image = pangolin::Display("image")
             .SetAspect(aspect);
 
@@ -96,20 +96,20 @@ int main(int argc, const char *argv[]) {
             .SetLayout(pangolin::LayoutEqual)
             .AddDisplay(d_image);
 
-    pangolin::GlTexture imageTexture(prophesee_width,
-                                     display_height,
-                                     GL_RGB, false, 0, GL_RGB, GL_UNSIGNED_BYTE);
+    pangolin::GlTexture imageTexture(display_width, display_height,
+                                     GL_RGB, false, 0,
+                                     GL_RGB, GL_UNSIGNED_BYTE);
 
     // Initialize container for depicting the image. This will contain the prophesee and the basler frames
-    cv::Mat display(display_height, basler_camera.Width.GetValue(),
+    cv::Mat display(display_height, display_width,
                     CV_8UC3, cv::Vec3b(0, 0, 0));
     cv::Mat prophesee_display(display,
                               cv::Rect(0, 0,
-                                       prophesee_width,
+                                       display_width,
                                        prophesee_height));
     cv::Mat basler_display(display,
                            cv::Rect(0, prophesee_height,
-                                    basler_camera.Width.GetValue(),
+                                    display_width,
                                     basler_display_height));
 
     while (!pangolin::ShouldQuit()) {
