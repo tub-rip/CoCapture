@@ -6,16 +6,30 @@
 #include <pangolin/display/view.h>
 #include <pangolin/display/widgets.h>
 #include <pangolin/display/default_font.h>
-#include <pangolin/handler/handler.h>
 #include <pangolin/var/varextra.h>
-
 #include <opencv2/core.hpp>
+#include <pylon/PylonIncludes.h>
 
 #include "../lib/prophesee_interface.h"
 #include "../lib/event_visualizer.h"
 
 
 int main() {
+
+    // #########################################################################
+    // Basler
+    // #########################################################################
+
+    Pylon::PylonInitialize();
+    Pylon::CInstantCamera camera( Pylon::CTlFactory::GetInstance().CreateFirstDevice());
+    std::cout << "Using device " << camera.GetDeviceInfo().GetModelName() << std::endl;
+
+    camera.MaxNumBuffer = 5;
+    Pylon::CGrabResultPtr grab_result;
+    camera.Open();
+    camera.StartGrabbing();
+    int basler_width = 1280;
+    int basler_height = 1024;
 
     // #########################################################################
     // PROPHESEE
@@ -86,7 +100,24 @@ int main() {
                                      i_geometry->get_height(),
                                      GL_RGB,false,0,GL_RGB,GL_UNSIGNED_BYTE);
 
+    cv::namedWindow("Debug", cv::WINDOW_KEEPRATIO);
+
     while(!pangolin::ShouldQuit()) {
+
+        // Get image from Basler camera
+        camera.RetrieveResult(5000, grab_result, Pylon::TimeoutHandling_ThrowException);
+        if (grab_result->GrabSucceeded()) {
+            int height = grab_result->GetHeight();
+            int width = grab_result->GetWidth();
+
+            std::cout << "size_x: " << grab_result->GetWidth() << std::endl;
+            std::cout << "size_y: " << grab_result->GetHeight() << std::endl;
+
+            cv::Mat display(height, width, CV_8UC1, (uint8_t*)grab_result->GetBuffer());
+            cv::imshow("Debug", display);
+            cv::waitKey(1);
+        }
+
         // Get image from Prophesee camera
         event_visualizer.get_display_frame(display);
         cv::flip(display, display, 0);
@@ -106,7 +137,8 @@ int main() {
                 std::string out_file_path("events.raw");
                 i_events_stream->log_raw_data(out_file_path);
                 is_recording = true;
-                std::cout << "Start recording to:\n" << out_file_path << std::endl;
+                //std::cout << "Start recording to:\n" << out_file_path << std::endl;
+                std::cout << "Recording not implemented yet!" << std::endl;
             } else {
                 std::cout << "Recording is running already" << std::endl;
             }
@@ -122,13 +154,12 @@ int main() {
             }
         }
 
-
-
-
         // Necessary
         pangolin::FinishFrame();
     }
 
     decoding_thread.join();
+
+    cv::destroyWindow("Debug");
     return 0;
 }
