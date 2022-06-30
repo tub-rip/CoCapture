@@ -15,3 +15,14 @@ Tested on Ubuntu 20.04
     cmake ..
     make -j
 
+## Usage
+
+Start recorder with
+
+    ./recorder
+
+To warp basler frames use
+
+    ./recorder --warp --homography <PATH-TO-HOMOGRAPHY>
+
+The homography is given as text file as seen in the example config/homography.txt
