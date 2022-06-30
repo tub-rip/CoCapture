@@ -20,6 +20,7 @@ bool parse_comman_line(int argc, const char *argv[], Parameters &params) {
             ("help,h", "Produce help message.")
             ("warp", po::bool_switch(&params.do_warp)->default_value(false), "Warp gray-scale frames according to a given homography")
             ("homography", po::value<std::string>(&homography_path)->default_value(""))
+            ("overlay", po::bool_switch(&params.overlay)->default_value(false), "Visualize event in overlay of grayscale frames")
             ;
 
     po::variables_map vm;

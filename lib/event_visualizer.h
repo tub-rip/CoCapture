@@ -16,6 +16,16 @@ public:
         img_.setTo(color_bg_);
     }
 
+    void get_display_frame(cv::Mat &display, const cv::Mat &canvas) {
+        {
+            std::unique_lock<std::mutex> lock(m_);
+            std::swap(img_, img_swap_);
+            //img_.setTo(color_bg_);
+            canvas.copyTo(img_);
+        }
+        cv::flip(img_swap_, display, 0);
+    }
+
     void get_display_frame(cv::Mat &display) {
         {
             std::unique_lock<std::mutex> lock(m_);
@@ -24,6 +34,7 @@ public:
         }
         cv::flip(img_swap_, display, 0);
     }
+
     void process_events(const Metavision::EventCD *begin,
                         const Metavision::EventCD *end) {
         {
@@ -40,9 +51,11 @@ private:
     std::mutex m_;
 
     // Display colors
-    cv::Vec3b color_bg_ = cv::Vec3b(30, 37, 52);
-    cv::Vec3b color_on_ = cv::Vec3b(216, 223, 236);
-    cv::Vec3b color_off_ = cv::Vec3b(64, 126, 201);
+    cv::Vec3b color_bg_ = cv::Vec3b(255, 255, 255);
+    //cv::Vec3b color_on_ = cv::Vec3b(216, 223, 236);
+    //cv::Vec3b color_off_ = cv::Vec3b(64, 126, 201);
+    cv::Vec3b color_on_ = cv::Vec3b(0, 0, 255);
+    cv::Vec3b color_off_ = cv::Vec3b(255, 0, 0);
 };
 
 

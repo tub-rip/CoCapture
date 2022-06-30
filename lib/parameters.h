@@ -12,6 +12,7 @@ struct Parameters {
     bool do_warp;
     int target_width;
     int target_height;
+    bool overlay;
 };
 
 

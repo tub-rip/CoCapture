@@ -112,7 +112,9 @@ int main(int argc, const char *argv[]) {
 
         // Get images from the two cameras
         basler_event_handler->get_display_frame(basler_display);
-        event_visualizer.get_display_frame(prophesee_display);
+        //basler_display.copyTo(prophesee_display)
+        event_visualizer.get_display_frame(prophesee_display, basler_display);
+        cv::flip(basler_display, basler_display, 0);
 
 
         // Image
