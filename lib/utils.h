@@ -62,7 +62,7 @@ bool parse_comman_line(int argc, const char *argv[], Parameters &params) {
         }
         ifs.close();
     }
-
+    return true;
 }
 
 #endif //RIP_COCAPTURE_GUI_UTILS_H
