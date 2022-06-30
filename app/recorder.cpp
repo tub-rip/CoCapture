@@ -59,6 +59,7 @@ int main(int argc, const char *argv[]) {
                                             Pylon::Cleanup_Delete);
 
     basler_camera.Open();
+    basler_camera.ReverseX.SetValue(true);
     basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
                                 Pylon::GrabLoop_ProvidedByInstantCamera);
 
@@ -72,14 +73,9 @@ int main(int argc, const char *argv[]) {
     pangolin::Var<bool> start_recording("ui.Start-Recording", false, false);
     pangolin::Var<bool> stop_recording("ui.Stop-Recording", false, false);
     bool is_recording = false;
-    /*
-    pangolin::Var<double> a_double("ui.A_Double",3,0,5);
-    pangolin::Var<int> an_int("ui.An_Int",2,0,5);
-    pangolin::Var<double> a_double_log("ui.Log_scale",3,1,1E4, true);
-    pangolin::Var<bool> a_checkbox("ui.A_Checkbox",false,true);
-    pangolin::Var<int> an_int_no_input("ui.An_Int_No_Input",2);
-    pangolin::Var<std::string> recording_status("ui.recording_status", "Ready");
-     */
+    int current_exposure_time = 5000;
+    pangolin::Var<int> exposure_time("ui.exposure_time",current_exposure_time,0,15000);
+
 
     // Image
     int basler_display_height = app_parameter.do_warp ? prophesee_height :
@@ -148,6 +144,11 @@ int main(int argc, const char *argv[]) {
             } else {
                 std::cout << "Cannot stop recording, because it's not running" << std::endl;
             }
+        }
+
+        if (exposure_time != current_exposure_time) {
+            basler_camera.ExposureTime.SetValue(exposure_time);
+            current_exposure_time = exposure_time;
         }
 
         // Necessary
