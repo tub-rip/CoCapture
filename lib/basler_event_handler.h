@@ -29,7 +29,6 @@ public:
                                 cv::Size(params_.target_width,
                                          params_.target_height));
         }
-        //cv::flip(img_swap_, img_swap_, 0);
         cv::cvtColor(img_swap_, display, cv::COLOR_GRAY2RGB);
     }
 

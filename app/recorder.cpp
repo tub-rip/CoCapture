@@ -74,13 +74,15 @@ int main(int argc, const char *argv[]) {
     pangolin::Var<bool> stop_recording("ui.Stop-Recording", false, false);
     bool is_recording = false;
     int current_exposure_time = 5000;
-    pangolin::Var<int> exposure_time("ui.exposure_time",current_exposure_time,0,15000);
+    pangolin::Var<int> exposure_time("ui.exposure_time", current_exposure_time, 0, 15000);
 
 
     // Image
     int basler_display_height = app_parameter.do_warp ? prophesee_height :
-            basler_camera.Height.GetValue();
-    int display_height = prophesee_height + basler_display_height;
+                                basler_camera.Height.GetValue();
+    int display_height = app_parameter.overlay ?
+                         prophesee_height : prophesee_height + basler_display_height;
+    //int display_height = prophesee_height + basler_display_height;
     int display_width = prophesee_width;
 
     double aspect = (double) display_width / (double) display_height;
@@ -103,17 +105,29 @@ int main(int argc, const char *argv[]) {
                               cv::Rect(0, 0,
                                        display_width,
                                        prophesee_height));
-    cv::Mat basler_display(display,
-                           cv::Rect(0, prophesee_height,
-                                    display_width,
-                                    basler_display_height));
+    cv::Mat basler_display;
+    if (app_parameter.overlay) {
+        basler_display = cv::Mat(basler_display_height, display_width,
+                                 CV_8UC3, cv::Vec3b(0, 0, 0));
+    } else {
+        basler_display = cv::Mat(display,
+                                 cv::Rect(0, prophesee_height,
+                                          display_width,
+                                          basler_display_height));
+    }
+
 
     while (!pangolin::ShouldQuit()) {
 
         // Get images from the two cameras
-        basler_event_handler->get_display_frame(basler_display);
-        //basler_display.copyTo(prophesee_display)
-        event_visualizer.get_display_frame(prophesee_display, basler_display);
+
+        if (app_parameter.overlay) {
+            basler_event_handler->get_display_frame(basler_display);
+            event_visualizer.get_display_frame(prophesee_display, basler_display);
+        } else {
+            basler_event_handler->get_display_frame(basler_display);
+            event_visualizer.get_display_frame(prophesee_display);
+        }
         cv::flip(basler_display, basler_display, 0);
 
 

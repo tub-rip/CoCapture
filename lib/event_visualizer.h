@@ -20,7 +20,6 @@ public:
         {
             std::unique_lock<std::mutex> lock(m_);
             std::swap(img_, img_swap_);
-            //img_.setTo(color_bg_);
             canvas.copyTo(img_);
         }
         cv::flip(img_swap_, display, 0);
@@ -52,8 +51,6 @@ private:
 
     // Display colors
     cv::Vec3b color_bg_ = cv::Vec3b(255, 255, 255);
-    //cv::Vec3b color_on_ = cv::Vec3b(216, 223, 236);
-    //cv::Vec3b color_off_ = cv::Vec3b(64, 126, 201);
     cv::Vec3b color_on_ = cv::Vec3b(0, 0, 255);
     cv::Vec3b color_off_ = cv::Vec3b(255, 0, 0);
 };

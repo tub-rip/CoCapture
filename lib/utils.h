@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdexcept>
 
 #include <boost/program_options.hpp>
 
@@ -61,6 +62,10 @@ bool parse_comman_line(int argc, const char *argv[], Parameters &params) {
             }
         }
         ifs.close();
+    }
+
+    if (params.overlay && !params.do_warp) {
+        throw std::invalid_argument("For overlay visualization warping must be activated by --warp!");
     }
     return true;
 }
