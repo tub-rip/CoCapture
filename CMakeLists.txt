@@ -8,7 +8,10 @@ find_package(Threads REQUIRED)
 set (boost_components_to_find program_options filesystem timer chrono thread)
 find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
 
-find_package(Pangolin 0.4 REQUIRED)
+find_package(Pangolin QUIET)
+if (NOT ${Pangolin_FOUND})
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPangolin.cmake")
+endif()
 include_directories(${Pangolin_INCLUDE_DIRS})
 
 set(MetavisionSDK_DIR "/home/friedhelm/env/openeb/build/generated/share/cmake/MetavisionSDKCMakePackagesFilesDir")
