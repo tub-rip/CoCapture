@@ -45,6 +45,11 @@ int main(int argc, const char *argv[]) {
                 event_visualizer.process_events(begin, end);
             });
 
+    prophesee_camera.cd().add_callback(
+            [&event_visualizer](const Metavision::EventCD *begin, const Metavision::EventCD *end) {
+                event_visualizer.estimate_snr(begin, end);
+            });
+
     prophesee_camera.start();
 
     // Setup Basler Camera
@@ -85,7 +90,6 @@ int main(int argc, const char *argv[]) {
                                 basler_camera.Height.GetValue();
     int display_height = app_parameter.overlay ?
                          prophesee_height : prophesee_height + basler_display_height;
-    //int display_height = prophesee_height + basler_display_height;
     int display_width = prophesee_width;
 
     double aspect = (double) display_width / (double) display_height;
@@ -133,7 +137,6 @@ int main(int argc, const char *argv[]) {
         }
         cv::flip(basler_display, basler_display, 0);
 
-
         // Image
         if (!display.empty()) {
             imageTexture.Upload(display.data, GL_RGB, GL_UNSIGNED_BYTE);
@@ -147,9 +150,7 @@ int main(int argc, const char *argv[]) {
 
             if (!is_recording) {
                 std::string out_file_path("events.raw");
-                //i_events_stream->log_raw_data(out_file_path);
                 is_recording = true;
-                //std::cout << "Start recording to:\n" << out_file_path << std::endl;
                 std::cout << "Recording not implemented yet!" << std::endl;
             } else {
                 std::cout << "Recording is running already" << std::endl;

@@ -13,6 +13,7 @@ struct Parameters {
     int target_width;
     int target_height;
     bool overlay;
+    bool show_snr;
 };
 
 

@@ -30,7 +30,7 @@ include_directories(
 add_executable(recorder
         app/recorder.cpp
         lib/event_visualizer.h
-        lib/basler_event_handler.h lib/utils.h lib/parameters.h)
+        lib/basler_event_handler.h lib/utils.h lib/parameters.h lib/constants.h)
 
 target_link_libraries(recorder
         pango_display
