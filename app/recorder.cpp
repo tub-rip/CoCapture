@@ -33,7 +33,7 @@ int main(int argc, const char *argv[]) {
     app_parameter.target_height = prophesee_height;
 
     EventVisualizer event_visualizer;
-    event_visualizer.setup_display(prophesee_width, prophesee_height);
+    event_visualizer.setup_display(prophesee_width, prophesee_height, app_parameter.show_snr);
 
     prophesee_camera.add_runtime_error_callback([](const Metavision::CameraException &e) {
         MV_LOG_ERROR() << e.what();

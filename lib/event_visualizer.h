@@ -16,12 +16,13 @@ public:
 
     ~EventVisualizer() = default;
 
-    void setup_display(const int width, const int height) {
+    void setup_display(const int width, const int height, bool show_snr) {
         img_ = cv::Mat(height, width, CV_8UC3);
         img_swap_ = cv::Mat(height, width, CV_8UC3);
         img_.setTo(color_bg_);
         signal_box_ = get_signal_box(width, height, 120);
         noise_box_ = get_noise_box(width, height, 120);
+        show_snr_ = show_snr;
     }
 
     void get_display_frame(cv::Mat &display, const cv::Mat &canvas) {
@@ -30,7 +31,9 @@ public:
             std::swap(img_, img_swap_);
             canvas.copyTo(img_);
         }
-        draw_snr(img_swap_);
+        if (show_snr_) {
+            draw_snr(img_swap_);
+        }
         cv::flip(img_swap_, display, 0);
     }
 
@@ -40,7 +43,9 @@ public:
             std::swap(img_, img_swap_);
             img_.setTo(color_bg_);
         }
-        draw_snr(img_swap_);
+        if (show_snr_) {
+            draw_snr(img_swap_);
+        }
         cv::flip(img_swap_, display, 0);
     }
 
@@ -71,7 +76,7 @@ public:
         {
             std::unique_lock<std::mutex> lock(m_snr_);
             if (cnt_noise != 0) {
-                last_snrs_.push_back((int) (100 * cnt_signal) / cnt_noise);
+                last_snrs_.push_back((int) 100 * (cnt_signal - cnt_noise) / cnt_noise);
             }
 
             if (last_snrs_.size() > max_size_snr_queue_) {
@@ -101,6 +106,7 @@ private:
     std::mutex m_snr_;
     Bbox signal_box_;
     Bbox noise_box_;
+    bool show_snr_;
     int max_size_snr_queue_ = 5000;
     std::deque<int> last_snrs_;
 
