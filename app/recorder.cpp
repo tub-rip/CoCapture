@@ -60,8 +60,11 @@ int main(int argc, const char *argv[]) {
 
     basler_camera.Open();
     basler_camera.ReverseX.SetValue(true);
+    //basler_camera.TriggerMode.SetValue(true);
     basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
                                 Pylon::GrabLoop_ProvidedByInstantCamera);
+    //basler_camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly,
+    //                            Pylon::GrabLoop_ProvidedByInstantCamera);
 
     // Define GUI
 
