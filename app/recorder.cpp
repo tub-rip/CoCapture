@@ -65,14 +65,10 @@ int main(int argc, const char *argv[]) {
 
     basler_camera.Open();
     basler_camera.ReverseX.SetValue(true);
-    //basler_camera.TriggerMode.SetValue(true);
     basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
                                 Pylon::GrabLoop_ProvidedByInstantCamera);
-    //basler_camera.StartGrabbing(Pylon::GrabStrategy_LatestImageOnly,
-    //                            Pylon::GrabLoop_ProvidedByInstantCamera);
 
     // Define GUI
-
     pangolin::CreateWindowAndBind("Main", 640, 480);
 
     const int UI_WIDTH = 20 * (int) pangolin::default_font().MaxWidth();
@@ -84,6 +80,20 @@ int main(int argc, const char *argv[]) {
     int current_exposure_time = 5000;
     pangolin::Var<int> exposure_time("ui.exposure_time", current_exposure_time, 0, 15000);
 
+    // Not the nicest solution but didn't find a way to directly initialize pangolin var in a std map
+    auto bias_values = prophesee_camera.biases().get_facility()->get_all_biases();
+    pangolin::Var<int> bias_fo("ui.bias_fo", bias_values["bias_fo"], 45, 110);
+    pangolin::Var<int> bias_diff_off("ui.bias_diff_off", bias_values["bias_diff_off"], 25, 65);
+    pangolin::Var<int> bias_diff_on("ui.bias_diff_on", bias_values["bias_diff_on"], 95, 140);
+    pangolin::Var<int> bias_hpf("ui.bias_hpf", bias_values["bias_hpf"], 0, 120);
+    pangolin::Var<int> bias_refr("ui.bias_refr", bias_values["bias_refr"], 20, 100);
+     std::unordered_map<std::string, pangolin::Var<int>*> bias_setting {
+            {"bias_fo", &bias_fo},
+            {"bias_diff_off", &bias_diff_off},
+            {"bias_diff_on", &bias_diff_on},
+            {"bias_hpf", &bias_hpf},
+            {"bias_refr", &bias_refr}
+    };
 
     // Image
     int basler_display_height = app_parameter.do_warp ? prophesee_height :
@@ -125,9 +135,7 @@ int main(int argc, const char *argv[]) {
 
 
     while (!pangolin::ShouldQuit()) {
-
         // Get images from the two cameras
-
         if (app_parameter.overlay) {
             basler_event_handler->get_display_frame(basler_display);
             event_visualizer.get_display_frame(prophesee_display, basler_display);
@@ -169,6 +177,15 @@ int main(int argc, const char *argv[]) {
         if (exposure_time != current_exposure_time) {
             basler_camera.ExposureTime.SetValue(exposure_time);
             current_exposure_time = exposure_time;
+        }
+
+
+        for (auto it: bias_setting) {
+            auto name = it.first;
+            auto input_value = *(it.second);
+            if (bias_values[name] != input_value) {
+                prophesee_camera.biases().get_facility()->set(name, input_value);
+            }
         }
 
         // Necessary
