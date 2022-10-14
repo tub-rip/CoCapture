@@ -93,8 +93,8 @@ public:
         }
         cv::Rect signal_box = signal_box_.get_cv_rect();
         cv::Rect noise_box = noise_box_.get_cv_rect();
-        cv::rectangle(display, signal_box, color_bbox_);
-        cv::rectangle(display, noise_box, color_bbox_);
+        cv::rectangle(display, signal_box, color_bbox_, 3);
+        cv::rectangle(display, noise_box, color_bbox_, 3);
         cv::putText(display, std::to_string(current_snr), cv::Point(20, 40),
                     cv::FONT_HERSHEY_SIMPLEX, 1, color_bbox_, 2);
     }
@@ -114,7 +114,7 @@ private:
     cv::Vec3b color_bg_ = cv::Vec3b(255, 255, 255);
     cv::Vec3b color_on_ = cv::Vec3b(0, 0, 255);
     cv::Vec3b color_off_ = cv::Vec3b(255, 0, 0);
-    cv::Scalar color_bbox_ = cv::Scalar (8, 100, 22);
+    cv::Scalar color_bbox_ = cv::Scalar (22, 100, 8);
 };
 
 
