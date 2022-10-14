@@ -87,13 +87,16 @@ int main(int argc, const char *argv[]) {
     pangolin::Var<int> bias_diff_on("ui.bias_diff_on", bias_values["bias_diff_on"], 95, 140);
     pangolin::Var<int> bias_hpf("ui.bias_hpf", bias_values["bias_hpf"], 0, 120);
     pangolin::Var<int> bias_refr("ui.bias_refr", bias_values["bias_refr"], 20, 100);
-     std::unordered_map<std::string, pangolin::Var<int>*> bias_setting {
+    std::unordered_map<std::string, pangolin::Var<int>*> bias_setting {
             {"bias_fo", &bias_fo},
             {"bias_diff_off", &bias_diff_off},
             {"bias_diff_on", &bias_diff_on},
             {"bias_hpf", &bias_hpf},
             {"bias_refr", &bias_refr}
     };
+
+    int current_snr = 0;
+    pangolin::Var<int> snr("ui.snr_proxy",current_snr);
 
     // Image
     int basler_display_height = app_parameter.do_warp ? prophesee_height :
@@ -179,6 +182,7 @@ int main(int argc, const char *argv[]) {
             current_exposure_time = exposure_time;
         }
 
+        snr = event_visualizer.get_snr();
 
         for (auto it: bias_setting) {
             auto name = it.first;

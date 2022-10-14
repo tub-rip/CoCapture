@@ -95,8 +95,13 @@ public:
         cv::Rect noise_box = noise_box_.get_cv_rect();
         cv::rectangle(display, signal_box, color_bbox_, 3);
         cv::rectangle(display, noise_box, color_bbox_, 3);
-        cv::putText(display, std::to_string(current_snr), cv::Point(20, 40),
-                    cv::FONT_HERSHEY_SIMPLEX, 1, color_bbox_, 2);
+        //cv::putText(display, std::to_string(current_snr), cv::Point(20, 40),
+        //            cv::FONT_HERSHEY_SIMPLEX, 1, color_bbox_, 2);
+    }
+
+    int get_snr() {
+        std::unique_lock<std::mutex> lock(m_snr_);
+        return (int) (std::reduce(last_snrs_.begin(), last_snrs_.end(), 0.0) / last_snrs_.size());
     }
 
 private:
