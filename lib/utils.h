@@ -23,6 +23,7 @@ bool parse_comman_line(int argc, const char *argv[], Parameters &params) {
             ("homography", po::value<std::string>(&homography_path)->default_value(""))
             ("overlay", po::bool_switch(&params.overlay)->default_value(false), "Visualize event in overlay of grayscale frames")
             ("show_snr", po::bool_switch(&params.show_snr)->default_value(false), "Show an estimate of the current SNR")
+            ("roi", po::bool_switch(&params.roi)->default_value(false), "Show an estimate of the current SNR")
             ;
 
     po::variables_map vm;
@@ -71,4 +72,16 @@ bool parse_comman_line(int argc, const char *argv[], Parameters &params) {
     return true;
 }
 
+
+void set_roi(Metavision::Camera& cam, Parameters& params) {
+    if (params.roi) {
+        auto roi_handle = cam.roi();
+        int x_min = 100;
+        int y_min = 260;
+        int height = 200;
+        int width = 200;
+        Metavision::Roi::Rectangle roi{x_min, y_min, height, width};
+        roi_handle.set(roi);
+    }
+}
 #endif //RIP_COCAPTURE_GUI_UTILS_H

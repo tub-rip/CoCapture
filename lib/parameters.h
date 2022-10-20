@@ -14,6 +14,7 @@ struct Parameters {
     int target_height;
     bool overlay;
     bool show_snr;
+    bool roi;
 };
 
 

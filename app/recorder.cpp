@@ -50,6 +50,7 @@ int main(int argc, const char *argv[]) {
                 event_visualizer.estimate_snr(begin, end);
             });
 
+    set_roi(prophesee_camera, app_parameter);
     prophesee_camera.start();
 
     // Setup Basler Camera
