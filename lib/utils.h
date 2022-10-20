@@ -77,10 +77,10 @@ void set_roi(Metavision::Camera& cam, Parameters& params) {
     if (params.roi) {
         auto roi_handle = cam.roi();
         int x_min = 100;
-        int y_min = 260;
-        int height = 200;
+        int y_min = 160;
+        int height = 400;
         int width = 200;
-        Metavision::Roi::Rectangle roi{x_min, y_min, height, width};
+        Metavision::Roi::Rectangle roi{x_min, y_min, width, height};
         roi_handle.set(roi);
     }
 }
