@@ -17,5 +17,8 @@ struct Parameters {
     bool roi;
 };
 
+struct PropheseeParams {
+    bool set_rois;
+};
 
 #endif //RIP_COCAPTURE_GUI_PARAMETERS_H
