@@ -14,7 +14,10 @@ namespace utils {
                  "Visualize event in overlay of grayscale frames")
                 ("show_snr", po::bool_switch(&params.show_snr)->default_value(false),
                  "Show an estimate of the current SNR")
-                ("roi", po::bool_switch(&params.roi)->default_value(false), "Show an estimate of the current SNR");
+                ("roi", po::bool_switch(&params.roi)->default_value(false),
+                 "Set hardware roi in prophesee camera")
+                ("cameras,c", po::value<std::vector<std::string>>(&params.camera_types)->multitoken(),
+                 "define number and kind of cameras by keyword");
 
         po::variables_map vm;
         try {
@@ -59,6 +62,22 @@ namespace utils {
             throw std::invalid_argument("For overlay visualization warping must be activated by --warp!");
         }
         return true;
+    }
+
+    PropheseeParams make_prophesee_params(Parameters &params) {
+        PropheseeParams prophesee_params;
+        prophesee_params.set_rois = params.roi;
+        prophesee_params.show_snr = params.show_snr;
+        return prophesee_params;
+    }
+
+    BaslerParams make_basler_params(Parameters &params) {
+        BaslerParams basler_params;
+        basler_params.do_warp = params.do_warp;
+        basler_params.homography = params.homography;
+        basler_params.target_width = params.target_width;
+        basler_params.target_height = params.target_height;
+        return basler_params;
     }
 
 

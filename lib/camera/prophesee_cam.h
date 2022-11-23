@@ -13,9 +13,10 @@ namespace camera {
 
     class PropheseeCam : public Base {
     public:
-        PropheseeCam(PropheseeParams& params) : params_(params) {};
+        PropheseeCam(PropheseeParams &params) : params_(params) {};
 
         void get_display_frame(cv::Mat &display) override;
+
         void get_display_frame(cv::Mat &display, const cv::Mat &canvas);
 
         void setup_camera() override;
@@ -25,6 +26,7 @@ namespace camera {
         EventVisualizer visualizer_;
         PropheseeParams params_;
     };
+
 
 } // camera
 

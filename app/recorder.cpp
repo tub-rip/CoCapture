@@ -19,35 +19,43 @@
 
 
 int main(int argc, const char *argv[]) {
+    Pylon::PylonInitialize();
     Parameters app_parameter;
     utils::parse_comman_line(argc, argv, app_parameter);
 
+    int display_height = 0;
+    int display_width = -1;
+    std::vector<camera::Base *> cameras;
+
+    for (auto type: app_parameter.camera_types) {
+        if (type == "prophesee") {
+            auto params = utils::make_prophesee_params(app_parameter);
+            cameras.push_back(new camera::PropheseeCam(params));
+        } else if (type == "basler") {
+            auto params = utils::make_basler_params(app_parameter);
+            cameras.push_back(new camera::BaslerCamera(params));
+        }
+        auto cam = cameras.back();
+        cam->setup_camera();
+
+        if (cam->get_width() > display_width) {
+            display_width = cam->get_width();
+        }
+        display_height += cam->get_height();
+    }
+
     // Setup Prophesee Camera
-    PropheseeParams prophesee_params;
-    prophesee_params.set_rois = false; // TODO: propagate from main params
-    camera::PropheseeCam prophesee_cam(prophesee_params);
-    prophesee_cam.setup_camera();
+    // PropheseeParams prophesee_params;
+    // prophesee_params.set_rois = false; // TODO: propagate from main params
+    // camera::PropheseeCam prophesee_cam(prophesee_params);
+    // prophesee_cam.setup_camera();
 
     // Setup Basler Camera
-    Pylon::PylonInitialize();
-    BaslerParams basler_params;
-    basler_params.do_warp = false; // TODO: propagate from main params
-    camera::BaslerCamera basler_cam(basler_params);
-    basler_cam.setup_camera();
-
-    //Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
-    //std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
-
-    //auto basler_event_handler = new basler::BaslerEventHandler(app_parameter.do_warp, app_parameter);
-
-    //basler_camera.RegisterImageEventHandler(basler_event_handler,
-    //                                        Pylon::RegistrationMode_ReplaceAll,
-    //                                        Pylon::Cleanup_Delete);
-//
-    //basler_camera.Open();
-    //basler_camera.ReverseX.SetValue(true);
-    //basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
-    //                            Pylon::GrabLoop_ProvidedByInstantCamera);
+    //
+    // BaslerParams basler_params;
+    // basler_params.do_warp = false; // TODO: propagate from main params
+    // camera::BaslerCamera basler_cam(basler_params);
+    // basler_cam.setup_camera();
 
     // Define GUI
     pangolin::CreateWindowAndBind("Main", 640, 480);
@@ -76,18 +84,18 @@ int main(int argc, const char *argv[]) {
     //         {"bias_refr",     &bias_refr}
     // };
 
-    int current_snr = 0;
-    pangolin::Var<int> snr("ui.snr_proxy", current_snr);
+    //int current_snr = 0;
+    //pangolin::Var<int> snr("ui.snr_proxy", current_snr);
 
     // TODO: at least for basler, set proper height and width in derived camera class
 
 
     // Image
-    int basler_display_height = app_parameter.do_warp ? prophesee_cam.get_height() :
-                                basler_cam.get_height();
-    int display_height = app_parameter.overlay ?
-                         prophesee_cam.get_height() : prophesee_cam.get_height() + basler_display_height;
-    int display_width = prophesee_cam.get_width();
+    //int basler_display_height = app_parameter.do_warp ? prophesee_cam.get_height() :
+    //                            basler_cam.get_height();
+    //int display_height = app_parameter.overlay ?
+    //                     prophesee_cam.get_height() : prophesee_cam.get_height() + basler_display_height;
+    //int display_width = prophesee_cam.get_width();
 
     double aspect = (double) display_width / (double) display_height;
     pangolin::View &d_image = pangolin::Display("image")
@@ -105,32 +113,32 @@ int main(int argc, const char *argv[]) {
     // Initialize container for depicting the image. This will contain the prophesee and the basler frames
     cv::Mat display(display_height, display_width,
                     CV_8UC3, cv::Vec3b(0, 0, 0));
-    cv::Mat prophesee_display(display,
-                              cv::Rect(0, 0,
-                                       display_width,
-                                       prophesee_cam.get_height()));
-    cv::Mat basler_display;
-    if (app_parameter.overlay) {
-        basler_display = cv::Mat(basler_display_height, display_width,
-                                 CV_8UC3, cv::Vec3b(0, 0, 0));
-    } else {
-        basler_display = cv::Mat(display,
-                                 cv::Rect(0, prophesee_cam.get_height(),
-                                          display_width,
-                                          basler_display_height));
-    }
 
+    int offset_height = 0;
+    for (auto cam: cameras) {
+        int h = cam->get_height();
+        int w = cam->get_width();
+        cam->set_display(cv::Mat(display, cv::Rect(0, offset_height, w, h)));
+        cam->set_offset(offset_height);
+        offset_height += h;
+    }
 
     while (!pangolin::ShouldQuit()) {
         // Get images from the two cameras
-        if (app_parameter.overlay) {
-            basler_cam.get_display_frame(basler_display);
-            prophesee_cam.get_display_frame(prophesee_display, basler_display);
-        } else {
-            basler_cam.get_display_frame(basler_display);
-            prophesee_cam.get_display_frame(prophesee_display);
+        // if (app_parameter.overlay) {
+        //     basler_cam.get_display_frame(basler_display);
+        //     prophesee_cam.get_display_frame(prophesee_display, basler_display);
+        // } else {
+        //     basler_cam.get_display_frame(basler_display);
+        //     prophesee_cam.get_display_frame(prophesee_display);
+        // }
+        //cv::flip(basler_display, basler_display, 0);
+
+        for (auto cam: cameras) {
+            //auto cam_display = cam->get_display();
+            //cam->get_display_frame(cam_display);
+            cam->update_display_frame();
         }
-        cv::flip(basler_display, basler_display, 0);
 
         // Image
         if (!display.empty()) {
@@ -179,5 +187,10 @@ int main(int argc, const char *argv[]) {
     }
 
     Pylon::PylonTerminate();
+
+    for (auto cam: cameras) {
+        delete cam;
+    }
+
     return 0;
 }

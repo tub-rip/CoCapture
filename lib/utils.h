@@ -17,6 +17,11 @@ namespace utils {
     namespace po = boost::program_options;
 
     bool parse_comman_line(int argc, const char *argv[], Parameters &params);
+
+    PropheseeParams make_prophesee_params(Parameters &params);
+
+    BaslerParams make_basler_params(Parameters &params);
+
     void set_roi(Metavision::Camera &cam);
 }
 

@@ -11,15 +11,36 @@ namespace camera {
 
     class Base {
     public:
+        Base() : offset_(-1), width_(-1), height_(-1) {}
+
+        // Pure virtuals
         virtual void setup_camera() = 0;
+
         virtual void get_display_frame(cv::Mat &display) = 0;
 
-        int get_height() {return height_;}
-        int get_width() {return width_;}
+        // Getter & Setter
+        [[nodiscard]] int get_height() const { return height_; }
+
+        [[nodiscard]] int get_width() const { return width_; }
+
+        void set_display(cv::Mat display);
+
+        cv::Mat get_display();
+
+        void set_offset(int offset) { offset_ = offset; }
+
+        [[nodiscard]] int get_offset() const { return offset_; }
+
+        // Further
+        void update_display_frame();
 
     protected:
         int width_;
         int height_;
+
+    private:
+        cv::Mat display_;
+        int offset_;
     };
 
 } // camera
