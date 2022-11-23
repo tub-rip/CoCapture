@@ -19,10 +19,8 @@ Tested on Ubuntu 20.04
 
 Start recorder with
 
-    ./recorder
+    ./recorder --cameras <type1> <type2> ...
 
-To warp basler frames use
+where `<typeX>` is either `basler` or `prophesee`. So for two Prophesee cameras call:
 
-    ./recorder --warp --homography <PATH-TO-HOMOGRAPHY>
-
-The homography is given as text file as seen in the example config/homography.txt
+    ./recorder --cameras prophesee prophesee
