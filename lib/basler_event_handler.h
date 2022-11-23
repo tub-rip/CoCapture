@@ -11,49 +11,50 @@
 
 namespace basler {
 
-class BaslerEventHandler : public Pylon::CImageEventHandler {
-public:
-    BaslerEventHandler(bool do_warp, Parameters params) :
-        do_warp_(do_warp),
-        params_(params) {}
-    ~BaslerEventHandler() override = default;
+    class BaslerEventHandler : public Pylon::CImageEventHandler {
+    public:
+        BaslerEventHandler(BaslerParams params) :
+                do_warp_(params.do_warp),
+                params_(params) {}
 
-    void get_display_frame(cv::Mat & display) {
-        {
-            std::unique_lock<std::mutex> lock(m_);
-            std::swap(img_, img_swap_);
+        ~BaslerEventHandler() override = default;
+
+        void get_display_frame(cv::Mat &display) {
+            {
+                std::unique_lock<std::mutex> lock(m_);
+                std::swap(img_, img_swap_);
+            }
+
+            if (do_warp_) {
+                cv::warpPerspective(img_swap_, img_swap_, params_.homography,
+                                    cv::Size(params_.target_width,
+                                             params_.target_height));
+            }
+            cv::cvtColor(img_swap_, display, cv::COLOR_GRAY2RGB);
+            cv::flip(display, display, 0);
         }
 
-        if (params_.do_warp) {
-            cv::warpPerspective(img_swap_, img_swap_, params_.homography,
-                                cv::Size(params_.target_width,
-                                         params_.target_height));
+        virtual void OnImageGrabbed(Pylon::CInstantCamera &camera,
+                                    const Pylon::CGrabResultPtr &grab_result) {
+            if (grab_result->GrabSucceeded()) {
+                std::unique_lock<std::mutex> lock(m_);
+                cv::Mat frame(grab_result->GetHeight(), grab_result->GetWidth(),
+                              CV_8UC1, (uint8_t *) grab_result->GetBuffer());
+                frame.copyTo(img_);
+            } else {
+                std::cout << "Error: " << std::hex << grab_result->GetErrorCode() <<
+                          std::dec << " " << grab_result->GetErrorDescription() << std::endl;
+            }
         }
-        cv::cvtColor(img_swap_, display, cv::COLOR_GRAY2RGB);
-    }
+        // TODO: include OnImageSkipped
 
-    virtual void OnImageGrabbed(Pylon::CInstantCamera& camera,
-                                const Pylon::CGrabResultPtr& grab_result) {
-        if (grab_result->GrabSucceeded()) {
-            std::unique_lock<std::mutex> lock(m_);
-            cv::Mat frame(grab_result->GetHeight(), grab_result->GetWidth(),
-                          CV_8UC1, (uint8_t*)grab_result->GetBuffer());
-            frame.copyTo(img_);
-        }
-        else {
-            std::cout << "Error: " << std::hex << grab_result->GetErrorCode() <<
-                      std::dec << " " << grab_result->GetErrorDescription() << std::endl;
-        }
-    }
-    // TODO: include OnImageSkipped
-
-private:
-    cv::Mat img_;
-    cv::Mat img_swap_;
-    std::mutex m_;
-    bool do_warp_;
-    Parameters params_;
-};
+    private:
+        cv::Mat img_;
+        cv::Mat img_swap_;
+        std::mutex m_;
+        bool do_warp_;
+        BaslerParams params_;
+    };
 
 } // basler
 

@@ -7,81 +7,22 @@
 #include <stdexcept>
 
 #include <boost/program_options.hpp>
+#include <metavision/sdk/driver/camera.h>
+#include <metavision/sdk/base/utils/log.h>
 
 #include "parameters.h"
+#include "camera/base.h"
+#include "camera/prophesee_cam.h"
 
-namespace po = boost::program_options;
+namespace utils {
 
+    namespace po = boost::program_options;
 
-bool parse_comman_line(int argc, const char *argv[], Parameters &params) {
-    const std::string program_desc("Recording and Visualization with the co-capture system.\n");
-    std::string homography_path;
-    po::options_description options_desc("Options");
-    options_desc.add_options()
-            ("help,h", "Produce help message.")
-            ("warp", po::bool_switch(&params.do_warp)->default_value(false), "Warp gray-scale frames according to a given homography")
-            ("homography", po::value<std::string>(&homography_path)->default_value(""))
-            ("overlay", po::bool_switch(&params.overlay)->default_value(false), "Visualize event in overlay of grayscale frames")
-            ("show_snr", po::bool_switch(&params.show_snr)->default_value(false), "Show an estimate of the current SNR")
-            ("roi", po::bool_switch(&params.roi)->default_value(false), "Show an estimate of the current SNR")
-            ;
+    bool parse_comman_line(int argc, const char *argv[], Parameters &params);
 
-    po::variables_map vm;
-    try {
-        po::store(po::command_line_parser(argc, argv).options(options_desc).run(), vm);
-        po::notify(vm);
-    } catch (po::error &e) {
-        MV_LOG_ERROR() << program_desc;
-        MV_LOG_ERROR() << options_desc;
-        MV_LOG_ERROR() << "Parsing error:" << e.what();
-        return false;
-    }
-
-    if (vm.count("help")) {
-        MV_LOG_INFO() << program_desc;
-        MV_LOG_INFO() << options_desc;
-        return false;
-    }
-
-    if (homography_path.empty()) {
-        if (params.do_warp) {
-            std::cout << "No homography provided, will proceed without warping" << std::endl;
-            params.do_warp = false;
-        }
-    }
-    else {
-        // Load homography
-        std::ifstream ifs;
-        std::string line;
-        ifs.open(homography_path, std::ios::in);
-        if(ifs) {
-            for (int i = 0; i < 3; ++i) {
-                std::getline(ifs, line);
-                std::stringstream ss(line);
-                for (int j = 0; j < 3; ++j) {
-                    ss >> params.homography(i, j);
-                }
-            }
-        }
-        ifs.close();
-    }
-
-    if (params.overlay && !params.do_warp) {
-        throw std::invalid_argument("For overlay visualization warping must be activated by --warp!");
-    }
-    return true;
+    void start_recording(std::vector<camera::Base*>& cameras);
+    void stop_recording(std::vector<camera::Base*>& cameras);
+    void set_roi(Metavision::Camera &cam);
 }
 
-
-void set_roi(Metavision::Camera& cam, Parameters& params) {
-    if (params.roi) {
-        auto roi_handle = cam.roi();
-        int x_min = 100;
-        int y_min = 160;
-        int height = 400;
-        int width = 200;
-        Metavision::Roi::Rectangle roi{x_min, y_min, width, height};
-        roi_handle.set(roi);
-    }
-}
 #endif //RIP_COCAPTURE_GUI_UTILS_H
