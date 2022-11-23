@@ -12,6 +12,7 @@ namespace camera {
     class Base {
     public:
         Base() : offset_(-1), width_(-1), height_(-1) {}
+        virtual ~Base() = default;
 
         // Pure virtuals
         virtual void setup_camera() = 0;

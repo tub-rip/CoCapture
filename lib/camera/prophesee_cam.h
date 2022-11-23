@@ -13,7 +13,8 @@ namespace camera {
 
     class PropheseeCam : public Base {
     public:
-        PropheseeCam(PropheseeParams &params) : params_(params) {};
+        explicit PropheseeCam(PropheseeParams &params) : params_(params) {};
+        explicit PropheseeCam(PropheseeParams params) : params_(params) {};
 
         void get_display_frame(cv::Mat &display) override;
 

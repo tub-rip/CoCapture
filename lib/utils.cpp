@@ -64,23 +64,6 @@ namespace utils {
         return true;
     }
 
-    PropheseeParams make_prophesee_params(Parameters &params) {
-        PropheseeParams prophesee_params;
-        prophesee_params.set_rois = params.roi;
-        prophesee_params.show_snr = params.show_snr;
-        return prophesee_params;
-    }
-
-    BaslerParams make_basler_params(Parameters &params) {
-        BaslerParams basler_params;
-        basler_params.do_warp = params.do_warp;
-        basler_params.homography = params.homography;
-        basler_params.target_width = params.target_width;
-        basler_params.target_height = params.target_height;
-        return basler_params;
-    }
-
-
     void set_roi(Metavision::Camera &cam) {
         auto roi_handle = cam.roi();
         roi_handle.set(std::vector<Metavision::Roi::Rectangle>{

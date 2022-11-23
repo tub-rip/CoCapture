@@ -8,7 +8,6 @@
 #include <pangolin/display/default_font.h>
 #include <pangolin/var/varextra.h>
 #include <opencv2/core.hpp>
-#include <pylon/PylonIncludes.h>
 #include <pylon/BaslerUniversalInstantCamera.h>
 
 #include "../lib/event_visualizer.h"
@@ -27,13 +26,11 @@ int main(int argc, const char *argv[]) {
     int display_width = -1;
     std::vector<camera::Base *> cameras;
 
-    for (auto type: app_parameter.camera_types) {
+    for (const auto& type: app_parameter.camera_types) {
         if (type == "prophesee") {
-            auto params = utils::make_prophesee_params(app_parameter);
-            cameras.push_back(new camera::PropheseeCam(params));
+            cameras.push_back(new camera::PropheseeCam(PropheseeParams(app_parameter)));
         } else if (type == "basler") {
-            auto params = utils::make_basler_params(app_parameter);
-            cameras.push_back(new camera::BaslerCamera(params));
+            cameras.push_back(new camera::BaslerCamera(BaslerParams(app_parameter)));
         }
         auto cam = cameras.back();
         cam->setup_camera();
