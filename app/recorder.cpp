@@ -44,19 +44,6 @@ int main(int argc, const char *argv[]) {
         display_height += cam->get_height();
     }
 
-    // Setup Prophesee Camera
-    // PropheseeParams prophesee_params;
-    // prophesee_params.set_rois = false; // TODO: propagate from main params
-    // camera::PropheseeCam prophesee_cam(prophesee_params);
-    // prophesee_cam.setup_camera();
-
-    // Setup Basler Camera
-    //
-    // BaslerParams basler_params;
-    // basler_params.do_warp = false; // TODO: propagate from main params
-    // camera::BaslerCamera basler_cam(basler_params);
-    // basler_cam.setup_camera();
-
     // Define GUI
     pangolin::CreateWindowAndBind("Main", 640, 480);
 
@@ -84,19 +71,7 @@ int main(int argc, const char *argv[]) {
     //         {"bias_refr",     &bias_refr}
     // };
 
-    //int current_snr = 0;
-    //pangolin::Var<int> snr("ui.snr_proxy", current_snr);
-
-    // TODO: at least for basler, set proper height and width in derived camera class
-
-
     // Image
-    //int basler_display_height = app_parameter.do_warp ? prophesee_cam.get_height() :
-    //                            basler_cam.get_height();
-    //int display_height = app_parameter.overlay ?
-    //                     prophesee_cam.get_height() : prophesee_cam.get_height() + basler_display_height;
-    //int display_width = prophesee_cam.get_width();
-
     double aspect = (double) display_width / (double) display_height;
     pangolin::View &d_image = pangolin::Display("image")
             .SetAspect(aspect);
@@ -124,15 +99,6 @@ int main(int argc, const char *argv[]) {
     }
 
     while (!pangolin::ShouldQuit()) {
-        // Get images from the two cameras
-        // if (app_parameter.overlay) {
-        //     basler_cam.get_display_frame(basler_display);
-        //     prophesee_cam.get_display_frame(prophesee_display, basler_display);
-        // } else {
-        //     basler_cam.get_display_frame(basler_display);
-        //     prophesee_cam.get_display_frame(prophesee_display);
-        // }
-        //cv::flip(basler_display, basler_display, 0);
 
         for (auto cam: cameras) {
             //auto cam_display = cam->get_display();
