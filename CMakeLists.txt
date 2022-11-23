@@ -30,7 +30,9 @@ include_directories(
 add_executable(recorder
         app/recorder.cpp
         lib/event_visualizer.h
-        lib/basler_event_handler.h lib/utils.h lib/parameters.h lib/constants.h lib/camera/base.cpp lib/camera/base.h lib/camera/prophesee_cam.cpp lib/camera/prophesee_cam.h lib/constants.cpp lib/utils.cpp)
+        lib/basler_event_handler.h lib/utils.h lib/parameters.h lib/constants.h lib/camera/base.cpp
+        lib/camera/base.h lib/camera/prophesee_cam.cpp lib/camera/prophesee_cam.h lib/constants.cpp
+        lib/utils.cpp lib/camera/basler_camera.cpp lib/camera/basler_camera.h)
 
 target_link_libraries(recorder
         pango_display

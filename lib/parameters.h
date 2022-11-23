@@ -21,4 +21,11 @@ struct PropheseeParams {
     bool set_rois;
 };
 
+struct BaslerParams {
+    bool do_warp;
+    int target_width;
+    int target_height;
+    cv::Matx33d homography;
+};
+
 #endif //RIP_COCAPTURE_GUI_PARAMETERS_H

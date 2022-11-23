@@ -13,8 +13,8 @@ namespace basler {
 
 class BaslerEventHandler : public Pylon::CImageEventHandler {
 public:
-    BaslerEventHandler(bool do_warp, Parameters params) :
-        do_warp_(do_warp),
+    BaslerEventHandler(BaslerParams params) :
+        do_warp_(params.do_warp),
         params_(params) {}
     ~BaslerEventHandler() override = default;
 
@@ -24,7 +24,7 @@ public:
             std::swap(img_, img_swap_);
         }
 
-        if (params_.do_warp) {
+        if (do_warp_) {
             cv::warpPerspective(img_swap_, img_swap_, params_.homography,
                                 cv::Size(params_.target_width,
                                          params_.target_height));
@@ -52,7 +52,7 @@ private:
     cv::Mat img_swap_;
     std::mutex m_;
     bool do_warp_;
-    Parameters params_;
+    BaslerParams params_;
 };
 
 } // basler

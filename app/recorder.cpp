@@ -10,13 +10,12 @@
 #include <opencv2/core.hpp>
 #include <pylon/PylonIncludes.h>
 #include <pylon/BaslerUniversalInstantCamera.h>
-#include <metavision/sdk/driver/camera.h>
-#include <metavision/sdk/base/utils/log.h>
 
 #include "../lib/event_visualizer.h"
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
 #include "../lib/camera/prophesee_cam.h"
+#include "../lib/camera/basler_camera.h"
 
 
 int main(int argc, const char *argv[]) {
@@ -24,26 +23,31 @@ int main(int argc, const char *argv[]) {
     utils::parse_comman_line(argc, argv, app_parameter);
 
     // Setup Prophesee Camera
-    PropheseeParams prophesee_params_;
-    prophesee_params_.set_rois = false;
-    camera::PropheseeCam prophesee_cam(prophesee_params_);
+    PropheseeParams prophesee_params;
+    prophesee_params.set_rois = false; // TODO: propagate from main params
+    camera::PropheseeCam prophesee_cam(prophesee_params);
     prophesee_cam.setup_camera();
 
     // Setup Basler Camera
     Pylon::PylonInitialize();
-    Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
-    std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
+    BaslerParams basler_params;
+    basler_params.do_warp = false; // TODO: propagate from main params
+    camera::BaslerCamera basler_cam(basler_params);
+    basler_cam.setup_camera();
 
-    auto basler_event_handler = new basler::BaslerEventHandler(app_parameter.do_warp, app_parameter);
+    //Pylon::CBaslerUniversalInstantCamera basler_camera(Pylon::CTlFactory::GetInstance().CreateFirstDevice());
+    //std::cout << "Opening Basler Camera: " << basler_camera.GetDeviceInfo().GetModelName() << std::endl;
 
-    basler_camera.RegisterImageEventHandler(basler_event_handler,
-                                            Pylon::RegistrationMode_ReplaceAll,
-                                            Pylon::Cleanup_Delete);
+    //auto basler_event_handler = new basler::BaslerEventHandler(app_parameter.do_warp, app_parameter);
 
-    basler_camera.Open();
-    basler_camera.ReverseX.SetValue(true);
-    basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
-                                Pylon::GrabLoop_ProvidedByInstantCamera);
+    //basler_camera.RegisterImageEventHandler(basler_event_handler,
+    //                                        Pylon::RegistrationMode_ReplaceAll,
+    //                                        Pylon::Cleanup_Delete);
+//
+    //basler_camera.Open();
+    //basler_camera.ReverseX.SetValue(true);
+    //basler_camera.StartGrabbing(Pylon::GrabStrategy_OneByOne,
+    //                            Pylon::GrabLoop_ProvidedByInstantCamera);
 
     // Define GUI
     pangolin::CreateWindowAndBind("Main", 640, 480);
@@ -75,9 +79,12 @@ int main(int argc, const char *argv[]) {
     int current_snr = 0;
     pangolin::Var<int> snr("ui.snr_proxy", current_snr);
 
+    // TODO: at least for basler, set proper height and width in derived camera class
+
+
     // Image
     int basler_display_height = app_parameter.do_warp ? prophesee_cam.get_height() :
-                                basler_camera.Height.GetValue();
+                                basler_cam.get_height();
     int display_height = app_parameter.overlay ?
                          prophesee_cam.get_height() : prophesee_cam.get_height() + basler_display_height;
     int display_width = prophesee_cam.get_width();
@@ -117,10 +124,10 @@ int main(int argc, const char *argv[]) {
     while (!pangolin::ShouldQuit()) {
         // Get images from the two cameras
         if (app_parameter.overlay) {
-            basler_event_handler->get_display_frame(basler_display);
+            basler_cam.get_display_frame(basler_display);
             prophesee_cam.get_display_frame(prophesee_display, basler_display);
         } else {
-            basler_event_handler->get_display_frame(basler_display);
+            basler_cam.get_display_frame(basler_display);
             prophesee_cam.get_display_frame(prophesee_display);
         }
         cv::flip(basler_display, basler_display, 0);
@@ -154,10 +161,10 @@ int main(int argc, const char *argv[]) {
             }
         }
 
-        if (exposure_time != current_exposure_time) {
-            basler_camera.ExposureTime.SetValue(exposure_time);
-            current_exposure_time = exposure_time;
-        }
+        // if (exposure_time != current_exposure_time) {
+        //     basler_camera.ExposureTime.SetValue(exposure_time);
+        //     current_exposure_time = exposure_time;
+        // }
 
         // for (const auto &it: bias_setting) {
         //     auto name = it.first;
