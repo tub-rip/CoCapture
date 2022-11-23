@@ -64,6 +64,19 @@ namespace utils {
         return true;
     }
 
+    void start_recording(std::vector<camera::Base*>& cameras) {
+        // int last_prophesee_index = 0;
+        // for (int i = 0; i < cameras.size(); ++i) {
+        //     if (dynamic_cast<camera::PropheseeCam*>(cameras[0])) {
+        //         last_prophesee_index = i;
+        //     }
+        // }
+    }
+
+    void stop_recording(std::vector<camera::Base>& cameras) {
+
+    }
+
     void set_roi(Metavision::Camera &cam) {
         auto roi_handle = cam.roi();
         roi_handle.set(std::vector<Metavision::Roi::Rectangle>{

@@ -3,6 +3,7 @@
 
 #include <metavision/sdk/driver/camera.h>
 #include <metavision/sdk/base/utils/log.h>
+#include <metavision/hal/facilities/i_device_control.h>
 
 #include "base.h"
 #include "../event_visualizer.h"
@@ -21,6 +22,11 @@ namespace camera {
         void get_display_frame(cv::Mat &display, const cv::Mat &canvas);
 
         void setup_camera() override;
+
+        void start_camera();
+        void stop_camera();
+        void set_mode_master();
+        void set_mode_slave();
 
     private:
         Metavision::Camera cam_;

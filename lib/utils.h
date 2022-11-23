@@ -11,6 +11,8 @@
 #include <metavision/sdk/base/utils/log.h>
 
 #include "parameters.h"
+#include "camera/base.h"
+#include "camera/prophesee_cam.h"
 
 namespace utils {
 
@@ -18,6 +20,8 @@ namespace utils {
 
     bool parse_comman_line(int argc, const char *argv[], Parameters &params);
 
+    void start_recording(std::vector<camera::Base*>& cameras);
+    void stop_recording(std::vector<camera::Base*>& cameras);
     void set_roi(Metavision::Camera &cam);
 }
 

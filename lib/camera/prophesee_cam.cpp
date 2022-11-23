@@ -38,4 +38,35 @@ namespace camera {
         visualizer_.get_display_frame(display, canvas);
     }
 
+    void PropheseeCam::start_camera() { cam_.start(); }
+
+    void PropheseeCam::stop_camera() { cam_.stop(); }
+
+    void PropheseeCam::set_mode_master() {
+        Metavision::Device &device = cam_.get_device();
+        auto *i_device_control = device.get_facility<Metavision::I_DeviceControl>();
+        if (i_device_control->set_mode_master()) {
+            std::cout << "Set mode Master successful."
+                         "Remember to start the slave first." << std::endl;
+        }
+        else {
+            std::cerr << "Could not set Master mode. Master/slave might"
+                         "not be supported by your camera" << std::endl;
+        }
+    }
+
+    void PropheseeCam::set_mode_slave() {
+        Metavision::Device &device = cam_.get_device();
+        auto *i_device_control = device.get_facility<Metavision::I_DeviceControl>();
+        if (i_device_control->set_mode_slave()) {
+            std::cout << "Set mode Slave successful."
+                         "Remember to start the slave first." << std::endl;
+        }
+        else {
+            std::cerr << "Could not set Slave mode. Master/slave might"
+                         "not be supported by your camera" << std::endl;
+        }
+    }
+
+
 } // camera

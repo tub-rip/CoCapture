@@ -47,8 +47,8 @@ int main(int argc, const char *argv[]) {
     const int UI_WIDTH = 20 * (int) pangolin::default_font().MaxWidth();
     pangolin::CreatePanel("ui")
             .SetBounds(0.0, 1.0, 0.0, pangolin::Attach::Pix(UI_WIDTH));
-    pangolin::Var<bool> start_recording("ui.Start-Recording", false, false);
-    pangolin::Var<bool> stop_recording("ui.Stop-Recording", false, false);
+    pangolin::Var<bool> b_start_recording("ui.Start-Recording", false, false);
+    pangolin::Var<bool> b_stop_recording("ui.Stop-Recording", false, false);
     bool is_recording = false;
     int current_exposure_time = 5000;
     pangolin::Var<int> exposure_time("ui.exposure_time", current_exposure_time, 0, 15000);
@@ -112,17 +112,15 @@ int main(int argc, const char *argv[]) {
         }
 
         // GUI
-        if (pangolin::Pushed(start_recording)) {
+        if (pangolin::Pushed(b_start_recording)) {
 
             if (!is_recording) {
-                std::string out_file_path("events.raw");
-                is_recording = true;
-                std::cout << "Recording not implemented yet!" << std::endl;
+                utils::start_recording(cameras);
             } else {
                 std::cout << "Recording is running already" << std::endl;
             }
         }
-        if (pangolin::Pushed(stop_recording)) {
+        if (pangolin::Pushed(b_stop_recording)) {
             if (is_recording) {
                 //i_events_stream->stop_log_raw_data();
                 is_recording = false;
