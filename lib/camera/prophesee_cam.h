@@ -4,6 +4,8 @@
 #include <metavision/sdk/driver/camera.h>
 #include <metavision/sdk/base/utils/log.h>
 #include <metavision/hal/facilities/i_device_control.h>
+#include <metavision/sdk/core/utils/cd_frame_generator.h>
+#include <metavision/sdk/core/utils/rate_estimator.h>
 
 #include "base.h"
 #include "../event_visualizer.h"
@@ -32,6 +34,7 @@ namespace camera {
         Metavision::Camera cam_;
         EventVisualizer visualizer_;
         PropheseeParams params_;
+        cv::Mat cd_frame_;
     };
 
 
