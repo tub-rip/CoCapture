@@ -23,16 +23,22 @@ struct PropheseeParams {
     explicit PropheseeParams(const Parameters &params) :
             set_rois(params.roi),
             show_snr(params.show_snr),
-            mode("master") {}
+            mode("master"),
+            record_from_startup(params.record),
+            id(0) {}
 
-    explicit PropheseeParams(const Parameters &params, const std::string &mode) :
+    explicit PropheseeParams(const Parameters &params, const std::string &mode, int new_id = 0) :
             set_rois(params.roi),
             show_snr(params.show_snr),
-            mode(mode) {}
+            mode(mode),
+            record_from_startup(params.record),
+            id(new_id) {}
 
     bool set_rois;
     bool show_snr;
+    bool record_from_startup;
     std::string mode;  // master/slave
+    int id;
 };
 
 struct BaslerParams {

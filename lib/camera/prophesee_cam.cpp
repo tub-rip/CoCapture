@@ -35,6 +35,12 @@ namespace camera {
             utils::set_roi(cam_);
         }
 
+        if (params_.record_from_startup) {
+            std::stringstream ss;
+            ss << "./out_" << params_.id << ".raw";
+            cam_.start_recording(ss.str());
+        }
+
         cam_.start();
     }
 

@@ -41,7 +41,7 @@ int main(int argc, const char *argv[]) {
             std::string mode = "slave";
             if (i == last_prophesee_i || !app_parameter.record) { mode = "master"; }
             cameras.push_back(new camera::PropheseeCam(PropheseeParams(app_parameter,
-                                                                       mode)));
+                                                                       mode, i)));
         } else if (type == "basler") {
             cameras.push_back(new camera::BaslerCamera(BaslerParams(app_parameter)));
         }
