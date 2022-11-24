@@ -24,3 +24,6 @@ Start recorder with
 where `<typeX>` is either `basler` or `prophesee`. So for two Prophesee cameras call:
 
     ./recorder --cameras prophesee prophesee
+
+Use the flag `--record` to record from startup. For synchronized data streams
+the cameras need to be hardware triggered 
