@@ -15,13 +15,21 @@ namespace camera {
             throw;
         });
 
-        cam_.cd().add_callback([this](const Metavision::EventCD *begin, const Metavision::EventCD *end) {
+        cam_.cd().add_callback([this](const Metavision::EventCD *begin,
+                                      const Metavision::EventCD *end) {
             visualizer_.process_events(begin, end);
         });
 
-        cam_.cd().add_callback([this](const Metavision::EventCD *begin, const Metavision::EventCD *end) {
+        cam_.cd().add_callback([this](const Metavision::EventCD *begin,
+                                      const Metavision::EventCD *end) {
             visualizer_.estimate_snr(begin, end);
         });
+
+        if (params_.mode == "master") {
+            this->set_mode_master();
+        } else if (params_.mode == "slave") {
+            this->set_mode_slave();
+        }
 
         if (params_.set_rois) {
             utils::set_roi(cam_);
@@ -48,8 +56,7 @@ namespace camera {
         if (i_device_control->set_mode_master()) {
             std::cout << "Set mode Master successful."
                          "Remember to start the slave first." << std::endl;
-        }
-        else {
+        } else {
             std::cerr << "Could not set Master mode. Master/slave might"
                          "not be supported by your camera" << std::endl;
         }
@@ -59,10 +66,8 @@ namespace camera {
         Metavision::Device &device = cam_.get_device();
         auto *i_device_control = device.get_facility<Metavision::I_DeviceControl>();
         if (i_device_control->set_mode_slave()) {
-            std::cout << "Set mode Slave successful."
-                         "Remember to start the slave first." << std::endl;
-        }
-        else {
+            std::cout << "Set mode Slave successful." << std::endl;
+        } else {
             std::cerr << "Could not set Slave mode. Master/slave might"
                          "not be supported by your camera" << std::endl;
         }

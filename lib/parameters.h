@@ -15,26 +15,31 @@ struct Parameters {
     bool overlay;
     bool show_snr;
     bool roi;
+    bool record;
     std::vector<std::string> camera_types;
 };
 
 struct PropheseeParams {
-    explicit PropheseeParams(Parameters &params) {
-        set_rois = params.roi;
-        show_snr = params.show_snr;
-    }
+    explicit PropheseeParams(const Parameters &params) :
+            set_rois(params.roi),
+            show_snr(params.show_snr),
+            mode("master") {}
+
+    explicit PropheseeParams(const Parameters &params, const std::string &mode) :
+            set_rois(params.roi),
+            show_snr(params.show_snr),
+            mode(mode) {}
 
     bool set_rois;
     bool show_snr;
+    std::string mode;  // master/slave
 };
 
 struct BaslerParams {
-    explicit BaslerParams(Parameters &params) {
-        do_warp = params.do_warp;
-        homography = params.homography;
-        target_width = params.target_width;
-        target_height = params.target_height;
-    }
+    explicit BaslerParams(Parameters &params) : do_warp(params.do_warp),
+                                                homography(params.homography),
+                                                target_height(params.target_height),
+                                                target_width(params.target_width) {}
 
     bool do_warp{};
     int target_width{};

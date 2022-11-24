@@ -26,9 +26,22 @@ int main(int argc, const char *argv[]) {
     int display_width = -1;
     std::vector<camera::Base *> cameras;
 
-    for (const auto& type: app_parameter.camera_types) {
+    // Set all but last prophesee camera to slave mode
+    int last_prophesee_i = -1;
+    for (int i = 0; i < app_parameter.camera_types.size(); ++i) {
+        if (app_parameter.camera_types[i] == "prophesee") {
+            last_prophesee_i = i;
+        }
+    }
+
+    for (int i = 0; i < app_parameter.camera_types.size(); ++i) {
+        const auto type = app_parameter.camera_types[i];
+
         if (type == "prophesee") {
-            cameras.push_back(new camera::PropheseeCam(PropheseeParams(app_parameter)));
+            std::string mode = "slave";
+            if (i == last_prophesee_i || !app_parameter.record) { mode = "master"; }
+            cameras.push_back(new camera::PropheseeCam(PropheseeParams(app_parameter,
+                                                                       mode)));
         } else if (type == "basler") {
             cameras.push_back(new camera::BaslerCamera(BaslerParams(app_parameter)));
         }

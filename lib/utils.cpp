@@ -17,7 +17,9 @@ namespace utils {
                 ("roi", po::bool_switch(&params.roi)->default_value(false),
                  "Set hardware roi in prophesee camera")
                 ("cameras,c", po::value<std::vector<std::string>>(&params.camera_types)->multitoken(),
-                 "define number and kind of cameras by keyword");
+                 "define number and kind of cameras by keyword")
+                ("record,r", po::bool_switch(&params.record)->default_value(false),
+                        "directly start recording");
 
         po::variables_map vm;
         try {
