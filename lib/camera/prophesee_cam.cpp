@@ -2,6 +2,7 @@
 
 
 namespace camera {
+
   void PropheseeCam::setup_camera() {
     cam_ = Metavision::Camera::from_first_available();
     std::cout << "Opening Prophesee Camera: " << cam_.get_camera_configuration().serial_number << std::endl;
@@ -14,42 +15,27 @@ namespace camera {
         MV_LOG_ERROR() << e.what();
         throw;
       });
-
+#ifdef USE_METAVISION_VIEWER
+    cd_frame_generator = new Metavision::CDFrameGenerator(width_, height_);
+    cd_frame_generator->set_display_accumulation_time_us(params_.ev_acc_t_ms);
+    auto id = cam_.cd().add_callback([this](const Metavision::EventCD *ev_begin,
+                                     const Metavision::EventCD *ev_end) {
+        cd_frame_generator->add_events(ev_begin, ev_end);
+      });
+    cd_frame_generator->start(params_.fps, [this](const Metavision::timestamp &ts, const cv::Mat &frame) {
+        frame.copyTo(cd_frame_);
+      });
+#else
     cam_.cd().add_callback([this](const Metavision::EventCD *begin,
                            const Metavision::EventCD *end) {
         visualizer_.process_events(begin, end);
       });
 
-//    cam_.cd().add_callback([this](const Metavision::EventCD *begin,
-//                           const Metavision::EventCD *end) {
-//        visualizer_.estimate_snr(begin, end);
-//      });
-
-    /**********************************************************/
-
-    std::cout<<"Before adding callbacks \n";
-    Metavision::timestamp cd_frame_ts{0};
-    Metavision::CDFrameGenerator cd_frame_generator(width_, height_);
-    cd_frame_generator.set_display_accumulation_time_us(10000); //10 ms
-    double avg_rate, peak_rate;
-    Metavision::RateEstimator cd_rate_estimator(
-          [&avg_rate, &peak_rate](Metavision::timestamp ts, double arate, double prate) {
-        avg_rate  = arate;
-        peak_rate = prate;
-      },
-    100000, 1000000, true);
-    cam_.cd().add_callback([&cd_frame_generator, &cd_rate_estimator](const Metavision::EventCD *ev_begin,
-                           const Metavision::EventCD *ev_end) {
-        cd_frame_generator.add_events(ev_begin, ev_end);
-//        cd_rate_estimator.add_data(std::prev(ev_end)->t, std::distance(ev_begin, ev_end));
+    cam_.cd().add_callback([this](const Metavision::EventCD *begin,
+                           const Metavision::EventCD *end) {
+        visualizer_.estimate_snr(begin, end);
       });
-    cd_frame_generator.start(30, [this, &cd_frame_ts](const Metavision::timestamp &ts, const cv::Mat &frame) {
-        cd_frame_ts = ts;
-        frame.copyTo(this->cd_frame_);
-      });
-
-    std::cout<<"After adding callbacks \n";
-    /*********************************************************/
+#endif
 
     if (params_.mode == "master") {
         this->set_mode_master();
@@ -66,13 +52,18 @@ namespace camera {
         ss << "./out_" << params_.id << ".raw";
         cam_.start_recording(ss.str());
       }
-std::cout<<"Before starting streaming";
+    std::cout<<"Before starting streaming \n";
     cam_.start();
   }
 
   void PropheseeCam::get_display_frame(cv::Mat &display) {
+#ifdef USE_METAVISION_VIEWER
+    if (!cd_frame_.empty()) {
+        cv::flip(cd_frame_, display, 0);
+      }
+#else
     visualizer_.get_display_frame(display);
-//    display = cd_frame_;
+#endif
   }
 
   void PropheseeCam::get_display_frame(cv::Mat &display, const cv::Mat &canvas) {
