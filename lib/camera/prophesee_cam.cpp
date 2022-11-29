@@ -5,6 +5,7 @@ namespace camera {
 
   void PropheseeCam::setup_camera() {
     cam_ = Metavision::Camera::from_first_available();
+    cam_.erc_module().enable(false);
     std::cout << "Opening Prophesee Camera: " << cam_.get_camera_configuration().serial_number << std::endl;
     auto &geometry = cam_.geometry();
     width_ = geometry.width();
