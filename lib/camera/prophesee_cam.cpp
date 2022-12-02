@@ -53,7 +53,6 @@ namespace camera {
             ss << "./out_" << params_.id << ".raw";
             cam_.start_recording(ss.str());
         }
-        std::cout << "Before starting streaming \n";
         cam_.start();
     }
 
