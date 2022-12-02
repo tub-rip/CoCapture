@@ -17,7 +17,7 @@ namespace camera {
             throw;
         });
 #ifdef USE_METAVISION_VIEWER
-        cd_frame_generator = new Metavision::CDFrameGenerator(width_, height_);
+        cd_frame_generator = std::make_unique<Metavision::CDFrameGenerator>(width_, height_);
         cd_frame_generator->set_display_accumulation_time_us(params_.ev_acc_t_ms);
         auto id = cam_.cd().add_callback([this](const Metavision::EventCD *ev_begin,
                                          const Metavision::EventCD *ev_end) {

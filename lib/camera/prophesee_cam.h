@@ -42,7 +42,7 @@ namespace camera {
         PropheseeParams params_;
         cv::Mat cd_frame_;
 #ifdef USE_METAVISION_VIEWER
-        Metavision::CDFrameGenerator *cd_frame_generator;
+        std::unique_ptr<Metavision::CDFrameGenerator> cd_frame_generator;
 #endif
     };
 
