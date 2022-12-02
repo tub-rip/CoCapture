@@ -14,8 +14,6 @@ if (NOT ${Pangolin_FOUND})
 endif()
 include_directories(${Pangolin_INCLUDE_DIRS})
 
-# set(MetavisionSDK_DIR "/home/friedhelm/env/openeb/build/generated/share/cmake/MetavisionSDKCMakePackagesFilesDir")
-# set(MetavisionHAL_DIR "/home/friedhelm/env/openeb/build/generated/share/cmake/MetavisionHALCMakePackagesFilesDir")
 find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
 
 find_package(Pylon QUIET)
