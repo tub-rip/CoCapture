@@ -10,7 +10,6 @@
 #include <opencv2/highgui/highgui.hpp>
 
 #include "base.h"
-#include "../event_visualizer.h"
 #include "../utils.h"
 
 
@@ -24,7 +23,6 @@ namespace camera {
 
         void get_display_frame(cv::Mat &display) override;
 
-        void get_display_frame(cv::Mat &display, const cv::Mat &canvas);
 
         void setup_camera() override;
 
@@ -38,12 +36,13 @@ namespace camera {
 
     private:
         Metavision::Camera cam_;
-        EventVisualizer visualizer_;
         PropheseeParams params_;
         cv::Mat cd_frame_;
-#ifdef USE_METAVISION_VIEWER
         std::unique_ptr<Metavision::CDFrameGenerator> cd_frame_generator;
-#endif
+
+        cv::Scalar color_bg_ = cv::Scalar{255, 255, 255};
+        cv::Scalar color_on_ = cv::Scalar{0, 0, 255};
+        cv::Scalar color_off_ = cv::Scalar{255, 0, 0};
     };
 
 

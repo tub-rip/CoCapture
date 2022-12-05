@@ -10,7 +10,6 @@
 #include <opencv2/core.hpp>
 #include <pylon/BaslerUniversalInstantCamera.h>
 
-#include "../lib/event_visualizer.h"
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
 #include "../lib/camera/prophesee_cam.h"
