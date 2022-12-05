@@ -20,25 +20,32 @@ struct Parameters {
 };
 
 struct PropheseeParams {
-    explicit PropheseeParams(const Parameters &params) :
+    explicit PropheseeParams(const Parameters &params, float fps = 30, double ev_acc_t_ms = 10000) :
             set_rois(params.roi),
             show_snr(params.show_snr),
             mode("master"),
             record_from_startup(params.record),
-            id(0) {}
+            id(0),
+            fps(fps),
+            ev_acc_t_ms(ev_acc_t_ms) {}
 
-    explicit PropheseeParams(const Parameters &params, const std::string &mode, int new_id = 0) :
+    explicit PropheseeParams(const Parameters &params, const std::string &mode, int new_id = 0, float fps = 30,
+                             double ev_acc_t_ms = 10000) :
             set_rois(params.roi),
             show_snr(params.show_snr),
             mode(mode),
             record_from_startup(params.record),
-            id(new_id) {}
+            id(new_id),
+            fps(fps),
+            ev_acc_t_ms(ev_acc_t_ms) {}
 
     bool set_rois;
     bool show_snr;
     bool record_from_startup;
     std::string mode;  // master/slave
     int id;
+    float fps;
+    double ev_acc_t_ms;
 };
 
 struct BaslerParams {

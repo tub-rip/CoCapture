@@ -5,13 +5,13 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(OpenCV REQUIRED)
 find_package(Threads REQUIRED)
 
-set (boost_components_to_find program_options filesystem timer chrono thread)
+set(boost_components_to_find program_options filesystem timer chrono thread)
 find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
 
 find_package(Pangolin QUIET)
 if (NOT ${Pangolin_FOUND})
     include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPangolin.cmake")
-endif()
+endif ()
 include_directories(${Pangolin_INCLUDE_DIRS})
 
 find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
@@ -19,7 +19,7 @@ find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
 find_package(Pylon QUIET)
 if (NOT ${Pylon_FOUND})
     include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPylon.cmake")
-endif()
+endif ()
 
 include_directories(
         ${Pylon_INCLUDE_DIRS}
@@ -27,7 +27,6 @@ include_directories(
 
 add_executable(recorder
         app/recorder.cpp
-        lib/event_visualizer.h
         lib/basler_event_handler.h lib/utils.h lib/parameters.h lib/constants.h lib/camera/base.cpp
         lib/camera/base.h lib/camera/prophesee_cam.cpp lib/camera/prophesee_cam.h lib/constants.cpp
         lib/utils.cpp lib/camera/basler_camera.cpp lib/camera/basler_camera.h)
