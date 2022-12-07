@@ -4,6 +4,7 @@
 #include <metavision/sdk/driver/camera.h>
 #include <metavision/sdk/base/utils/log.h>
 #include <metavision/hal/facilities/i_device_control.h>
+#include <metavision/hal/facilities/i_trigger_in.h>
 #include <metavision/sdk/core/utils/cd_frame_generator.h>
 #include <metavision/sdk/core/utils/rate_estimator.h>
 #include <opencv2/core/core.hpp>

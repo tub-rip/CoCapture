@@ -39,6 +39,8 @@ namespace camera {
         if (params_.record_from_startup) {
             std::stringstream ss;
             ss << "./out_" << params_.id << ".raw";
+            int channel_id = 0; // for EVK4, EVK3
+            cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
             cam_.start_recording(ss.str());
         }
         cam_.start();
