@@ -22,4 +22,4 @@ namespace camera {
         event_handler_->get_display_frame(display);
     }
 
-} // camerastd::make_unique<basler::BaslerEventHandler>
+} // camera
