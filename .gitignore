@@ -34,3 +34,5 @@ build/*
 *.exe
 *.out
 *.app
+
+CMakeLsists.txt.user
