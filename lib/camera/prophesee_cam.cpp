@@ -25,6 +25,10 @@ namespace camera {
         cd_frame_generator->start(params_.fps, [this](const Metavision::timestamp &ts, const cv::Mat &frame) {
             frame.copyTo(cd_frame_);
         });
+        cam_.ext_trigger().add_callback([this](const Metavision::EventExtTrigger *begin,
+                                                                      const Metavision::EventExtTrigger *end) {
+            std::cout << "Trigger event received at "<< begin->t << std::endl;
+        });
 
         if (params_.mode == "master") {
             this->set_mode_master();
