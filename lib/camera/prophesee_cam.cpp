@@ -27,7 +27,7 @@ namespace camera {
         });
         cam_.ext_trigger().add_callback([this](const Metavision::EventExtTrigger *begin,
                                                                       const Metavision::EventExtTrigger *end) {
-            std::cout << "Trigger event received at "<< begin->t << std::endl;
+            std::cout << "Trigger event received at "<< begin->t << "us" << std::endl;
         });
 
         if (params_.mode == "master") {
