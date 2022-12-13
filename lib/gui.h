@@ -10,6 +10,8 @@
 #include "SDL2/SDL.h"
 #include <SDL_opengl.h>
 
+#include "camera/base.h"
+
 namespace gui {
     struct window_settings {
         std::string title;
@@ -40,6 +42,8 @@ namespace gui {
 
             void update_texture_cam(GLuint tex, void* data,
                                     int w, int h);
+
+            void display_cams(GLuint* tex, std::vector<camera::Base *> cameras);
 
         private:
             SDL_Window* window;

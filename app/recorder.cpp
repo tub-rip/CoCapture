@@ -12,12 +12,12 @@
 
 int main(int argc, const char* argv[]) {
     // Setup GUI
-    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
+
+    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     gui::window_settings ws = {
             "Recorder",
@@ -95,11 +95,9 @@ int main(int argc, const char* argv[]) {
 
                 g.update_texture_cam(textures[i], (void*) mats[i].data,
                                      widths[i], heights[i]);
-
-                ImGui::Begin(app_parameter.camera_types[i].c_str());
-                ImGui::Image((void*)(intptr_t) textures[i], ImGui::GetWindowSize());
-                ImGui::End();
             }
+
+            g.display_cams(textures, cameras);
         }
 
         g.render();
