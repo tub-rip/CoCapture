@@ -12,7 +12,7 @@
 
 int main(int argc, const char* argv[]) {
     // Setup GUI
-    SDL_Init(SDL_INIT_VIDEO);
+    gui::gui g = gui::gui();
 
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
@@ -31,7 +31,7 @@ int main(int argc, const char* argv[]) {
             ImVec4(0x22/255.0f, 0x63/255.0f, 0x87/255.0f, 1.0f)
     };
 
-    gui::gui g = gui::gui(ws, cs);
+    g.create_window(ws, cs);
 
     // Setup cameras
     Pylon::PylonInitialize();

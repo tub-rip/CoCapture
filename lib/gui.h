@@ -25,7 +25,7 @@ namespace gui {
 
     class gui {
         public:
-             gui(window_settings ws, color_settings cs);
+             gui();
             ~gui();
 
             SDL_Window* get_window();
@@ -33,8 +33,10 @@ namespace gui {
             window_settings get_window_settings();
             color_settings get_color_settings();
 
+            void create_window(window_settings ws, color_settings cs);
             void start_frame();
             void render();
+            void draw(GLuint tex, ImVec2 pos, ImVec2 size, int idx);
             void handle_event(bool* done);
 
             void setup_texture_cam(GLuint* tex,

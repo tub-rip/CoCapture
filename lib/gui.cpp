@@ -1,12 +1,26 @@
 #include "gui.h"
 
 namespace gui {
-    gui::gui(window_settings ws, color_settings cs) {
-        this->ws = ws;
-        this->cs = cs;
+    gui::gui() {
+        SDL_Init(SDL_INIT_VIDEO);
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+    }
+
+    gui::~gui() {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplSDL2_Shutdown();
+        ImGui::DestroyContext();
+
+        SDL_GL_DeleteContext(gl_context);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+    }
+
+    void gui::create_window(window_settings ws, color_settings cs) {
+        this->ws = ws;
+        this->cs = cs;
 
         window = SDL_CreateWindow(ws.title.c_str(),
                                   ws.x, ws.y,
@@ -22,16 +36,6 @@ namespace gui {
 
         const char* glsl_version = "#version 130";
         ImGui_ImplOpenGL3_Init(glsl_version);
-    }
-
-    gui::~gui() {
-        ImGui_ImplOpenGL3_Shutdown();
-        ImGui_ImplSDL2_Shutdown();
-        ImGui::DestroyContext();
-
-        SDL_GL_DeleteContext(gl_context);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
     }
 
     void gui::start_frame() {
@@ -55,6 +59,16 @@ namespace gui {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         SDL_GL_SwapWindow(window);
+    }
+
+    void gui::draw(GLuint tex, ImVec2 pos, ImVec2 size, int idx) {
+        ImGui::SetNextWindowSize(size, ImGuiCond_Appearing);
+        ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, ImVec2(0.0f, 0.0f));
+
+        ImGui::Begin(std::to_string(idx).c_str(), NULL,
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImGui::Image((void*) (intptr_t) tex, ImGui::GetWindowSize());
+        ImGui::End();
     }
 
     void gui::handle_event(bool* done) {
@@ -107,52 +121,38 @@ namespace gui {
         int n_cameras = cameras.size();
         ImGuiIO& io = ImGui::GetIO();
 
+        ImVec2 pos;
+        ImVec2 size;
+
         if(n_cameras == 1) {
-            ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y), ImGuiCond_None);
-            ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f),
-                                    ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y);
+            pos = ImVec2(0.0f, 0.0f);
 
-            ImGui::Begin(std::to_string(0).c_str());
-            ImGui::Image((void*) (intptr_t) tex[0], ImGui::GetWindowSize());
-            ImGui::End();
-        } else if(n_cameras == 2) {
-            float grid_width = io.DisplaySize.x / 2;
-            float grid_height = io.DisplaySize.y;
+            draw(*tex, pos, size, 0);
+        }
 
-            ImGui::SetNextWindowSize(ImVec2(grid_width, grid_height), ImGuiCond_None);
-            ImGui::SetNextWindowPos(ImVec2(0 * grid_width, 0 * grid_height),
-                                    ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+        else if(n_cameras == 2) {
+            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y / 2);
+            ImVec2 poses[2] = { ImVec2(0.0f, 0.0f), ImVec2(0.0f, size.y) };
 
-            ImGui::Begin(std::to_string(0).c_str());
-            ImGui::Image((void*) (intptr_t) tex[0], ImGui::GetWindowSize());
-            ImGui::End();
+            for(int i = 0; i < 2; i++)
+                draw(tex[i], poses[i], size, i);
+        }
 
-            ImGui::SetNextWindowSize(ImVec2(grid_width, grid_height), ImGuiCond_None);
-            ImGui::SetNextWindowPos(ImVec2(1 * grid_width, 0 * grid_height),
-                                    ImGuiCond_Always, ImVec2(0.0f, 0.0f));
-
-            ImGui::Begin(std::to_string(1).c_str());
-            ImGui::Image((void*) (intptr_t) tex[1], ImGui::GetWindowSize());
-            ImGui::End();
-        } else {
+        else {
             int n_horizontal_grids = (n_cameras % 2 == 0 ? n_cameras : n_cameras + 1) / 2;
-
             int x_offset; int y_offset;
-            float grid_width; float grid_height;
+
             for(int i = 0; i < n_cameras; i++) {
                 x_offset = i % (n_horizontal_grids);
                 y_offset = i < (n_horizontal_grids) ? 0 : 1;
 
-                grid_width = io.DisplaySize.x / n_horizontal_grids;
-                grid_height = io.DisplaySize.y / 2 ;
+                size = ImVec2(io.DisplaySize.x / n_horizontal_grids,
+                              io.DisplaySize.y / 2);
 
-                ImGui::SetNextWindowSize(ImVec2(grid_width, grid_height), ImGuiCond_None);
-                ImGui::SetNextWindowPos(ImVec2(x_offset * grid_width, y_offset * grid_height),
-                                        ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+                pos = ImVec2(x_offset * size.x, y_offset * size.y);
 
-                ImGui::Begin(std::to_string(i).c_str());
-                ImGui::Image((void*) (intptr_t) tex[i], ImGui::GetWindowSize());
-                ImGui::End();
+                draw(tex[i], pos, size, i);
             }
         }
     }
