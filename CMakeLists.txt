@@ -8,11 +8,26 @@ find_package(Threads REQUIRED)
 set(boost_components_to_find program_options filesystem timer chrono thread)
 find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
 
-find_package(Pangolin QUIET)
-if (NOT ${Pangolin_FOUND})
-    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPangolin.cmake")
-endif ()
-include_directories(${Pangolin_INCLUDE_DIRS})
+add_library(ImGui STATIC)
+find_package(SDL2 REQUIRED)
+find_package(OpenGL REQUIRED)
+
+target_sources(ImGui
+		       PRIVATE
+		       lib/imgui/imgui.cpp lib/imgui/imgui_draw.cpp
+	    	   lib/imgui/imgui_tables.cpp lib/imgui/imgui_widgets.cpp
+	    	   lib/imgui/backend/imgui_impl_sdl.cpp lib/imgui/backend/imgui_impl_opengl3.cpp
+			   lib/imgui/imgui_demo.cpp)
+
+target_include_directories(ImGui
+						   PUBLIC
+		  		  	       lib/imgui lib/imgui/backend
+		  				   ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
+
+target_link_libraries(ImGui
+					  PUBLIC
+					  ${CMAKE_DL_LIBS}
+					  ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES})
 
 find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
 
@@ -29,10 +44,10 @@ add_executable(recorder
         app/recorder.cpp
         lib/basler_event_handler.h lib/utils.h lib/parameters.h lib/constants.h lib/camera/base.cpp
         lib/camera/base.h lib/camera/prophesee_cam.cpp lib/camera/prophesee_cam.h lib/constants.cpp
-        lib/utils.cpp lib/camera/basler_camera.cpp lib/camera/basler_camera.h)
+        lib/utils.cpp lib/camera/basler_camera.cpp lib/camera/basler_camera.h lib/gui.cpp lib/gui.h)
 
 target_link_libraries(recorder
-        pango_display
+		ImGui
         ${OpenCV_LIBRARIES}
         Boost::program_options
         MetavisionSDK::core
