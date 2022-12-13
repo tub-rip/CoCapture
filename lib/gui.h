@@ -36,7 +36,7 @@ namespace gui {
             void create_window(window_settings ws, color_settings cs);
             void start_frame();
             void render();
-            void draw(GLuint tex, ImVec2 pos, ImVec2 size, int idx);
+            void draw(GLuint tex, ImVec2 pos, ImVec2 size, ImVec2 pivot, int idx);
             void handle_event(bool* done);
 
             void setup_texture_cam(GLuint* tex,

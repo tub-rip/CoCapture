@@ -61,9 +61,9 @@ namespace gui {
         SDL_GL_SwapWindow(window);
     }
 
-    void gui::draw(GLuint tex, ImVec2 pos, ImVec2 size, int idx) {
+    void gui::draw(GLuint tex, ImVec2 pos, ImVec2 size, ImVec2 pivot, int idx) {
         ImGui::SetNextWindowSize(size, ImGuiCond_Appearing);
-        ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, ImVec2(0.0f, 0.0f));
+        ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, pivot);
 
         ImGui::Begin(std::to_string(idx).c_str(), NULL,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -121,38 +121,47 @@ namespace gui {
         int n_cameras = cameras.size();
         ImGuiIO& io = ImGui::GetIO();
 
+        ImVec2 grid_size;
         ImVec2 pos;
         ImVec2 size;
 
+        float scale = 0.9f;
+
         if(n_cameras == 1) {
-            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y);
-            pos = ImVec2(0.0f, 0.0f);
+            camera::Base* cam = cameras[0];
 
-            draw(*tex, pos, size, 0);
-        }
+            grid_size = ImVec2(io.DisplaySize.x, io.DisplaySize.y);
 
-        else if(n_cameras == 2) {
-            size = ImVec2(io.DisplaySize.x, io.DisplaySize.y / 2);
-            ImVec2 poses[2] = { ImVec2(0.0f, 0.0f), ImVec2(0.0f, size.y) };
+            size = ImVec2(((float) cam->get_width() / cam->get_height()) * (scale * grid_size.y),
+                          scale * grid_size.y);
 
-            for(int i = 0; i < 2; i++)
-                draw(tex[i], poses[i], size, i);
+            pos = ImVec2(0.5 * grid_size.x,
+                         0.5 * grid_size.y);
+
+            draw(*tex, pos, size, ImVec2(0.5f, 0.5f), 0);
         }
 
         else {
             int n_horizontal_grids = (n_cameras % 2 == 0 ? n_cameras : n_cameras + 1) / 2;
-            int x_offset; int y_offset;
+            grid_size = ImVec2(io.DisplaySize.x / n_horizontal_grids,
+                               io.DisplaySize.y / 2);
+
+            int x_offset;
+            int y_offset;
 
             for(int i = 0; i < n_cameras; i++) {
+                camera::Base* cam = cameras[i];
+
                 x_offset = i % (n_horizontal_grids);
                 y_offset = i < (n_horizontal_grids) ? 0 : 1;
 
-                size = ImVec2(io.DisplaySize.x / n_horizontal_grids,
-                              io.DisplaySize.y / 2);
+                size = ImVec2(((float) cam->get_width() / cam->get_height()) * (scale * grid_size.y),
+                              scale * grid_size.y);
 
-                pos = ImVec2(x_offset * size.x, y_offset * size.y);
+                pos = ImVec2(x_offset * grid_size.x + 0.5 * grid_size.x,
+                             y_offset * grid_size.y + 0.5 * grid_size.y);
 
-                draw(tex[i], pos, size, i);
+                draw(tex[i], pos, size, ImVec2(0.5f, 0.5f), i);
             }
         }
     }
