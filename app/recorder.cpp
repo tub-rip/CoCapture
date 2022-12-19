@@ -85,10 +85,10 @@ int main(int argc, const char* argv[]) {
         for(int i = 0; i < n_cams; i++) {
             cameras[i]->update_display_frame();
 
-            if(!mats[i].empty())
+            if(!mats[i].empty()) {
                 g.update_texture_cam(textures[i], (void*) mats[i].data,
                                      cameras[i]->get_width(), cameras[i]->get_height());
-
+            }
 
             g.display_cams(textures, cameras);
         }
