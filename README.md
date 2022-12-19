@@ -1,11 +1,21 @@
 # rip-cocapture-gui
+
 Light-weight viewer and recorder for the co-capture system
 
 ## Dependencies:
 
+Install OpenGL3 library with:
+
+    sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev  
+
+Install SDL2 library with:
+
+    sudo apt-get install libsdl2-dev
+
+further dependencies for the cameras:
+
 - OpenEB, from https://github.com/prophesee-ai/openeb
 - Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
-- Pangolin, from https://github.com/stevenlovegrove/Pangolin
 
 ## Installation
 
