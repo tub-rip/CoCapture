@@ -38,26 +38,23 @@ int main(int argc, const char* argv[]) {
 
     Parameters app_parameter;
     utils::parse_comman_line(argc, argv, app_parameter);
+    int n_cams = app_parameter.camera_types.size();
 
     std::vector<camera::Base *> cameras;
-
-    int n_cameras = app_parameter.camera_types.size();
-    GLuint textures[n_cameras];
-    int      widths[n_cameras];
-    int     heights[n_cameras];
-    cv::Mat    mats[n_cameras];
+    std::vector<cv::Mat> mats;
+    GLuint* textures = new GLuint[n_cams];
 
     // Set all but last prophesee camera to slave mode
     int last_prophesee_i = -1;
-    for (int i = 0; i < n_cameras; ++i) {
+    for (int i = 0; i < n_cams; ++i) {
         if (app_parameter.camera_types[i] == "prophesee") {
             last_prophesee_i = i;
         }
     }
 
-    for (int i = 0; i < n_cameras; ++i) {
+    // Setup cameras
+    for (int i = 0; i < n_cams; ++i) {
         const auto type = app_parameter.camera_types[i];
-
         if (type == "prophesee") {
             std::string mode = "slave";
             if (i == last_prophesee_i || !app_parameter.record) { mode = "master"; }
@@ -69,15 +66,13 @@ int main(int argc, const char* argv[]) {
         auto cam = cameras.back();
         cam->setup_camera();
 
-        widths[i] = cam->get_width();
-        heights[i] = cam->get_height();
+        mats.push_back(cv::Mat(cam->get_height(), cam->get_width(),
+                               CV_8UC3, cv::Vec3b(0,0,0)));
 
-        mats[i] = cv::Mat(heights[i], widths[i],
-                          CV_8UC3, cv::Vec3b(0,0,0));
-        cam->set_display(mats[i]);
+        auto mat = mats.back();
+        cam->set_display(mat);
 
-        g.setup_texture_cam(textures + i,
-                            widths[i], heights[i]);
+        g.setup_texture_cam(textures + i, cam->get_width(), cam->get_height());
     }
 
     // Main loop
@@ -87,14 +82,14 @@ int main(int argc, const char* argv[]) {
 
         g.start_frame();
 
-        for(int i = 0; i < n_cameras; i++) {
+        for(int i = 0; i < n_cams; i++) {
             cameras[i]->update_display_frame();
 
             if(!mats[i].empty()) {
                 cv::flip(mats[i], mats[i], 0);
 
                 g.update_texture_cam(textures[i], (void*) mats[i].data,
-                                     widths[i], heights[i]);
+                                     cameras[i]->get_width(), cameras[i]->get_height());
             }
 
             g.display_cams(textures, cameras);
@@ -107,6 +102,8 @@ int main(int argc, const char* argv[]) {
     for(auto cam : cameras) {
         delete cam;
     }
+
+    delete[] textures;
 
     return 0;
 }
