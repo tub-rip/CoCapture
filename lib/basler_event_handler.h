@@ -31,7 +31,6 @@ namespace basler {
                                              params_.target_height));
             }
             cv::cvtColor(img_swap_, display, cv::COLOR_GRAY2RGB);
-            cv::flip(display, display, 0);
         }
 
         virtual void OnImageGrabbed(Pylon::CInstantCamera &camera,
