@@ -48,7 +48,7 @@ namespace camera {
 
     void PropheseeCam::get_display_frame(cv::Mat &display) {
         if (!cd_frame_.empty()) {
-            cv::copyTo(cd_frame_, display, 0);
+            cd_frame_.copyTo(display);
         }
     }
 
