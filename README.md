@@ -4,7 +4,11 @@ Light-weight viewer and recorder for the co-capture system
 
 ## Dependencies:
 
-Install sdl2 library with:
+Install OpenGL3 library with:
+
+    sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev  
+
+Install SDL2 library with:
 
     sudo apt-get install libsdl2-dev
 
