@@ -22,7 +22,9 @@
 namespace CCGui {
 
     // Constants
-    const std::string TITLE = "Recorder";
+    const std::string APP_TITLE = "Recorder";
+    const std::string GENERAL_TITLE = "General";
+    const std::string SETTINGS_TITLE = "Settings";
     const std::string GLSL_VERSION = "#version 130";
     const std::string PROPHESEE = "prophesee";
     const std::string BASLER = "basler";
@@ -30,31 +32,49 @@ namespace CCGui {
     const std::string SLAVE = "slave";
 
     const int DISPLAY_INDEX = 0;
-    const int ORIGIN = 0;
+    const int ZERO = 0;
     const int MAT_TYPE = CV_8UC3;
     const int WINDOW_FLAGS = SDL_WINDOW_OPENGL |
                              SDL_WINDOW_RESIZABLE |
                              SDL_WINDOW_ALLOW_HIGHDPI;
 
-    const float SCALE = 0.9f;
+    const float GRID_SCALE_Y = 0.9f;
     const float ALPHA = 1.0f;
-    const float MAX_VAL_RGBU8 = 255.0f;
 
-    const char CC_R = 0x3B; const char CC_G = 0x3B; const char CC_B = 0x3B;
+    const short MAX_VAL_RGBU8 = 255;
+    const short CC_R = 0x3B; const int CC_G = 0x3B; const int CC_B = 0x3B;
 
-    const ImVec2 PIVOT_CENTER = ImVec2(0.5f, 0.5f);
-    const ImVec4 CLEAR_COLOR = ImVec4(CC_R/MAX_VAL_RGBU8,
-                                      CC_G/MAX_VAL_RGBU8,
-                                      CC_B/MAX_VAL_RGBU8,
-                                      ALPHA);
+    const ImVec2 PIVOT_CENTER = ImVec2(0.5, 0.5);
+    const ImVec2 NO_PIVOT = ImVec2(0, 0);
+    const ImVec2 WINDOW_PADDING = ImVec2(2.5f, 2.5f);
+
+    const ImVec2 DISPLAY_SPACE_SCALE = ImVec2(0.75f, 1.0f);
+    const ImVec2 GENERAL_SPACE_SCALE = ImVec2(0.25f, 0.35f);
+    const ImVec2 SETTINGS_SPACE_SCALE = ImVec2(0.25f, 0.65f);
+
+    const ImVec4 CLEAR_COLOR = ImVec4(float(CC_R)/MAX_VAL_RGBU8,
+                                      float(CC_G)/MAX_VAL_RGBU8,
+                                      float(CC_B)/MAX_VAL_RGBU8,
+                                      float(ALPHA));
 
     const cv::Vec3b INITIAL_PIXEL_VALUE = cv::Vec3b(0, 0, 0);
 
+    const cv::Point ORIGIN = cv::Point(30, 60);
+    const cv::HersheyFonts FONT_FACE = cv::FONT_HERSHEY_SIMPLEX;
+    const double FONT_SCALE = 1.25;
+    const cv::Scalar FONT_COLOR = cv::Scalar(0, MAX_VAL_RGBU8, 0);
+    const int LINE_THICKNESS = 1;
+    const int LINE_TYPE = cv::LINE_8;
+    const bool BOTTOM_LEFT_ORIGIN = true;
+
     // CCGui structs
+    // @TODO: Window triple struct (pos, size, pivot)
+
     // CCGui camera
     struct CCCamera {
         camera::Base* cam;
         std::string camType;
+        int camIdx;
         GLuint* camTex;
         cv::Mat camMat;
     };
@@ -86,7 +106,11 @@ namespace CCGui {
         void handleEvent(bool* done);
         void setupTexture(GLuint* tex, int w, int h);
         void updateTexture(GLuint tex, void* data, int w, int h);
+
         void drawToWindow(GLuint tex, ImVec2 pos, ImVec2 size, ImVec2 pivot, int idx);
+        void writeToDisplay(std::string text, cv::Mat mat);
+        void displayGeneral();
+        void displaySettings();
 
         // Camera methods
         void setupCameras();

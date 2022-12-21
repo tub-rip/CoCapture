@@ -15,7 +15,7 @@ namespace CCGui {
         // Using SDL, creates an OpenGL window as well as an OpenGL context
         // sets up aforementioned OpenGL context for rendering to the corresponding OpenGL window
         SDL_GetCurrentDisplayMode(DISPLAY_INDEX, &container.displayMode);
-        container.mainWindow = SDL_CreateWindow(TITLE.c_str(),
+        container.mainWindow = SDL_CreateWindow(APP_TITLE.c_str(),
                                                 SDL_WINDOWPOS_CENTERED,
                                                 SDL_WINDOWPOS_CENTERED,
                                                 container.displayMode.w,
@@ -72,7 +72,7 @@ namespace CCGui {
 
         // Sets viewport size
         ImGuiIO& io = ImGui::GetIO();
-        glViewport(ORIGIN, ORIGIN,
+        glViewport(ZERO, ZERO,
                    (int) io.DisplaySize.x,
                    (int) io.DisplaySize.y);
 
@@ -142,9 +142,60 @@ namespace CCGui {
         ImGui::SetNextWindowSize(size, ImGuiCond_Appearing);
         ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, pivot);
 
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, WINDOW_PADDING);
         ImGui::Begin(std::to_string(idx).c_str(), NULL,
-                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+                     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::Image((void*) (intptr_t) tex, ImGui::GetWindowSize());
+        ImGui::End();
+        ImGui::PopStyleVar();
+    }
+
+    // NEW FEATURES WEEK 4 //
+    void CCGui::writeToDisplay(std::string text, cv::Mat mat) {
+        cv::putText(mat,
+                    text,
+                    ORIGIN,
+                    FONT_FACE,
+                    FONT_SCALE,
+                    FONT_COLOR,
+                    LINE_THICKNESS,
+                    LINE_TYPE,
+                    !BOTTOM_LEFT_ORIGIN);
+    }
+
+    void CCGui::displayGeneral() {
+        ImGuiIO& io = ImGui::GetIO();
+
+        ImVec2 size = ImVec2(io.DisplaySize.x * GENERAL_SPACE_SCALE.x,
+                             io.DisplaySize.y * GENERAL_SPACE_SCALE.y);
+
+        ImVec2 pos = ImVec2(io.DisplaySize.x * (1 - GENERAL_SPACE_SCALE.x),
+                            io.DisplaySize.y * 0);
+
+        ImGui::SetNextWindowSize(size, ImGuiCond_Appearing);
+        ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, NO_PIVOT);
+        ImGui::Begin(GENERAL_TITLE.c_str(), NULL,
+                     ImGuiWindowFlags_NoCollapse|
+                     ImGuiWindowFlags_NoResize|
+                     ImGuiWindowFlags_NoMove);
+        ImGui::End();
+    }
+
+    void CCGui::displaySettings() {
+        ImGuiIO& io = ImGui::GetIO();
+
+        ImVec2 size = ImVec2(io.DisplaySize.x * SETTINGS_SPACE_SCALE.x,
+                             io.DisplaySize.y * SETTINGS_SPACE_SCALE.y);
+
+        ImVec2 pos = ImVec2(io.DisplaySize.x * (1 - SETTINGS_SPACE_SCALE.x),
+                            io.DisplaySize.y * (GENERAL_SPACE_SCALE.y));
+
+        ImGui::SetNextWindowSize(size, ImGuiCond_Appearing);
+        ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, NO_PIVOT);
+        ImGui::Begin(SETTINGS_TITLE.c_str(), NULL,
+                     ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoResize |
+                     ImGuiWindowFlags_NoMove);
         ImGui::End();
     }
 
@@ -183,6 +234,7 @@ namespace CCGui {
             cam->setup_camera();
 
             std::string camType = type;
+            int camIdx = i;
 
             GLuint* camTex = container.glTextures + i;
             setupTexture(camTex, cam->get_width(), cam->get_height());
@@ -191,7 +243,7 @@ namespace CCGui {
                                       MAT_TYPE, INITIAL_PIXEL_VALUE);
             cam->set_display(camMat);
 
-            container.cameras.push_back( CCCamera { cam, camType, camTex, camMat } );
+            container.cameras.push_back( CCCamera { cam, camType, camIdx, camTex, camMat } );
         }
     }
 
@@ -201,6 +253,8 @@ namespace CCGui {
             ccc.cam->update_display_frame();
 
             if(!ccc.camMat.empty()) {
+                writeToDisplay(ccc.camType + " " + std::to_string(ccc.camIdx),
+                               ccc.camMat);
                 updateTexture(*ccc.camTex, (void*) ccc.camMat.data,
                               ccc.cam->get_width(), ccc.cam->get_height());
             }
@@ -213,16 +267,20 @@ namespace CCGui {
 
         camera::Base* cam;
         ImVec2 gridSize;
+        ImVec2 virtualDisplaySize;
         ImVec2 pos;
         ImVec2 size;
 
+        virtualDisplaySize = ImVec2(DISPLAY_SPACE_SCALE.x * io.DisplaySize.x,
+                                    DISPLAY_SPACE_SCALE.y * io.DisplaySize.y);
+
         if(container.numCams == 1) {
-            int idx = 0;
+            int idx = ZERO;
             cam = container.cameras[idx].cam;
 
-            gridSize = ImVec2(io.DisplaySize.x, io.DisplaySize.y);
-            size = ImVec2(((float) cam->get_width() / cam->get_height()) * (SCALE * gridSize.y),
-                          SCALE * gridSize.y);
+            gridSize = ImVec2(virtualDisplaySize.x, virtualDisplaySize.y);
+            size = ImVec2(((float) cam->get_width() / cam->get_height()) * (GRID_SCALE_Y * gridSize.y),
+                          GRID_SCALE_Y * gridSize.y);
 
             pos = ImVec2(0.5 * gridSize.x,
                          0.5 * gridSize.y);
@@ -232,8 +290,8 @@ namespace CCGui {
 
         else {
             int nHorizontalGrids = (container.numCams % 2 == 0 ? container.numCams : container.numCams + 1) / 2;
-            gridSize = ImVec2(io.DisplaySize.x / nHorizontalGrids,
-                              io.DisplaySize.y / 2);
+            gridSize = ImVec2(virtualDisplaySize.x / nHorizontalGrids,
+                              virtualDisplaySize.y / 2);
 
             int xOffset;
             int yOffset;
@@ -244,8 +302,8 @@ namespace CCGui {
                 xOffset = i % (nHorizontalGrids);
                 yOffset = i < (nHorizontalGrids) ? 0 : 1;
 
-                size = ImVec2(((float) cam->get_width() / cam->get_height()) * (SCALE * gridSize.y),
-                              SCALE * gridSize.y);
+                size = ImVec2(((float) cam->get_width() / cam->get_height()) * (GRID_SCALE_Y * gridSize.y),
+                              GRID_SCALE_Y * gridSize.y);
 
                 pos = ImVec2(xOffset * gridSize.x + 0.5 * gridSize.x,
                              yOffset * gridSize.y + 0.5 * gridSize.y);

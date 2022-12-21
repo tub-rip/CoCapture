@@ -15,7 +15,10 @@ int main(int argc, const char* argv[]) {
         // - - - - - - APPLICATON LOGIC - - - - - - //
 
         ccg.updateCameras();
+
         ccg.displayCameras();
+        ccg.displayGeneral();
+        ccg.displaySettings();
 
         // - - - - - - APPLICATON LOGIC - - - - - - //
 
