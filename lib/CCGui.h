@@ -22,7 +22,7 @@
 namespace CCGui {
 
     // Constants
-    const std::string APP_TITLE = "Recorder";
+    const std::string APP_TITLE = "RIP_COCAPTURE_GUI";
     const std::string GENERAL_TITLE = "General";
     const std::string SETTINGS_TITLE = "Settings";
     const std::string GLSL_VERSION = "#version 130";
@@ -49,8 +49,8 @@ namespace CCGui {
     const ImVec2 WINDOW_PADDING = ImVec2(2.5f, 2.5f);
 
     const ImVec2 DISPLAY_SPACE_SCALE = ImVec2(0.75f, 1.0f);
-    const ImVec2 GENERAL_SPACE_SCALE = ImVec2(0.25f, 0.35f);
-    const ImVec2 SETTINGS_SPACE_SCALE = ImVec2(0.25f, 0.65f);
+    const ImVec2 GENERAL_SPACE_SCALE = ImVec2(0.25f, 0.20f);
+    const ImVec2 SETTINGS_SPACE_SCALE = ImVec2(0.25f, 0.80f);
 
     const ImVec4 CLEAR_COLOR = ImVec4(float(CC_R)/MAX_VAL_RGBU8,
                                       float(CC_G)/MAX_VAL_RGBU8,
@@ -67,8 +67,59 @@ namespace CCGui {
     const int LINE_TYPE = cv::LINE_8;
     const bool BOTTOM_LEFT_ORIGIN = true;
 
+    const std::string BASLER_EXPOSURE_LABEL = "ExposureTime";
+    const int BASLER_EXPOSURE_DEFAULT = 5000;
+    const int BASLER_EXPOSURE_MIN = 500;
+    const int BASLER_EXPOSURE_MAX = 20000;
+
+    const std::string PROPHESEE_BIAS_FO_LABEL = "bias_fo";
+    const int PROPHESEE_BIAS_FO_DEFAULT = 70;
+    const int PROPHESEE_BIAS_FO_MIN = 45;
+    const int PROPHESEE_BIAS_FO_MAX = 110;
+
+    const std::string PROPHESEE_BIAS_DIFF_OFF_LABEL = "bias_diff_off";
+    const int PROPHESEE_BIAS_DIFF_OFF_DEFAULT = 40;
+    const int PROPHESEE_BIAS_DIFF_OFF_MIN = 25;
+    const int PROPHESEE_BIAS_DIFF_OFF_MAX = 65;
+
+    const std::string PROPHESEE_BIAS_DIFF_ON_LABEL = "bias_diff_on";
+    const int PROPHESEE_BIAS_DIFF_ON_DEFAULT = 125;
+    const int PROPHESEE_BIAS_DIFF_ON_MIN = 95;
+    const int PROPHESEE_BIAS_DIFF_ON_MAX = 140;
+
+    const std::string PROPHESEE_BIAS_HPF_LABEL = "bias_hpf";
+    const int PROPHESEE_BIAS_HPF_DEFAULT = 60;
+    const int PROPHESEE_BIAS_HPF_MIN = 0;
+    const int PROPHESEE_BIAS_HPF_MAX = 120;
+
+    const std::string PROPHESEE_BIAS_REFR_LABEL = "bias_refr";
+    const int PROPHESEE_BIAS_REFR_DEFAULT = 60;
+    const int PROPHESEE_BIAS_REFR_MIN = 20;
+    const int PROPHESEE_BIAS_REFR_MAX = 100;
+
+    const std::vector<std::string> PROPHESEE_BIAS_VALUES { PROPHESEE_BIAS_FO_LABEL,
+                                                           PROPHESEE_BIAS_DIFF_OFF_LABEL,
+                                                           PROPHESEE_BIAS_DIFF_ON_LABEL,
+                                                           PROPHESEE_BIAS_HPF_LABEL,
+                                                           PROPHESEE_BIAS_REFR_LABEL };
+
     // CCGui structs
     // @TODO: Window triple struct (pos, size, pivot)
+
+    // Basler Settings
+    struct BaslerSettings {
+        int exposureTime;
+    };
+
+    struct PropheseeSettings {
+        int bias_fo;
+        int bias_diff_off;
+        int bias_diff_on;
+        int bias_hpf;
+        int bias_refr;
+    };
+
+    // Prophesee Settings
 
     // CCGui camera
     struct CCCamera {
@@ -77,6 +128,9 @@ namespace CCGui {
         int camIdx;
         GLuint* camTex;
         cv::Mat camMat;
+
+        BaslerSettings basSet;
+        PropheseeSettings proSet;
     };
 
     // CCGui container

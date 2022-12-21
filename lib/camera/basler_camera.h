@@ -25,6 +25,9 @@ namespace camera {
 
         void setup_camera() override;
 
+        int get_exposure_time();
+        void set_exposure_time(int exposure_time);
+
     private:
         BaslerParams params_;
         Pylon::CBaslerUniversalInstantCamera cam_;

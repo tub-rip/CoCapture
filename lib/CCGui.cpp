@@ -178,6 +178,14 @@ namespace CCGui {
                      ImGuiWindowFlags_NoCollapse|
                      ImGuiWindowFlags_NoResize|
                      ImGuiWindowFlags_NoMove);
+
+        ImGui::Text("%s", APP_TITLE.c_str());
+        ImGui::NewLine();
+        ImGui::Text("Detected cameras:");
+        for(auto ccc : container.cameras) {
+            ImGui::BulletText("%s %d", ccc.camType.c_str(), ccc.camIdx);
+        }
+
         ImGui::End();
     }
 
@@ -196,6 +204,41 @@ namespace CCGui {
                      ImGuiWindowFlags_NoCollapse |
                      ImGuiWindowFlags_NoResize |
                      ImGuiWindowFlags_NoMove);
+
+        for(auto ccc : container.cameras) {
+            ImGui::BulletText("%s %d", ccc.camType.c_str(), ccc.camIdx);
+
+            // Display Basler camera settings
+            if(ccc.camType == BASLER) {
+                ImGui::SliderInt((BASLER_EXPOSURE_LABEL + "##" + std::to_string(ccc.camIdx)).c_str(),
+                                 &container.cameras[ccc.camIdx].basSet.exposureTime,
+                                 BASLER_EXPOSURE_MIN, BASLER_EXPOSURE_MAX);
+            }
+
+            // Display Prophesee camera settings
+            else if(ccc.camType == PROPHESEE) {
+                ImGui::SliderInt((PROPHESEE_BIAS_FO_LABEL + "##" + std::to_string(ccc.camIdx)).c_str(),
+                                 &container.cameras[ccc.camIdx].proSet.bias_fo,
+                                 PROPHESEE_BIAS_FO_MIN, PROPHESEE_BIAS_FO_MAX);
+
+                ImGui::SliderInt((PROPHESEE_BIAS_DIFF_OFF_LABEL + "##" + std::to_string(ccc.camIdx)).c_str(),
+                                 &container.cameras[ccc.camIdx].proSet.bias_diff_off,
+                                 PROPHESEE_BIAS_DIFF_OFF_MIN, PROPHESEE_BIAS_DIFF_OFF_MAX);
+
+                ImGui::SliderInt((PROPHESEE_BIAS_DIFF_ON_LABEL + "##" + std::to_string(ccc.camIdx)).c_str(),
+                                 &container.cameras[ccc.camIdx].proSet.bias_diff_on,
+                                 PROPHESEE_BIAS_DIFF_ON_MIN, PROPHESEE_BIAS_DIFF_ON_MAX);
+
+                ImGui::SliderInt((PROPHESEE_BIAS_HPF_LABEL + "##" + std::to_string(ccc.camIdx)).c_str(),
+                                 &container.cameras[ccc.camIdx].proSet.bias_hpf,
+                                 PROPHESEE_BIAS_HPF_MIN, PROPHESEE_BIAS_HPF_MAX);
+
+                ImGui::SliderInt((PROPHESEE_BIAS_REFR_LABEL + "##" + std::to_string(ccc.camIdx)).c_str(),
+                                 &container.cameras[ccc.camIdx].proSet.bias_refr,
+                                 PROPHESEE_BIAS_REFR_MIN, PROPHESEE_BIAS_REFR_MAX);
+            }
+        }
+
         ImGui::End();
     }
 
@@ -243,7 +286,15 @@ namespace CCGui {
                                       MAT_TYPE, INITIAL_PIXEL_VALUE);
             cam->set_display(camMat);
 
-            container.cameras.push_back( CCCamera { cam, camType, camIdx, camTex, camMat } );
+            BaslerSettings basSet = { BASLER_EXPOSURE_DEFAULT };
+            PropheseeSettings proSet = { PROPHESEE_BIAS_FO_DEFAULT,
+                                         PROPHESEE_BIAS_DIFF_OFF_DEFAULT,
+                                         PROPHESEE_BIAS_DIFF_ON_DEFAULT,
+                                         PROPHESEE_BIAS_HPF_DEFAULT,
+                                         PROPHESEE_BIAS_REFR_DEFAULT };
+
+            container.cameras.push_back( CCCamera { cam, camType, camIdx, camTex, camMat ,
+                                                    basSet, proSet} );
         }
     }
 
@@ -252,11 +303,29 @@ namespace CCGui {
         for(auto ccc : container.cameras) {
             ccc.cam->update_display_frame();
 
+            // Update camera mat
             if(!ccc.camMat.empty()) {
                 writeToDisplay(ccc.camType + " " + std::to_string(ccc.camIdx),
                                ccc.camMat);
                 updateTexture(*ccc.camTex, (void*) ccc.camMat.data,
                               ccc.cam->get_width(), ccc.cam->get_height());
+            }
+
+            // Update Basler camera settings
+            if(ccc.camType == BASLER) {
+                camera::BaslerCamera* bCam = (camera::BaslerCamera*) ccc.cam;
+                bCam->set_exposure_time(ccc.basSet.exposureTime);
+            }
+
+            // Update Prophesee camera settings
+            if(ccc.camType == PROPHESEE) {
+                camera::PropheseeCam* pCam = (camera::PropheseeCam*) ccc.cam;
+
+                pCam->set_bias_value(PROPHESEE_BIAS_FO_LABEL, ccc.proSet.bias_fo);
+                pCam->set_bias_value(PROPHESEE_BIAS_DIFF_OFF_LABEL, ccc.proSet.bias_diff_off);
+                pCam->set_bias_value(PROPHESEE_BIAS_DIFF_ON_LABEL, ccc.proSet.bias_diff_on);
+                pCam->set_bias_value(PROPHESEE_BIAS_HPF_LABEL, ccc.proSet.bias_hpf);
+                pCam->set_bias_value(PROPHESEE_BIAS_REFR_LABEL, ccc.proSet.bias_refr);
             }
         }
     }
