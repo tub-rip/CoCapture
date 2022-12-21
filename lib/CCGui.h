@@ -49,8 +49,8 @@ namespace CCGui {
     const ImVec2 WINDOW_PADDING = ImVec2(2.5f, 2.5f);
 
     const ImVec2 DISPLAY_SPACE_SCALE = ImVec2(0.75f, 1.0f);
-    const ImVec2 GENERAL_SPACE_SCALE = ImVec2(0.25f, 0.20f);
-    const ImVec2 SETTINGS_SPACE_SCALE = ImVec2(0.25f, 0.80f);
+    const ImVec2 GENERAL_SPACE_SCALE = ImVec2(0.25f, 0.15f);
+    const ImVec2 SETTINGS_SPACE_SCALE = ImVec2(0.25f, 0.85f);
 
     const ImVec4 CLEAR_COLOR = ImVec4(float(CC_R)/MAX_VAL_RGBU8,
                                       float(CC_G)/MAX_VAL_RGBU8,
