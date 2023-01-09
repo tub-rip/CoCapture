@@ -4,6 +4,7 @@
 #include <pylon/BaslerUniversalInstantCamera.h>
 
 #include "../lib/Gui/gui.h"
+#include "../lib/Gui/Gui.h"
 
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
@@ -17,26 +18,8 @@ int main(int argc, const char* argv[]) {
     utils::parse_comman_line(argc, argv, app_parameter);
 
     // Setup GUI
-    gui::gui g = gui::gui();
-
-    SDL_DisplayMode display_mode;
-    SDL_GetCurrentDisplayMode(0, &display_mode);
-
-    SDL_WindowFlags window_flags = (SDL_WindowFlags) (SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-
-    gui::window_settings ws = {
-            "Recorder",
-            SDL_WINDOWPOS_CENTERED,
-            SDL_WINDOWPOS_CENTERED,
-            display_mode.w, display_mode.h,
-            window_flags
-    };
-
-    gui::color_settings cs = {
-            ImVec4(0x22/255.0f, 0x63/255.0f, 0x87/255.0f, 1.0f)
-    };
-
-    g.create_window(ws, cs);
+    Gui::Gui gui = Gui::Gui();
+    gui.setupGui();
 
     // Setup cameras
     Gui::CameraController controller = Gui::CameraController();
@@ -46,7 +29,7 @@ int main(int argc, const char* argv[]) {
     GLuint* textures = new GLuint[controller.getNumCams()];
     for(int i = 0; i < controller.getNumCams(); i++) {
         auto cam = controller.getCams()[i];
-        g.setup_texture_cam(textures + i, cam.getWidth(), cam.getHeight());
+        gui.setup_texture_cam(textures + i, cam.getWidth(), cam.getHeight());
     }
 
     std::vector<camera::Base*> cameras;
@@ -56,9 +39,9 @@ int main(int argc, const char* argv[]) {
 
     bool done = false;
     while(!done) {
-        g.handle_event(&done);
+        gui.handleEvent(&done);
 
-        g.start_frame();
+        gui.startFrame();
 
         for(int i = 0; i < controller.getNumCams(); i++) {
             controller.updateCameras();
@@ -66,18 +49,19 @@ int main(int argc, const char* argv[]) {
             auto cam = controller.getCams()[i];
 
             if(!cam.getDisplay().empty()) {
-                g.update_texture_cam(textures[i], (void*) cam.getDisplay().data,
+                gui.update_texture_cam(textures[i], (void*) cam.getDisplay().data,
                                      cam.getWidth(), cam.getHeight());
             }
 
-            g.display_cams(textures, cameras);
+            gui.display_cams(textures, cameras);
         }
 
-        g.render();
+        gui.endFrameAndFinalizeRender();
     }
 
     // Cleanup
     controller.cleanupCameras();
+    gui.cleanupGui();
 
     delete[] textures;
 

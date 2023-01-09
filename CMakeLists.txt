@@ -48,7 +48,7 @@ add_executable(recorder
 		lib/Gui/Base.cpp lib/Gui/Base.h
 		lib/Gui/CameraController.cpp lib/Gui/CameraController.h
 		lib/Gui/BaslerWrapper.h
-		lib/Gui/Constants.h lib/Gui/PropheseeWrapper.h)
+		lib/Gui/Constants.h lib/Gui/PropheseeWrapper.h lib/Gui/Gui.cpp lib/Gui/Gui.h)
 
 target_link_libraries(recorder
 		ImGui
