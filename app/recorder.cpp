@@ -41,19 +41,17 @@ int main(int argc, const char* argv[]) {
     // Setup cameras
     Gui::CameraController controller = Gui::CameraController();
     controller.setupController(app_parameter);
+    controller.setupCameras();
 
     GLuint* textures = new GLuint[controller.getNumCams()];
-
-    controller.setupCameras();
+    for(int i = 0; i < controller.getNumCams(); i++) {
+        auto cam = controller.getCams()[i];
+        g.setup_texture_cam(textures + i, cam.getWidth(), cam.getHeight());
+    }
 
     std::vector<camera::Base*> cameras;
     for(auto cam : controller.getCams()) {
-        cameras.push_back(cam.getCam());
-    }
-
-    for(int i = 0; i < controller.getNumCams(); i++) {
-        auto cam = controller.getCams()[i].getCam();
-        g.setup_texture_cam(textures + i, cam->get_width(), cam->get_height());
+        cameras.push_back(cam.getActual());
     }
 
     bool done = false;
@@ -79,9 +77,7 @@ int main(int argc, const char* argv[]) {
     }
 
     // Cleanup
-    for(auto cam : cameras) {
-        delete cam;
-    }
+    controller.cleanupCameras();
 
     delete[] textures;
 

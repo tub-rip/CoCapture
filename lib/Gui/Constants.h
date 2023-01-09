@@ -11,4 +11,9 @@ namespace Gui {
     // Basler camera
     const std::string BASLER = "basler";
 
+    // Prophesee camera
+    const std::string PROPHESEE = "prophesee";
+    const std::string MASTER = "master";
+    const std::string SLAVE = "slave";
+
 } // Gui

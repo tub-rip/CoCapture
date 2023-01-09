@@ -13,7 +13,7 @@ namespace Gui {
         void updateCamera();
 
     public:
-        camera::Base* getCam() { return cam; }
+        camera::Base* getActual() { return cam; }
 
         cv::Mat getDisplay() { return cam->get_display(); }
         int getWidth() { return cam->get_width(); }
