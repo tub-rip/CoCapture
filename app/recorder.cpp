@@ -3,14 +3,19 @@
 #include <opencv2/core.hpp>
 #include <pylon/BaslerUniversalInstantCamera.h>
 
-#include "../lib/gui.h"
+#include "../lib/Gui/gui.h"
 
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
 #include "../lib/camera/prophesee_cam.h"
 #include "../lib/camera/basler_camera.h"
 
+#include "../lib/Gui/CameraController.h"
+
 int main(int argc, const char* argv[]) {
+    Parameters app_parameter;
+    utils::parse_comman_line(argc, argv, app_parameter);
+
     // Setup GUI
     gui::gui g = gui::gui();
 
@@ -34,60 +39,37 @@ int main(int argc, const char* argv[]) {
     g.create_window(ws, cs);
 
     // Setup cameras
-    Pylon::PylonInitialize();
+    Gui::CameraController controller = Gui::CameraController();
+    controller.setupController(app_parameter);
 
-    Parameters app_parameter;
-    utils::parse_comman_line(argc, argv, app_parameter);
-    int n_cams = app_parameter.camera_types.size();
+    GLuint* textures = new GLuint[controller.getNumCams()];
 
-    std::vector<camera::Base *> cameras;
-    std::vector<cv::Mat> mats;
-    GLuint* textures = new GLuint[n_cams];
+    controller.setupCameras();
 
-    // Set all but last prophesee camera to slave mode
-    int last_prophesee_i = -1;
-    for (int i = 0; i < n_cams; ++i) {
-        if (app_parameter.camera_types[i] == "prophesee") {
-            last_prophesee_i = i;
-        }
+    std::vector<camera::Base*> cameras;
+    for(auto cam : controller.getCams()) {
+        cameras.push_back(cam.getCam());
     }
 
-    // Setup cameras
-    for (int i = 0; i < n_cams; ++i) {
-        const auto type = app_parameter.camera_types[i];
-        if (type == "prophesee") {
-            std::string mode = "slave";
-            if (i == last_prophesee_i || !app_parameter.record) { mode = "master"; }
-            cameras.push_back(new camera::PropheseeCam(PropheseeParams(app_parameter, mode, i)));
-        } else if (type == "basler") {
-            cameras.push_back(new camera::BaslerCamera(BaslerParams(app_parameter)));
-        }
-
-        auto cam = cameras.back();
-        cam->setup_camera();
-
-        mats.push_back(cv::Mat(cam->get_height(), cam->get_width(),
-                               CV_8UC3, cv::Vec3b(0,0,0)));
-
-        auto mat = mats.back();
-        cam->set_display(mat);
-
+    for(int i = 0; i < controller.getNumCams(); i++) {
+        auto cam = controller.getCams()[i].getCam();
         g.setup_texture_cam(textures + i, cam->get_width(), cam->get_height());
     }
 
-    // Main loop
     bool done = false;
     while(!done) {
         g.handle_event(&done);
 
         g.start_frame();
 
-        for(int i = 0; i < n_cams; i++) {
-            cameras[i]->update_display_frame();
+        for(int i = 0; i < controller.getNumCams(); i++) {
+            controller.updateCameras();
 
-            if(!mats[i].empty()) {
-                g.update_texture_cam(textures[i], (void*) mats[i].data,
-                                     cameras[i]->get_width(), cameras[i]->get_height());
+            auto cam = controller.getCams()[i];
+
+            if(!cam.getDisplay().empty()) {
+                g.update_texture_cam(textures[i], (void*) cam.getDisplay().data,
+                                     cam.getWidth(), cam.getHeight());
             }
 
             g.display_cams(textures, cameras);

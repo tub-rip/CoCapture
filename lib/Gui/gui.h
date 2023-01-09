@@ -10,7 +10,7 @@
 #include "SDL2/SDL.h"
 #include <SDL_opengl.h>
 
-#include "camera/base.h"
+#include "../camera/base.h"
 
 namespace gui {
     struct window_settings {
