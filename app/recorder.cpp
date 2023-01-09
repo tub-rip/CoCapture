@@ -3,15 +3,15 @@
 #include <opencv2/core.hpp>
 #include <pylon/BaslerUniversalInstantCamera.h>
 
-#include "../lib/Gui/gui.h"
-#include "../lib/Gui/Gui.h"
+#include "../lib/Application/Gui.h"
 
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
 #include "../lib/camera/prophesee_cam.h"
 #include "../lib/camera/basler_camera.h"
 
-#include "../lib/Gui/CameraController.h"
+#include "../lib/Application/CameraController.h"
+#include "../lib/Application/Components/Viewpanel.h"
 
 int main(int argc, const char* argv[]) {
     Parameters app_parameter;
@@ -26,16 +26,11 @@ int main(int argc, const char* argv[]) {
     controller.setupController(app_parameter);
     controller.setupCameras();
 
-    GLuint* textures = new GLuint[controller.getNumCams()];
-    for(int i = 0; i < controller.getNumCams(); i++) {
-        auto cam = controller.getCams()[i];
-        gui.setup_texture_cam(textures + i, cam.getWidth(), cam.getHeight());
-    }
+    // Viewpanel
+    std::vector<Gui::Component*> components;
+    Gui::Viewpanel viewpanel = Gui::Viewpanel(0.9f, controller.getCams());
 
-    std::vector<camera::Base*> cameras;
-    for(auto cam : controller.getCams()) {
-        cameras.push_back(cam.getActual());
-    }
+    components.push_back(&viewpanel);
 
     bool done = false;
     while(!done) {
@@ -43,17 +38,9 @@ int main(int argc, const char* argv[]) {
 
         gui.startFrame();
 
-        for(int i = 0; i < controller.getNumCams(); i++) {
-            controller.updateCameras();
-
-            auto cam = controller.getCams()[i];
-
-            if(!cam.getDisplay().empty()) {
-                gui.update_texture_cam(textures[i], (void*) cam.getDisplay().data,
-                                     cam.getWidth(), cam.getHeight());
-            }
-
-            gui.display_cams(textures, cameras);
+        controller.updateCameras();
+        for(Gui::Component* c : components) {
+            c->show();
         }
 
         gui.endFrameAndFinalizeRender();
@@ -62,8 +49,6 @@ int main(int argc, const char* argv[]) {
     // Cleanup
     controller.cleanupCameras();
     gui.cleanupGui();
-
-    delete[] textures;
 
     return 0;
 }

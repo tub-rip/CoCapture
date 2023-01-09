@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../camera/basler_camera.h"
-#include "../camera/prophesee_cam.h"
+#include "../../camera/basler_camera.h"
+#include "../../camera/prophesee_cam.h"
 
-#include "Constants.h"
+#include "../Constants.h"
 
 namespace Gui {
 
@@ -23,4 +23,4 @@ namespace Gui {
         camera::Base* cam;
     };
 
-} // Gui
+}

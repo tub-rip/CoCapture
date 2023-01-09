@@ -3,8 +3,8 @@
 #include "../camera/basler_camera.h"
 #include "../camera/prophesee_cam.h"
 
-#include "BaslerWrapper.h"
-#include "PropheseeWrapper.h"
+#include "Camera/BaslerWrapper.h"
+#include "Camera/PropheseeWrapper.h"
 
 namespace Gui {
 
@@ -39,4 +39,4 @@ namespace Gui {
         std::vector<Base> cams;
     };
 
-} // Gui
+}

@@ -40,4 +40,4 @@ namespace Gui {
     const std::string MASTER = "master";
     const std::string SLAVE = "slave";
 
-} // Gui
+} // Application

@@ -12,4 +12,4 @@ namespace Gui {
         cam->update_display_frame();
     }
 
-} // Gui
+}
