@@ -62,7 +62,7 @@ namespace Gui {
         ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, pivot);
 
         ImGui::Begin(title.c_str(), NULL,
-                     ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse);
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
         ImGui::Image((void*) (intptr_t) tex, ImGui::GetWindowSize());
         ImGui::End();
     }
