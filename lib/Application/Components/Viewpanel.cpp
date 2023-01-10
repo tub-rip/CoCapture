@@ -4,16 +4,16 @@ namespace Gui {
 
     void Viewpanel::setupTextures() {
         for(int i = 0; i < numCams; i++) {
-            Base cam = cams[i];
-            setupTexture(textures + i, cam.getWidth(), cam.getHeight());
+            Base* cam = actualCams[i];
+            setupTexture(textures + i, cam->getWidth(), cam->getHeight());
         }
     }
 
     void Viewpanel::updateTextures() {
         for(int i = 0; i < numCams; i++) {
-            Base cam = cams[i];
-            if(!cam.getDisplay().empty()) {
-                updateTexture(*(textures + i), cam.getDisplay().data, cam.getWidth(), cam.getHeight());
+            Base* cam = actualCams[i];
+            if(!cam->getDisplay().empty()) {
+                updateTexture(*(textures + i), cam->getDisplay().data, cam->getWidth(), cam->getHeight());
             }
         }
     }
@@ -73,12 +73,16 @@ namespace Gui {
 
         ImVec2 gridSize, displayPos, displaySize;
 
+        ImVec2 demoShowSpaceScale = ImVec2(0.75f, 1.0f);
+        ImVec2 demoShowSpace = ImVec2(io.DisplaySize.x * demoShowSpaceScale.x,
+                                      io.DisplaySize.y * demoShowSpaceScale.y);
+
         // For a single camera
         if(numCams == 1) {
-            Base cam = cams[0];
-            gridSize = ImVec2(io.DisplaySize.x, io.DisplaySize.y);
+            Base* cam = actualCams[0];
+            gridSize = demoShowSpace;
 
-            displaySize = calcWindowSize(cam.getWidth(), cam.getHeight(), gridSize);
+            displaySize = calcWindowSize(cam->getWidth(), cam->getHeight(), gridSize);
             displayPos = ImVec2(0.5f * gridSize.x,
                                 0.5f * gridSize.y);
 
@@ -88,22 +92,22 @@ namespace Gui {
 
         else {
             int nHorizontalGrids = (numCams % 2 == 0 ? numCams : numCams + 1) / 2;
-            gridSize = ImVec2(io.DisplaySize.x / nHorizontalGrids,
-                               io.DisplaySize.y / 2);
+            gridSize = ImVec2(demoShowSpace.x / nHorizontalGrids,
+                              demoShowSpace.y / 2);
 
             int xOffset, yOffset;
             for(int i = 0; i < numCams; i++) {
-                Base cam = cams[i];
+                Base* cam = actualCams[i];
 
                 xOffset = i % nHorizontalGrids;
                 yOffset = i < nHorizontalGrids ? 0 : 1;
 
-                displaySize = calcWindowSize(cam.getWidth(), cam.getHeight(), gridSize);
+                displaySize = calcWindowSize(cam->getWidth(), cam->getHeight(), gridSize);
                 displayPos = ImVec2(xOffset * gridSize.x + 0.5f * gridSize.x,
                                     yOffset * gridSize.y + 0.5f * gridSize.y);
 
                 drawToWindow(textures[i], displayPos, displaySize,
-                             ImVec2(0.5f, 0.5f), "View " + std::to_string(i));
+                             ImVec2(0.5f, 0.5f), cam->getType() + " " + std::to_string(i));
             }
         }
     }

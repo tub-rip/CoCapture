@@ -10,6 +10,8 @@ namespace Gui {
 
     void Base::updateCamera() {
         cam->update_display_frame();
+
+        updateValues();
     }
 
 }

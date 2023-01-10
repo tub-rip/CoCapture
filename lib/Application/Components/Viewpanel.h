@@ -7,9 +7,9 @@ namespace Gui {
 
     class Viewpanel : public Component {
     public:
-        Viewpanel(float gridScaleY, std::vector<Base> cams) {
-            this->cams = cams;
-            this->numCams = cams.size();
+        Viewpanel(float gridScaleY, std::vector<Base*> actualCams) {
+            this->actualCams = actualCams;
+            this->numCams = actualCams.size();
             this->textures = new GLuint[numCams];
             this->gridScaleY = gridScaleY;
             setupTextures();
@@ -23,7 +23,6 @@ namespace Gui {
         void show() override;
 
     public:
-
         void drawToWindow(GLuint tex,
                           ImVec2 pos, ImVec2 size, ImVec2 pivot,
                           std::string title);
@@ -41,7 +40,7 @@ namespace Gui {
 
     private:
         int numCams;
-        std::vector<Base> cams;
+        std::vector<Base*> actualCams;
         GLuint* textures;
         float gridScaleY;
     };

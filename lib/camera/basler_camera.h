@@ -25,6 +25,10 @@ namespace camera {
 
         void setup_camera() override;
 
+        int get_exposure_time() { return int(cam_.ExposureTime.GetValue()); }
+
+        void set_exposure_time(int exposure_time) { cam_.ExposureTime.SetValue(float(exposure_time)); }
+
     private:
         BaslerParams params_;
         Pylon::CBaslerUniversalInstantCamera cam_;

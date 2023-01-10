@@ -12,6 +12,7 @@
 
 #include "../lib/Application/CameraController.h"
 #include "../lib/Application/Components/Viewpanel.h"
+#include "../lib/Application/Components/Sidepanel.h"
 
 int main(int argc, const char* argv[]) {
     Parameters app_parameter;
@@ -26,11 +27,16 @@ int main(int argc, const char* argv[]) {
     controller.setupController(app_parameter);
     controller.setupCameras();
 
-    // Viewpanel
+    // Components
     std::vector<Gui::Component*> components;
-    Gui::Viewpanel viewpanel = Gui::Viewpanel(0.9f, controller.getCams());
 
+    // Viewpanel
+    Gui::Viewpanel viewpanel = Gui::Viewpanel(0.75f, controller.getCamRefs());
     components.push_back(&viewpanel);
+
+    // Sidepanel
+    Gui::Sidepanel sidepanel = Gui::Sidepanel(controller.getCamRefs());
+    components.push_back(&sidepanel);
 
     bool done = false;
     while(!done) {

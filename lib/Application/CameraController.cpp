@@ -10,7 +10,7 @@ namespace Gui {
     }
 
     void CameraController::setupCameras() {
-        Base cam;
+        Base* camRef;
 
         for(int i = 0; i < numCams; i++) {
             std::string type = appParams.camera_types[i];
@@ -18,36 +18,38 @@ namespace Gui {
 
             // Basler
             if(type == BASLER) {
-                BaslerWrapper bCam = BaslerWrapper();
-                bCam.setupBasler(appParams);
-                cam = bCam;
+                BaslerWrapper* bCam = new BaslerWrapper();
+
+                bCam->setupBasler(appParams);
+                camRef = bCam;
             }
 
             // Prophesee
             else if(type == PROPHESEE) {
-                PropheseeWrapper pCam = PropheseeWrapper();
+                PropheseeWrapper* pCam = new PropheseeWrapper();
 
                 std::string mode = SLAVE;
                 // Sets all but the last Prophesee camera to slave mode
                 if(i == lastPropheseeIdx || !appParams.record) { mode = MASTER; }
 
-                pCam.setupProphesee(appParams, mode, i);
-                cam = pCam;
+                pCam->setupProphesee(appParams, mode, i);
+                camRef = pCam;
             }
 
-            cams.push_back(cam);
+            camRefs.push_back(camRef);
         }
     }
 
     void CameraController::updateCameras() {
-        for(Base cam : cams) {
-            cam.updateCamera();
+        for(Base* cam : camRefs) {
+            cam->updateCamera();
         }
     }
 
     void CameraController::cleanupCameras() {
-        for(Base cam : cams) {
-            delete cam.getActual();
+        for(Base* cam : camRefs) {
+            delete cam->getActual();
+            delete cam;
         }
     }
 

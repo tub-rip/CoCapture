@@ -21,7 +21,7 @@ namespace Gui {
 
     public:
         int getNumCams() { return numCams; }
-        std::vector<Base> getCams() { return cams; }
+        std::vector<Base*> getCamRefs() { return camRefs; }
 
         int getLastCam(std::string type) {
             int lastCamIdx = -1;
@@ -36,7 +36,7 @@ namespace Gui {
         Parameters appParams;
         int numCams;
 
-        std::vector<Base> cams;
+        std::vector<Base*> camRefs;
     };
 
 }

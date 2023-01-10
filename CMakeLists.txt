@@ -50,7 +50,8 @@ add_executable(recorder
 		lib/Application/Camera/BaslerWrapper.h
 		lib/Application/Constants.h lib/Application/Camera/PropheseeWrapper.h
 		lib/Application/Gui.cpp lib/Application/Gui.h lib/Application/Components/Component.h
-		lib/Application/Components/Viewpanel.cpp lib/Application/Components/Viewpanel.h)
+		lib/Application/Components/Viewpanel.cpp lib/Application/Components/Viewpanel.h
+		lib/Application/Components/Sidepanel.cpp lib/Application/Components/Sidepanel.h)
 
 target_link_libraries(recorder
 		ImGui
