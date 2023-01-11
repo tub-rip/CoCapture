@@ -35,9 +35,13 @@ namespace camera {
 
         void set_mode_slave();
 
-        int get_bias_value(std::string bias_name) { return cam_.biases().get_facility()->get(bias_name); }
+        int get_bias_value(std::string bias_name);
 
-        void set_bias_value(std::string bias_name, int bias_value) { cam_.biases().get_facility()->set(bias_name, bias_value); }
+        void set_bias_value(std::string bias_name, int bias_value);
+
+        void start_recording_to_path(std::string path);
+
+        void stop_recording();
 
     private:
         Metavision::Camera cam_;

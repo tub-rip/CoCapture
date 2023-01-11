@@ -83,4 +83,16 @@ namespace camera {
         }
     }
 
+    int PropheseeCam::get_bias_value(std::string bias_name)
+        { return cam_.biases().get_facility()->get(bias_name); }
+
+    void PropheseeCam::set_bias_value(std::string bias_name, int bias_value)
+        { cam_.biases().get_facility()->set(bias_name, bias_value); }
+
+    void PropheseeCam::start_recording_to_path(std::string path)
+        { cam_.start_recording(path); }
+
+    void PropheseeCam::stop_recording()
+        { cam_.stop_recording(); }
+
 } // camera

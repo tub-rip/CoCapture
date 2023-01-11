@@ -22,4 +22,8 @@ namespace camera {
         event_handler_->get_display_frame(display);
     }
 
+    int BaslerCamera::get_exposure_time() { return int(cam_.ExposureTime.GetValue()); }
+
+    void BaslerCamera::set_exposure_time(int exposure_time) { cam_.ExposureTime.SetValue(float(exposure_time)); }
+
 } // camera
