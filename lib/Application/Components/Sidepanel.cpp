@@ -18,7 +18,7 @@ namespace Gui {
                            demoShowSpace .y / 2 + offset.y);
 
         windowSize = ImVec2(demoShowSpace .x - 0.025f * demoShowSpace .x,
-                            demoShowSpace .y - 0.025f * demoShowSpace .y);
+                            demoShowSpace .y - 0.0175f * demoShowSpace .y);
 
         ImGui::SetNextWindowSize(windowSize, ImGuiCond_Appearing);
         ImGui::SetNextWindowPos(windowPos, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
