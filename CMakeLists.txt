@@ -7,6 +7,7 @@ find_package(Threads REQUIRED)
 
 set(boost_components_to_find program_options filesystem timer chrono thread)
 find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
+include_directories(${boost_components_to_find})
 
 add_library(ImGui STATIC)
 find_package(SDL2 REQUIRED)
@@ -62,4 +63,5 @@ target_link_libraries(recorder
         MetavisionSDK::ui
         Metavision::HAL_discovery
         Threads::Threads
-        ${Pylon_LIBRARIES})
+        ${Pylon_LIBRARIES}
+        ${Boost_LIBRARIES})
