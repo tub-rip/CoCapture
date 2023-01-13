@@ -1,14 +1,39 @@
-//
-// Created by febryanto on 11.01.23.
-//
+#pragma once
 
-#ifndef RIP_COCAPTURE_GUI_RECORDER_H
-#define RIP_COCAPTURE_GUI_RECORDER_H
+#include "Component.h"
+#include "../Camera/PropheseeWrapper.h"
 
+#include <iostream>
+#include <ctime>
+#include <boost/filesystem.hpp>
 
-class Recorder {
+namespace Gui {
 
-};
+    class Recorder : public Component {
+    public:
+        Recorder(std::vector<Base*> camRefs) {
+            this->camRefs = camRefs;
+        }
 
+        ~Recorder() {}
 
-#endif //RIP_COCAPTURE_GUI_RECORDER_H
+    public:
+        void show() override;
+
+    public:
+        void demoRecorder();
+
+    public:
+        std::string getCurrTimeRootDirStr();
+        void makeCameraSubDirsAndRecord(std::string rootDir);
+        void stopRecording();
+
+    private:
+        std::vector<Base*> camRefs;
+        std::string workDir = ".";
+        std::string status = "Not currently recording.";
+
+        bool recording = false;
+    };
+
+}

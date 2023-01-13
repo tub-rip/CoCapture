@@ -32,6 +32,10 @@ int main(int argc, const char* argv[]) {
     Gui::Sidepanel sidepanel = Gui::Sidepanel(controller.getCamRefs());
     components.push_back(&sidepanel);
 
+    // Recorder
+    Gui::Recorder recorder = Gui::Recorder(controller.getCamRefs());
+    components.push_back(&recorder);
+
     bool done = false;
     while(!done) {
         gui.handleEvent(&done);

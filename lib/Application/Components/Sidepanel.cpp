@@ -5,20 +5,20 @@ namespace Gui {
     void Sidepanel::demoSidepanel() {
         ImGuiIO &io = ImGui::GetIO();
 
-        ImVec2 demoShowSpaceScale = ImVec2(0.25f, 1.0f);
+        ImVec2 demoShowSpaceScale = ImVec2(0.25f, 0.75f);
         ImVec2 demoShowSpace = ImVec2(io.DisplaySize.x * demoShowSpaceScale.x,
                                       io.DisplaySize.y * demoShowSpaceScale.y);
 
         ImVec2 offset, windowPos, windowSize;
 
         offset = ImVec2(io.DisplaySize.x * (1 - demoShowSpaceScale.x),
-                        io.DisplaySize.y * (1 - demoShowSpaceScale.y));
+                        io.DisplaySize.y * (0.9975f - demoShowSpaceScale.y));
 
-        windowPos = ImVec2(demoShowSpace .x / 2 + offset.x,
-                           demoShowSpace .y / 2 + offset.y);
+        windowPos = ImVec2(demoShowSpace.x / 2 + offset.x,
+                           demoShowSpace.y / 2 + offset.y);
 
-        windowSize = ImVec2(demoShowSpace .x - 0.0275f * demoShowSpace .x,
-                            demoShowSpace .y - 0.0195f * demoShowSpace .y);
+        windowSize = ImVec2(demoShowSpace.x - 0.0275f * demoShowSpace.x,
+                            demoShowSpace.y - 0.0195f * demoShowSpace.y);
 
         ImGui::SetNextWindowSize(windowSize);
         ImGui::SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
