@@ -58,8 +58,8 @@ namespace Gui {
     }
 
     void Viewpanel::drawToWindow(GLuint tex, ImVec2 pos, ImVec2 size, ImVec2 pivot, std::string title) {
-        ImGui::SetNextWindowSize(size, ImGuiCond_Appearing);
-        ImGui::SetNextWindowPos(pos, ImGuiCond_Appearing, pivot);
+        ImGui::SetNextWindowSize(size);
+        ImGui::SetNextWindowPos(pos, 0, pivot);
 
         ImGui::Begin(title.c_str(), NULL,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
