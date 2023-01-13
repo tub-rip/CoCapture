@@ -33,7 +33,7 @@ int main(int argc, const char* argv[]) {
     components.push_back(&sidepanel);
 
     // Recorder
-    Gui::Recorder recorder = Gui::Recorder(controller.getCamRefs());
+    Gui::Recorder recorder = Gui::Recorder(controller.getCamRefs(), app_parameter.record_output_path);
     components.push_back(&recorder);
 
     bool done = false;

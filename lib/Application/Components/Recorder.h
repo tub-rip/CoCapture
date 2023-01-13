@@ -11,8 +11,11 @@ namespace Gui {
 
     class Recorder : public Component {
     public:
-        Recorder(std::vector<Base*> camRefs) {
+        Recorder(std::vector<Base*> camRefs, std::string outputDir) {
             this->camRefs = camRefs;
+
+            this->workDir = outputDir;
+            if(workDir.back() == '/') { workDir.pop_back(); }
         }
 
         ~Recorder() {}

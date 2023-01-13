@@ -10,6 +10,8 @@ namespace utils {
                 ("warp", po::bool_switch(&params.do_warp)->default_value(false),
                  "Warp gray-scale frames according to a given homography")
                 ("homography", po::value<std::string>(&homography_path)->default_value(""))
+                ("output_path", po::value<std::string>(&params.record_output_path)->default_value("."),
+                        "Set the recording output path")
                 ("overlay", po::bool_switch(&params.overlay)->default_value(false),
                  "Visualize event in overlay of grayscale frames")
                 ("show_snr", po::bool_switch(&params.show_snr)->default_value(false),
