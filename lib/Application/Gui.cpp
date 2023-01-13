@@ -7,7 +7,7 @@ namespace Gui {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
 
-        SDL_GetCurrentDisplayMode(BE_DISPLAY_INDEX, &displayMode);
+        SDL_GetCurrentDisplayMode(BE_DEFAULT_DISPLAY_INDEX, &displayMode);
         mainWindow = SDL_CreateWindow(BE_WINDOW_TITLE.c_str(),
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,

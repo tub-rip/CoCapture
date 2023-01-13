@@ -10,7 +10,7 @@ namespace Gui {
 
     // Backend (SDL and OpenGL)
     const int BE_INIT_SUBSYSTEMS = SDL_INIT_VIDEO;
-    const int BE_DISPLAY_INDEX = 0;
+    const int BE_DEFAULT_DISPLAY_INDEX = 0;
     const std::string BE_WINDOW_TITLE = "Recorder";
     const int BE_WINDOW_FLAGS = SDL_WINDOW_OPENGL |
                                 SDL_WINDOW_RESIZABLE |
