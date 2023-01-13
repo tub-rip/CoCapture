@@ -1,18 +1,12 @@
-#include <iostream>
-
 #include <opencv2/core.hpp>
-#include <pylon/BaslerUniversalInstantCamera.h>
-
-#include "../lib/Application/Gui.h"
-
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
-#include "../lib/camera/prophesee_cam.h"
-#include "../lib/camera/basler_camera.h"
 
+#include "../lib/Application/Gui.h"
 #include "../lib/Application/CameraController.h"
 #include "../lib/Application/Components/Viewpanel.h"
 #include "../lib/Application/Components/Sidepanel.h"
+#include "../lib/Application/Components/Recorder.h"
 
 int main(int argc, const char* argv[]) {
     Parameters app_parameter;
