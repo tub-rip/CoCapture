@@ -44,7 +44,8 @@ namespace Gui {
     const std::string PROPHESEE = "prophesee";
     const std::string MASTER = "master";
     const std::string SLAVE = "slave";
-    const std::string RAW_OUTPUT_FILENAME = "output";
+
+    const std::string PROPHESEE_RAW_OUTPUT_FILENAME = "output";
 
     const std::string PROPHESEE_BIAS_FO_LABEL = "bias_fo";
     const int PROPHESEE_BIAS_FO_DEFAULT = 70;
