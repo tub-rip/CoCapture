@@ -63,6 +63,14 @@ namespace Gui {
 
         ImGui::Begin(title.c_str(), NULL,
                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+        float aspectRatio = size.x / size.y;
+        ImVec2 windowSize = ImGui::GetWindowSize();
+        if(windowSize.x / windowSize.y != aspectRatio) {
+            float windowScaleY = windowSize.x / (windowSize.y * aspectRatio);
+            ImGui::SetWindowSize( ImVec2(windowSize.x, windowScaleY * windowSize.y) );
+        }
+
         ImGui::Image((void*) (intptr_t) tex, ImGui::GetWindowSize());
         ImGui::End();
     }
