@@ -68,6 +68,7 @@ namespace Gui {
         ImVec2 windowSize = ImGui::GetWindowSize();
         if(windowSize.x / windowSize.y != aspectRatio) {
             float windowScaleY = windowSize.x / (windowSize.y * aspectRatio);
+            // This function is not recommended, a better alternative in the future would be great
             ImGui::SetWindowSize( ImVec2(windowSize.x, windowScaleY * windowSize.y) );
         }
 
