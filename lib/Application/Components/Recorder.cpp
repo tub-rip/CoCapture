@@ -63,7 +63,7 @@ namespace Gui {
         ImGui::SetNextWindowSize(windowSize);
         ImGui::SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
 
-        ImGui::Begin("Recorder");
+        ImGui::Begin("Recorder", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
         bool propExists = false;
         for(Base* cam : camRefs) {

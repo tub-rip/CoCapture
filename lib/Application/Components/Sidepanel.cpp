@@ -23,7 +23,7 @@ namespace Gui {
         ImGui::SetNextWindowSize(windowSize);
         ImGui::SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
 
-        ImGui::Begin("Sidepanel");
+        ImGui::Begin("Sidepanel", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
         int i = 0;
         for(Base* cam : actualCams) {
