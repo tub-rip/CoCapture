@@ -10,10 +10,19 @@ namespace camera {
                 Pylon::RegistrationMode_ReplaceAll,
                 Pylon::Cleanup_Delete
         );
+
         cam_.Open();
+
         width_ = cam_.Width.GetValue();
         height_ = cam_.Height.GetValue();
+
         cam_.ReverseX.SetValue(true);
+        cam_.LineSelector.SetValue("Line1");
+        cam_.LineMode.SetValue("Input");
+        cam_.TriggerSelector.SetValue("FrameStart");
+        cam_.TriggerSource.SetValue("Line1");
+        cam_.TriggerActivation.SetValue("RisingEdge");
+
         cam_.StartGrabbing(Pylon::GrabStrategy_OneByOne,
                            Pylon::GrabLoop_ProvidedByInstantCamera);
     }
@@ -22,8 +31,8 @@ namespace camera {
         event_handler_->get_display_frame(display);
     }
 
-    int BaslerCamera::get_exposure_time() { return int(cam_.ExposureTime.GetValue()); }
-
     void BaslerCamera::set_exposure_time(int exposure_time) { cam_.ExposureTime.SetValue(float(exposure_time)); }
+
+    void BaslerCamera::set_trigger_mode(std::string trigger_mode) { cam_.TriggerMode.SetValue(trigger_mode.c_str()); }
 
 } // camera

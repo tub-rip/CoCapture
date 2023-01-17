@@ -65,6 +65,7 @@ namespace Gui {
 
         ImGui::Begin("Recorder", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
+        // Prophesee camera
         bool propExists = false;
         for(Base* cam : camRefs) {
             if(cam->getType() == PROPHESEE) {

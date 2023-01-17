@@ -25,9 +25,9 @@ namespace camera {
 
         void setup_camera() override;
 
-        int get_exposure_time();
-
         void set_exposure_time(int exposure_time);
+
+        void set_trigger_mode(std::string trigger_mode);
 
     private:
         BaslerParams params_;
