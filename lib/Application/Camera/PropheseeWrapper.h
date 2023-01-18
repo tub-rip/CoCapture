@@ -34,12 +34,12 @@ namespace Gui {
         int* getBiasHpfRef() { return &biasHpf; }
         int* getBiasRefrRef() { return &biasRefr; }
 
-        void startRecording(std::string path) {
+        void startRecording(std::string path) override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->start_recording_to_path(path);
         }
 
-        void stopRecording() {
+        void stopRecording() override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->stop_recording();
         }

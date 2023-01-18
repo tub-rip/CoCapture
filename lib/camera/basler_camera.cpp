@@ -38,8 +38,8 @@ namespace camera {
     void BaslerCamera::start_recording_to_path(std::string path) {
         recorder_->set_file_path(path);
         cam_.RegisterImageEventHandler(recorder_,
-                                       Pylon::RegistrationMode_ReplaceAll,
-                                       Pylon::Cleanup_Delete);
+                                       Pylon::RegistrationMode_Append,
+                                       Pylon::Cleanup_None);
     }
 
     void BaslerCamera::startup_recorder(std::string file_path, double fps) {
@@ -49,7 +49,6 @@ namespace camera {
 
     void BaslerCamera::stop_recording() {
         cam_.DeregisterImageEventHandler(recorder_);
-        delete recorder_;
     }
 
 } // camera

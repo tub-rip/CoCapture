@@ -13,6 +13,8 @@ namespace Gui {
         void updateCamera();
 
         virtual void updateValues() {}
+        virtual void startRecording(std::string path) {}
+        virtual void stopRecording() {}
 
     public:
         camera::Base* getActual() { return cam; }

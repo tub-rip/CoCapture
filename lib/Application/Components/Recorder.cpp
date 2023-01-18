@@ -25,7 +25,13 @@ namespace Gui {
             // Prophesee camera
             if(cam->getType() == PROPHESEE) {
                 PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
-                pCam->startRecording(camDir + "/" + PROPHESEE_RAW_OUTPUT_FILENAME);
+                pCam->startRecording(camDir + "/" + PROPHESEE_OUTPUT_FILENAME);
+            }
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->startRecording(camDir + "/" + BASLER_OUTPUT_FILENAME);
             }
 
             i++;
@@ -38,6 +44,12 @@ namespace Gui {
             if(cam->getType() == PROPHESEE) {
                 PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
                 pCam->stopRecording();
+            }
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->stopRecording();
             }
         }
     }
@@ -65,17 +77,29 @@ namespace Gui {
 
         ImGui::Begin("Recorder", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
-        // Prophesee camera
-        bool propExists = false;
+        // Camera availability check
+        bool cameraExists = camRefs.size() > 0 ? true : false;
+
+        bool pExists = false;
+        bool bExists = false;
         for(Base* cam : camRefs) {
-            if(cam->getType() == PROPHESEE) {
-                propExists = true;
-            }
+            if(cam->getType() == PROPHESEE) { pExists = true; }
+            if(cam->getType() == BASLER) { bExists = true; }
         }
 
-        if(propExists) {
-            ImGui::TextUnformatted(PROPHESEE.c_str());
+        if(cameraExists) {
+            ImGui::TextUnformatted("Detected camera types:");
             ImGui::Spacing();
+
+            if(bExists) {
+                ImGui::TextUnformatted(( "- " + BASLER ).c_str());
+                ImGui::Spacing();
+            }
+
+            if(pExists) {
+                ImGui::TextUnformatted(( "- " + PROPHESEE ).c_str());
+                ImGui::Spacing();
+            }
 
             std::string rootDir = getCurrTimeRootDirStr();
 

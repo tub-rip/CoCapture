@@ -22,7 +22,7 @@ namespace basler {
                 int height = grab_result->GetHeight();
                 if (video_writer_ == NULL) {
                     video_writer_ = new cv::VideoWriter(file_path_,
-                                                        cv::VideoWriter::fourcc('M', 'P', '4', 'V'),
+                                                        cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
                                                         fps_,
                                                         cv::Size(width, height),
                                                         0);
@@ -37,7 +37,8 @@ namespace basler {
         }
 
         virtual void OnImageEventHandlerDeregistered(Pylon::CInstantCamera &camera) {
-            delete video_writer_;
+            video_writer_->release();
+            delete this;
         }
 
         void set_file_path(std::string file_path) {

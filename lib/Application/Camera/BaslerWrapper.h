@@ -26,6 +26,16 @@ namespace Gui {
     public:
         int* getExposureTimeRef() { return &exposureTime; }
 
+        void startRecording(std::string path) override {
+            camera::BaslerCamera* bCam = (camera::BaslerCamera*) cam;
+            bCam->startup_recorder(path, BASLER_RECORDING_FPS);
+        }
+
+        void stopRecording() override {
+            camera::BaslerCamera* bCam = (camera::BaslerCamera*) cam;
+            bCam->stop_recording();
+        }
+
     private:
         int exposureTime = BASLER_EXPOSURE_DEFAULT;
     };

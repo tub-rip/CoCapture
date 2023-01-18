@@ -2,6 +2,7 @@
 
 #include "Component.h"
 #include "../Camera/PropheseeWrapper.h"
+#include "../Camera/BaslerWrapper.h"
 
 #include <iostream>
 #include <ctime>
