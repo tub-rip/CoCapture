@@ -35,4 +35,21 @@ namespace camera {
 
     void BaslerCamera::set_trigger_mode(std::string trigger_mode) { cam_.TriggerMode.SetValue(trigger_mode.c_str()); }
 
+    void BaslerCamera::start_recording_to_path(std::string path) {
+        recorder_->set_file_path(path);
+        cam_.RegisterImageEventHandler(recorder_,
+                                       Pylon::RegistrationMode_ReplaceAll,
+                                       Pylon::Cleanup_Delete);
+    }
+
+    void BaslerCamera::startup_recorder(std::string file_path, double fps) {
+        recorder_ = new basler::BaslerRecorder(fps);
+        start_recording_to_path(file_path);
+    }
+
+    void BaslerCamera::stop_recording() {
+        cam_.DeregisterImageEventHandler(recorder_);
+        delete recorder_;
+    }
+
 } // camera

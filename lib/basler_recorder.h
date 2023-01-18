@@ -7,15 +7,12 @@ namespace basler {
 
     class BaslerRecorder : public Pylon::CImageEventHandler {
     public:
-        BaslerRecorder(std::string file_path, double fps) :
-                file_path_(file_path),
+        BaslerRecorder(double fps) :
+                file_path_(""),
                 fps_(fps),
                 video_writer_(NULL) {}
 
-        ~BaslerRecorder() {
-            delete video_writer_;
-            Pylon::CImageEventHandler::~CImageEventHandler();
-        }
+        ~BaslerRecorder() override = default;
 
     public:
         virtual void OnImageGrabbed(Pylon::CInstantCamera &camera,
@@ -37,6 +34,14 @@ namespace basler {
                 std::cout << "Error: " << std::hex << grab_result->GetErrorCode() <<
                           std::dec << " " << grab_result->GetErrorDescription() << std::endl;
             }
+        }
+
+        virtual void OnImageEventHandlerDeregistered(Pylon::CInstantCamera &camera) {
+            delete video_writer_;
+        }
+
+        void set_file_path(std::string file_path) {
+            file_path_ = file_path;
         }
 
     private:
