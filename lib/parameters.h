@@ -17,6 +17,7 @@ struct Parameters {
     bool roi;
     bool record;
     std::vector<std::string> camera_types;
+    std::string record_output_path;
 };
 
 struct PropheseeParams {

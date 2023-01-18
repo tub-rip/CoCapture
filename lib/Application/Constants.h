@@ -10,7 +10,7 @@ namespace Gui {
 
     // Backend (SDL and OpenGL)
     const int BE_INIT_SUBSYSTEMS = SDL_INIT_VIDEO;
-    const int BE_DISPLAY_INDEX = 1;
+    const int BE_DEFAULT_DISPLAY_INDEX = 0;
     const std::string BE_WINDOW_TITLE = "Recorder";
     const int BE_WINDOW_FLAGS = SDL_WINDOW_OPENGL |
                                 SDL_WINDOW_RESIZABLE |
@@ -44,6 +44,8 @@ namespace Gui {
     const std::string PROPHESEE = "prophesee";
     const std::string MASTER = "master";
     const std::string SLAVE = "slave";
+
+    const std::string PROPHESEE_RAW_OUTPUT_FILENAME = "output";
 
     const std::string PROPHESEE_BIAS_FO_LABEL = "bias_fo";
     const int PROPHESEE_BIAS_FO_DEFAULT = 70;

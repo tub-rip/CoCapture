@@ -34,6 +34,16 @@ namespace Gui {
         int* getBiasHpfRef() { return &biasHpf; }
         int* getBiasRefrRef() { return &biasRefr; }
 
+        void startRecording(std::string path) {
+            camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
+            pCam->start_recording_to_path(path);
+        }
+
+        void stopRecording() {
+            camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
+            pCam->stop_recording();
+        }
+
     private:
         int biasFo = PROPHESEE_BIAS_FO_DEFAULT;
         int biasDiffOff = PROPHESEE_BIAS_DIFF_OFF_DEFAULT;

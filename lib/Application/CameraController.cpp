@@ -30,7 +30,7 @@ namespace Gui {
 
                 std::string mode = SLAVE;
                 // Sets all but the last Prophesee camera to slave mode
-                if(i == lastPropheseeIdx || !appParams.record) { mode = MASTER; }
+                if(i == lastPropheseeIdx) { mode = MASTER; }
 
                 pCam->setupProphesee(appParams, mode, i);
                 camRef = pCam;

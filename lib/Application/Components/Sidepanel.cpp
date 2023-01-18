@@ -5,25 +5,25 @@ namespace Gui {
     void Sidepanel::demoSidepanel() {
         ImGuiIO &io = ImGui::GetIO();
 
-        ImVec2 demoShowSpaceScale = ImVec2(0.275f, 1.0f);
+        ImVec2 demoShowSpaceScale = ImVec2(0.25f, 0.75f);
         ImVec2 demoShowSpace = ImVec2(io.DisplaySize.x * demoShowSpaceScale.x,
                                       io.DisplaySize.y * demoShowSpaceScale.y);
 
         ImVec2 offset, windowPos, windowSize;
 
-        offset = ImVec2(io.DisplaySize.x * (1 - demoShowSpaceScale.x - 0.0225f),
-                        io.DisplaySize.y * (1 - demoShowSpaceScale.y));
+        offset = ImVec2(io.DisplaySize.x * (1 - demoShowSpaceScale.x),
+                        io.DisplaySize.y * (0.9975f - demoShowSpaceScale.y));
 
-        windowPos = ImVec2(demoShowSpace .x / 2 + offset.x,
-                           demoShowSpace .y / 2 + offset.y);
+        windowPos = ImVec2(demoShowSpace.x / 2 + offset.x,
+                           demoShowSpace.y / 2 + offset.y);
 
-        windowSize = ImVec2(demoShowSpace .x - 0.025f * demoShowSpace .x,
-                            demoShowSpace .y - 0.025f * demoShowSpace .y);
+        windowSize = ImVec2(demoShowSpace.x - 0.0275f * demoShowSpace.x,
+                            demoShowSpace.y - 0.0195f * demoShowSpace.y);
 
-        ImGui::SetNextWindowSize(windowSize, ImGuiCond_Appearing);
-        ImGui::SetNextWindowPos(windowPos, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowSize(windowSize);
+        ImGui::SetNextWindowPos(windowPos, 0, ImVec2(0.5f, 0.5f));
 
-        ImGui::Begin("Sidepanel");
+        ImGui::Begin("Sidepanel", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 
         int i = 0;
         for(Base* cam : actualCams) {

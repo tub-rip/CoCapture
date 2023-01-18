@@ -7,6 +7,7 @@ find_package(Threads REQUIRED)
 
 set(boost_components_to_find program_options filesystem timer chrono thread)
 find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
+include_directories(${boost_components_to_find})
 
 add_library(ImGui STATIC)
 find_package(SDL2 REQUIRED)
@@ -51,7 +52,8 @@ add_executable(recorder
         lib/Application/Constants.h lib/Application/Camera/PropheseeWrapper.h
         lib/Application/Gui.cpp lib/Application/Gui.h lib/Application/Components/Component.h
         lib/Application/Components/Viewpanel.cpp lib/Application/Components/Viewpanel.h
-        lib/Application/Components/Sidepanel.cpp lib/Application/Components/Sidepanel.h)
+        lib/Application/Components/Sidepanel.cpp lib/Application/Components/Sidepanel.h
+        lib/Application/Components/Recorder.cpp lib/Application/Components/Recorder.h)
 
 target_link_libraries(recorder
         ImGui
@@ -62,4 +64,5 @@ target_link_libraries(recorder
         MetavisionSDK::ui
         Metavision::HAL_discovery
         Threads::Threads
-        ${Pylon_LIBRARIES})
+        ${Pylon_LIBRARIES}
+        ${Boost_LIBRARIES})

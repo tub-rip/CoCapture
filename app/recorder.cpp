@@ -1,18 +1,12 @@
-#include <iostream>
-
 #include <opencv2/core.hpp>
-#include <pylon/BaslerUniversalInstantCamera.h>
-
-#include "../lib/Application/Gui.h"
-
 #include "../lib/basler_event_handler.h"
 #include "../lib/utils.h"
-#include "../lib/camera/prophesee_cam.h"
-#include "../lib/camera/basler_camera.h"
 
+#include "../lib/Application/Gui.h"
 #include "../lib/Application/CameraController.h"
 #include "../lib/Application/Components/Viewpanel.h"
 #include "../lib/Application/Components/Sidepanel.h"
+#include "../lib/Application/Components/Recorder.h"
 
 int main(int argc, const char* argv[]) {
     Parameters app_parameter;
@@ -37,6 +31,10 @@ int main(int argc, const char* argv[]) {
     // Sidepanel
     Gui::Sidepanel sidepanel = Gui::Sidepanel(controller.getCamRefs());
     components.push_back(&sidepanel);
+
+    // Recorder
+    Gui::Recorder recorder = Gui::Recorder(controller.getCamRefs(), app_parameter.record_output_path);
+    components.push_back(&recorder);
 
     bool done = false;
     while(!done) {
