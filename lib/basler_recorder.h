@@ -18,11 +18,6 @@ namespace basler {
         }
 
     public:
-        void setup_recorder(std::string file_path, double fps) {
-            file_path_ = file_path;
-            fps_ = fps;
-        }
-
         virtual void OnImageGrabbed(Pylon::CInstantCamera &camera,
                                     const Pylon::CGrabResultPtr &grab_result) {
             if (grab_result->GrabSucceeded()) {
