@@ -21,10 +21,12 @@ namespace Gui {
 
             // Update Basler camera values
             bCam->set_exposure_time(exposureTime);
+            bCam->set_trigger_mode(triggerMode);
         }
 
     public:
         int* getExposureTimeRef() { return &exposureTime; }
+        bool* getTriggerModeRef() { return &triggerMode; }
 
         void startRecording(std::string path) override {
             camera::BaslerCamera* bCam = (camera::BaslerCamera*) cam;
@@ -38,6 +40,7 @@ namespace Gui {
 
     private:
         int exposureTime = BASLER_EXPOSURE_DEFAULT;
+        bool triggerMode = false;
     };
 
 }

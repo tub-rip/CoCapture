@@ -35,13 +35,14 @@ namespace Gui {
     // Basler camera
     const std::string BASLER = "basler";
 
-    const std::string BASLER_EXPOSURE_LABEL = "Exposure time";
-
     const std::string BASLER_OUTPUT_FILENAME = "frames.mp4";
 
+    const std::string BASLER_EXPOSURE_LABEL = "Exposure time";
     const int BASLER_EXPOSURE_DEFAULT = 5000;
     const int BASLER_EXPOSURE_MIN = 500;
     const int BASLER_EXPOSURE_MAX = 20000;
+
+    const std::string BASLER_TRIGGER_MODE_LABEL = "External trigger";
 
     const double BASLER_RECORDING_FPS = 30;
 

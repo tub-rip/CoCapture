@@ -28,7 +28,7 @@ namespace camera {
 
         void set_exposure_time(int exposure_time);
 
-        void set_trigger_mode(std::string trigger_mode);
+        void set_trigger_mode(bool on);
 
         void startup_recorder(std::string file_path, double fps);
 

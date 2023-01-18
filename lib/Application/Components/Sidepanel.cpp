@@ -33,6 +33,7 @@ namespace Gui {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
                 ImGui::TextUnformatted((bCam->getType() + " " + std::to_string(i)).c_str());
 
+                ImGui::Checkbox((BASLER_TRIGGER_MODE_LABEL + "##").c_str(), bCam->getTriggerModeRef());
                 ImGui::SliderInt((BASLER_EXPOSURE_LABEL + "##").c_str(), bCam->getExposureTimeRef(),
                                  BASLER_EXPOSURE_MIN, BASLER_EXPOSURE_MAX);
                 ImGui::Spacing();

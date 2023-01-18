@@ -33,7 +33,10 @@ namespace camera {
 
     void BaslerCamera::set_exposure_time(int exposure_time) { cam_.ExposureTime.SetValue(float(exposure_time)); }
 
-    void BaslerCamera::set_trigger_mode(std::string trigger_mode) { cam_.TriggerMode.SetValue(trigger_mode.c_str()); }
+    void BaslerCamera::set_trigger_mode(bool on) {
+        if(on) { cam_.TriggerMode.SetValue("On"); }
+        else { cam_.TriggerMode.SetValue("Off"); }
+    }
 
     void BaslerCamera::start_recording_to_path(std::string path) {
         recorder_->set_file_path(path);

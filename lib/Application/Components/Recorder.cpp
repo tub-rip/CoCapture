@@ -101,6 +101,8 @@ namespace Gui {
                 ImGui::Spacing();
             }
 
+            ImGui::Spacing();
+
             std::string rootDir = getCurrTimeRootDirStr();
 
             if(ImGui::Button("Record")) {
