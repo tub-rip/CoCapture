@@ -23,6 +23,9 @@ namespace camera {
         cam_.TriggerSource.SetValue("Line1");
         cam_.TriggerActivation.SetValue("RisingEdge");
 
+        cam_.AcquisitionFrameRateEnable.SetValue(true);
+        cam_.AcquisitionFrameRate.SetValue(30);
+
         cam_.StartGrabbing(Pylon::GrabStrategy_OneByOne,
                            Pylon::GrabLoop_ProvidedByInstantCamera);
     }
