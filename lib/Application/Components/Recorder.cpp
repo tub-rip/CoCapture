@@ -2,6 +2,14 @@
 
 namespace Gui {
 
+    void Recorder::resetContentCount() {
+        contentCount.clear();
+        int numCams = camRefs.size();
+        for(int i = 0; i < numCams; i++) {
+            contentCount.push_back(0);
+        }
+    }
+
     std::string Recorder::getCurrTimeRootDirStr() {
         time_t rawTime;
         struct tm * timeInfo;
@@ -15,7 +23,7 @@ namespace Gui {
     }
 
     void Recorder::makeCameraSubDirsAndRecord(std::string rootDir) {
-        contentCount.clear();
+        resetContentCount();
         currentTargetDir = workDir + "/" + rootDir;
 
         int i = 0;
@@ -66,14 +74,14 @@ namespace Gui {
             // Prophesee camera
             if(cam->getType() == PROPHESEE) {
                 PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
-                contentCount.push_back(pCam->getExtTriggerEvts());
+                contentCount[i] = pCam->getExtTriggerEvts();
                 pCam->resetExtTriggerEvts();
             }
 
             // Basler camera
             if(cam->getType() == BASLER) {
                 cv::VideoCapture capture (camDir + "/" + BASLER_OUTPUT_FILENAME);
-                contentCount.push_back(capture.get(cv::CAP_PROP_FRAME_COUNT));
+                contentCount[i] = (capture.get(cv::CAP_PROP_FRAME_COUNT));
             }
 
             i++;
@@ -165,7 +173,12 @@ namespace Gui {
         }
 
         ImGui::Spacing();
+
         ImGui::TextUnformatted(status.c_str());
+        ImGui::Spacing();
+
+        // Only for testing
+        ImGui::Text("Captured frames: %d", contentCount[0]);
         ImGui::End();
     }
 
