@@ -17,6 +17,8 @@ namespace Gui {
 
             this->workDir = outputDir;
             if(workDir.back() == '/') { workDir.pop_back(); }
+
+            resetContentCount();
         }
 
         ~Recorder() {}
@@ -31,6 +33,7 @@ namespace Gui {
         std::string getCurrTimeRootDirStr();
         void makeCameraSubDirsAndRecord(std::string rootDir);
         void stopRecording();
+        void resetContentCount();
         void sanityCheck();
 
     private:
