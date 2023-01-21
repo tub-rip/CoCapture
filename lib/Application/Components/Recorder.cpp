@@ -179,6 +179,7 @@ namespace Gui {
 
         // Only for testing
         ImGui::Text("Captured frames: %d", contentCount[0]);
+        ImGui::Text("Captured external events: %d", contentCount[1]);
         ImGui::End();
     }
 
