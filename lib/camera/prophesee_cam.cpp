@@ -89,10 +89,23 @@ namespace camera {
     void PropheseeCam::set_bias_value(std::string bias_name, int bias_value)
         { cam_.biases().get_facility()->set(bias_name, bias_value); }
 
-    void PropheseeCam::start_recording_to_path(std::string path)
-        { cam_.start_recording(path); }
+    void PropheseeCam::start_recording_to_path(std::string path) {
+        cam_.start_recording(path);
+        auto ext_trigger_evts_cb = std::bind(&PropheseeCam::increment_ext_trigger_evts, this);
+        cam_.ext_trigger().add_callback( ext_trigger_evts_cb ); }
 
-    void PropheseeCam::stop_recording()
-        { cam_.stop_recording(); }
+    void PropheseeCam::stop_recording() {
+        cam_.ext_trigger().remove_callback(1);
+        cam_.stop_recording();
+    }
+
+    void PropheseeCam::increment_ext_trigger_evts()
+        { ext_trigger_evts_++; }
+
+    void PropheseeCam::reset_ext_trigger_evts()
+        { ext_trigger_evts_ = 0; }
+
+    int PropheseeCam::get_ext_trigger_evts()
+        { return ext_trigger_evts_; }
 
 } // camera

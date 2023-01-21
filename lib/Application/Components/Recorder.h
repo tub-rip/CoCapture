@@ -31,12 +31,16 @@ namespace Gui {
         std::string getCurrTimeRootDirStr();
         void makeCameraSubDirsAndRecord(std::string rootDir);
         void stopRecording();
+        void sanityCheck();
 
     private:
         std::vector<Base*> camRefs;
-        std::string workDir = ".";
-        std::string status = "Not currently recording.";
+        std::vector<int> contentCount;
 
+        std::string workDir = ".";
+        std::string currentTargetDir = "";
+
+        std::string status = "Not currently recording.";
         bool recording = false;
     };
 

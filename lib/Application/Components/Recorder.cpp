@@ -15,11 +15,12 @@ namespace Gui {
     }
 
     void Recorder::makeCameraSubDirsAndRecord(std::string rootDir) {
-        std::string targetDir = workDir + "/" + rootDir;
+        contentCount.clear();
+        currentTargetDir = workDir + "/" + rootDir;
 
         int i = 0;
         for(Base* cam : camRefs) {
-            std::string camDir = targetDir + "/" + cam->getType() + "_" + std::to_string(i);
+            std::string camDir = currentTargetDir + "/" + cam->getType() + "_" + std::to_string(i);
             boost::filesystem::create_directories(camDir);
 
             // Prophesee camera
@@ -51,6 +52,31 @@ namespace Gui {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
                 bCam->stopRecording();
             }
+        }
+
+        sanityCheck();
+    }
+
+    void Recorder::sanityCheck() {
+        int i = 0;
+        for(Base* cam : camRefs) {
+            std::string camDir = currentTargetDir + "/" + cam->getType() + "_" + std::to_string(i);
+            std::string outputFile;
+
+            // Prophesee camera
+            if(cam->getType() == PROPHESEE) {
+                PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
+                contentCount.push_back(pCam->getExtTriggerEvts());
+                pCam->resetExtTriggerEvts();
+            }
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                cv::VideoCapture capture (camDir + "/" + BASLER_OUTPUT_FILENAME);
+                contentCount.push_back(capture.get(cv::CAP_PROP_FRAME_COUNT));
+            }
+
+            i++;
         }
     }
 
