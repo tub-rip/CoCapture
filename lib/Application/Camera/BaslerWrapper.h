@@ -29,6 +29,9 @@ namespace Gui {
         int* getExposureTimeRef() { return &exposureTime; }
         bool* getTriggerModeRef() { return &triggerMode; }
 
+        void setCapturedFrames(int cpt) { capturedFrames = cpt; }
+        int getCapturedFrames() { return capturedFrames; }
+
         void startRecording(std::string path) override {
             camera::BaslerCamera* bCam = (camera::BaslerCamera*) cam;
             bCam->startup_recorder(path, BASLER_RECORDING_FPS);
@@ -42,6 +45,7 @@ namespace Gui {
     private:
         int exposureTime = BASLER_EXPOSURE_DEFAULT;
         bool triggerMode = false;
+        int capturedFrames = 0;
     };
 
 }

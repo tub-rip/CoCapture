@@ -3,10 +3,18 @@
 namespace Gui {
 
     void Recorder::resetContentCount() {
-        contentCount.clear();
-        int numCams = camRefs.size();
-        for(int i = 0; i < numCams; i++) {
-            contentCount.push_back(0);
+        for(Base* cam : camRefs) {
+            // Prophesee camera
+            if(cam->getType() == PROPHESEE) {
+                PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
+                pCam->setExternalTriggers(0);
+            }
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->setCapturedFrames(0);
+            }
         }
     }
 
@@ -49,16 +57,16 @@ namespace Gui {
 
     void Recorder::stopRecording() {
         for(Base* cam : camRefs) {
-            // Prophesee camera
-            if(cam->getType() == PROPHESEE) {
-                PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
-                pCam->stopRecording();
-            }
-
             // Basler camera
             if(cam->getType() == BASLER) {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
                 bCam->stopRecording();
+            }
+
+            // Prophesee camera
+            if(cam->getType() == PROPHESEE) {
+                PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
+                pCam->stopRecording();
             }
         }
 
@@ -68,20 +76,21 @@ namespace Gui {
     void Recorder::sanityCheck() {
         int i = 0;
         for(Base* cam : camRefs) {
-            std::string camDir = currentTargetDir + cam->getString();
+            std::string camDir = currentTargetDir + "/" + cam->getString();
             std::string outputFile;
 
             // Prophesee camera
             if(cam->getType() == PROPHESEE) {
                 PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
-                contentCount[i] = pCam->getExtTriggerEvts();
+                pCam->setExternalTriggers(pCam->getExtTriggerEvts());
                 pCam->resetExtTriggerEvts();
             }
 
             // Basler camera
             if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
                 cv::VideoCapture capture (camDir + "/" + BASLER_OUTPUT_FILENAME);
-                contentCount[i] = (capture.get(cv::CAP_PROP_FRAME_COUNT));
+                bCam->setCapturedFrames(capture.get(cv::CAP_PROP_FRAME_COUNT));
             }
 
             i++;
@@ -177,9 +186,6 @@ namespace Gui {
         ImGui::TextUnformatted(status.c_str());
         ImGui::Spacing();
 
-        // Only for testing
-        ImGui::Text("Captured frames: %d", contentCount[0]);
-        ImGui::Text("External triggers: %d", contentCount[1]);
         ImGui::End();
     }
 

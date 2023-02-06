@@ -38,7 +38,6 @@ namespace Gui {
 
     private:
         std::vector<Base*> camRefs;
-        std::vector<int> contentCount;
 
         std::string workDir = ".";
         std::string currentTargetDir = "";
