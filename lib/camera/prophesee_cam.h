@@ -59,7 +59,9 @@ namespace camera {
         cv::Scalar color_on_ = cv::Scalar{0, 0, 255};
         cv::Scalar color_off_ = cv::Scalar{255, 0, 0};
 
-        int ext_trigger_evts_ = 0;
+        bool is_recording_{false};
+        int ext_trigger_evts_{0};
+        int ext_trigger_evts_cb_id_{false};
     };
 
 

@@ -47,6 +47,13 @@ namespace camera {
             cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
             cam_.start_recording(ss.str());
         }
+
+        int channel_id = 0; // for EVK4, EVK3
+        cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
+
+        auto ext_trigger_evts_cb = std::bind(&PropheseeCam::increment_ext_trigger_evts, this);
+        ext_trigger_evts_cb_id_ = cam_.ext_trigger().add_callback( ext_trigger_evts_cb );
+
         cam_.start();
     }
 
@@ -90,17 +97,17 @@ namespace camera {
         { cam_.biases().get_facility()->set(bias_name, bias_value); }
 
     void PropheseeCam::start_recording_to_path(std::string path) {
+        is_recording_ = true;
         cam_.start_recording(path);
-        auto ext_trigger_evts_cb = std::bind(&PropheseeCam::increment_ext_trigger_evts, this);
-        cam_.ext_trigger().add_callback( ext_trigger_evts_cb ); }
+    }
 
     void PropheseeCam::stop_recording() {
-        cam_.ext_trigger().remove_callback(1);
+        is_recording_ = false;
         cam_.stop_recording();
     }
 
     void PropheseeCam::increment_ext_trigger_evts()
-        { ext_trigger_evts_++; }
+        { if(is_recording_) { ext_trigger_evts_++; } }
 
     void PropheseeCam::reset_ext_trigger_evts()
         { ext_trigger_evts_ = 0; }
