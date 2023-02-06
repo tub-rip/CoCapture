@@ -31,6 +31,7 @@ namespace Gui {
 
     public:
         std::string getCurrTimeRootDirStr();
+        void makeCameraSubDirs(std::string rootDir);
         void makeCameraSubDirsAndRecord(std::string rootDir);
         void stopRecording();
         void resetContentCount();

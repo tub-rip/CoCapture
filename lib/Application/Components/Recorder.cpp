@@ -30,14 +30,22 @@ namespace Gui {
         return std::string(buf);
     }
 
+    void Recorder::makeCameraSubDirs(std::string rootDir) {
+        currentTargetDir = workDir + "/" + rootDir;
+        for(Base* cam : camRefs) {
+            std::string camDir = currentTargetDir + "/" + cam->getString();
+            boost::filesystem::create_directories(camDir);
+        }
+    }
+
     void Recorder::makeCameraSubDirsAndRecord(std::string rootDir) {
         resetContentCount();
-        currentTargetDir = workDir + "/" + rootDir;
+
+        makeCameraSubDirs(rootDir);
 
         int i = 0;
         for(Base* cam : camRefs) {
             std::string camDir = currentTargetDir + "/" + cam->getString();
-            boost::filesystem::create_directories(camDir);
 
             // Prophesee camera
             if(cam->getType() == PROPHESEE) {
