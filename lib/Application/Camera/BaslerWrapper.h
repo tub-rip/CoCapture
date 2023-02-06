@@ -10,9 +10,10 @@ namespace Gui {
         ~BaslerWrapper() {}
 
     public:
-        void setupBasler(Parameters appParams) {
-            cam = new camera::BaslerCamera(BaslerParams(appParams));
-            type = BASLER;
+        void setupBasler(Parameters appParams, int id) {
+            this->cam = new camera::BaslerCamera(BaslerParams(appParams));
+            this->type = BASLER;
+            this->id = id;
             setupCamera();
         }
 

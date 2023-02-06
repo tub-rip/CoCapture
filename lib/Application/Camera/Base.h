@@ -24,9 +24,12 @@ namespace Gui {
         int getHeight() { return cam->get_height(); }
         std::string getType() { return type; }
 
+        std::string getString() { return (type + "_" + std::to_string(id)); }
+
     protected:
         camera::Base* cam;
         std::string type;
+        int id;
     };
 
 }

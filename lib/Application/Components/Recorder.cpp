@@ -19,7 +19,7 @@ namespace Gui {
 
         int i = 0;
         for(Base* cam : camRefs) {
-            std::string camDir = targetDir + "/" + cam->getType() + "_" + std::to_string(i);
+            std::string camDir = targetDir + "/" + cam->getString();
             boost::filesystem::create_directories(camDir);
 
             // Prophesee camera

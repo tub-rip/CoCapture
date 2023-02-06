@@ -96,7 +96,7 @@ namespace Gui {
                                 0.5f * gridSize.y);
 
             drawToWindow(*textures, displayPos, displaySize,
-                         ImVec2(0.5f, 0.5f), "View " + std::to_string(0));
+                         ImVec2(0.5f, 0.5f), cam->getString());
         }
 
         else {
@@ -116,7 +116,7 @@ namespace Gui {
                                     yOffset * gridSize.y + 0.5f * gridSize.y);
 
                 drawToWindow(textures[i], displayPos, displaySize,
-                             ImVec2(0.5f, 0.5f), cam->getType() + " " + std::to_string(i));
+                             ImVec2(0.5f, 0.5f), cam->getString());
             }
         }
     }

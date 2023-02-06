@@ -10,9 +10,10 @@ namespace Gui {
         ~PropheseeWrapper() {}
 
     public:
-        void setupProphesee(Parameters appParams, std::string mode, int index) {
-            cam = new camera::PropheseeCam(PropheseeParams(appParams, mode, index));
-            type = PROPHESEE;
+        void setupProphesee(Parameters appParams, std::string mode, int index, int id) {
+            this->cam = new camera::PropheseeCam(PropheseeParams(appParams, mode, index));
+            this->type = PROPHESEE;
+            this->id = id;
             setupCamera();
         }
 
