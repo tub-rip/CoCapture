@@ -39,9 +39,9 @@ namespace camera {
 
         void set_bias_value(std::string bias_name, int bias_value);
 
-        void start_recording_to_path(std::string path);
+        void start_recording_to_path(std::string path) override;
 
-        void stop_recording();
+        void stop_recording() override;
 
     private:
         Metavision::Camera cam_;

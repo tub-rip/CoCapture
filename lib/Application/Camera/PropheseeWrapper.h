@@ -10,9 +10,10 @@ namespace Gui {
         ~PropheseeWrapper() {}
 
     public:
-        void setupProphesee(Parameters appParams, std::string mode, int index) {
-            cam = new camera::PropheseeCam(PropheseeParams(appParams, mode, index));
-            type = PROPHESEE;
+        void setupProphesee(Parameters appParams, std::string mode, int index, int id) {
+            this->cam = new camera::PropheseeCam(PropheseeParams(appParams, mode, index));
+            this->type = PROPHESEE;
+            this->id = id;
             setupCamera();
         }
 
@@ -34,12 +35,12 @@ namespace Gui {
         int* getBiasHpfRef() { return &biasHpf; }
         int* getBiasRefrRef() { return &biasRefr; }
 
-        void startRecording(std::string path) {
+        void startRecording(std::string path) override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->start_recording_to_path(path);
         }
 
-        void stopRecording() {
+        void stopRecording() override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->stop_recording();
         }
