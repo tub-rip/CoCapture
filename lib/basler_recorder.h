@@ -37,7 +37,7 @@ namespace basler {
         }
 
         virtual void OnImageEventHandlerDeregistered(Pylon::CInstantCamera &camera) {
-            video_writer_->release();
+            if(video_writer_ != NULL) { video_writer_->release(); }
             delete this;
         }
 
