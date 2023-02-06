@@ -30,7 +30,9 @@ namespace camera {
 
         void set_trigger_mode(bool on);
 
-        void startup_recorder(std::string file_path, double fps);
+        void startup_recorder(std::string file_path, double fps, int width, int height);
+
+        void cleanup_recorder();
 
         void start_recording_to_path(std::string path) override;
 
