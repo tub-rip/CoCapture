@@ -65,6 +65,12 @@ namespace Gui {
                 pCam->startRecording(camDir + "/" + PROPHESEE_OUTPUT_FILENAME);
             }
 
+            // Realsense camera
+            if(cam->getType() == REALSENSE) {
+                RealSenseWrapper* rCam = (RealSenseWrapper*) cam;
+                rCam->startRecording(camDir + "/" + REALSENSE_FRAME_OUTPUT_FILENAME);
+            }
+
             i++;
         }
     }
@@ -81,6 +87,13 @@ namespace Gui {
             if(cam->getType() == BASLER) {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
                 bCam->stopRecording();
+            }
+
+
+            // Realsense camera
+            if(cam->getType() == REALSENSE) {
+                RealSenseWrapper* rCam = (RealSenseWrapper*) cam;
+                rCam->stopRecording();
             }
         }
 
@@ -151,9 +164,11 @@ namespace Gui {
 
         bool pExists = false;
         bool bExists = false;
+        bool rExists = false;
         for(Base* cam : camRefs) {
             if(cam->getType() == PROPHESEE) { pExists = true; }
             if(cam->getType() == BASLER) { bExists = true; }
+            if(cam->getType() == REALSENSE) { rExists = true; }
         }
 
         if(cameraExists) {
@@ -167,6 +182,11 @@ namespace Gui {
 
             if(pExists) {
                 ImGui::TextUnformatted(( "- " + PROPHESEE ).c_str());
+                ImGui::Spacing();
+            }
+
+            if(rExists) {
+                ImGui::TextUnformatted(( "- " + REALSENSE ).c_str());
                 ImGui::Spacing();
             }
 

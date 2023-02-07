@@ -80,5 +80,6 @@ namespace Gui {
 
     // Realsense camera
     const std::string REALSENSE = "realsense";
+    const std::string REALSENSE_FRAME_OUTPUT_FILENAME = "frame";
 
 }

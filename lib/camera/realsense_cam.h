@@ -7,7 +7,10 @@ namespace camera {
 
     class RealSenseCam : public Base {
     public:
-        RealSenseCam(int idx, rs2::context& ctx) {
+        RealSenseCam(int idx, rs2::context& ctx):
+                record_(false),
+                seq_(0),
+                path_("") {
             dvc_ = ctx.query_devices()[idx];
 
             rs2::config cfg;
@@ -24,10 +27,17 @@ namespace camera {
         virtual void start_recording_to_path(std::string path);
         virtual void stop_recording();
 
+    public:
+        void metadata_to_csv(const rs2::frame& frm, const std::string& filename);
+
     private:
         rs2::device dvc_;
         rs2::pipeline pipe_;
         rs2::colorizer color_map_;
+
+        bool record_;
+        int seq_;
+        std::string path_;
     };
 
 }

@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "Base.h"
@@ -20,9 +21,13 @@ namespace Gui {
         void updateValues() override {}
 
     public:
-        void startRecording(std::string path) override {}
+        void startRecording(std::string path) override {
+            cam->start_recording_to_path(path);
+        }
 
-        void stopRecording() override {}
+        void stopRecording() override {
+            cam->stop_recording();
+        }
     };
 
 }

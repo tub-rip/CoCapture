@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "../Camera/PropheseeWrapper.h"
 #include "../Camera/BaslerWrapper.h"
+#include "../Camera/RealSenseWrapper.h"
 
 #include <iostream>
 #include <ctime>
