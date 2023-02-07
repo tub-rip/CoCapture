@@ -78,4 +78,7 @@ namespace Gui {
     const int PROPHESEE_BIAS_REFR_MIN = 20;
     const int PROPHESEE_BIAS_REFR_MAX = 100;
 
-} // Application
+    // Realsense camera
+    const std::string REALSENSE = "realsense";
+
+}

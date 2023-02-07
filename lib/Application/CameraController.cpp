@@ -13,6 +13,7 @@ namespace Gui {
         Base* camRef;
         int bCounter = 0;
         int pCounter = 0;
+        int rCounter = 0;
 
         for(int i = 0; i < numCams; i++) {
             std::string type = appParams.camera_types[i];
@@ -36,6 +37,16 @@ namespace Gui {
 
                 pCam->setupProphesee(appParams, mode, i, pCounter++);
                 camRef = pCam;
+            }
+
+            // Realsense
+            else if(type == REALSENSE) {
+                RealSenseWrapper* rCam = new RealSenseWrapper();
+
+                rCam->setupRealSense(rCounter, ctx);
+                camRef = rCam;
+
+                rCounter++;
             }
 
             camRefs.push_back(camRef);
