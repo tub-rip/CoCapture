@@ -25,10 +25,8 @@ namespace camera {
         cd_frame_generator->start(params_.fps, [this](const Metavision::timestamp &ts, const cv::Mat &frame) {
             frame.copyTo(cd_frame_);
         });
-        cam_.ext_trigger().add_callback([this](const Metavision::EventExtTrigger *begin,
-                                                                      const Metavision::EventExtTrigger *end) {
-            std::cout << "Trigger event received at "<< begin->t << "us" << std::endl;
-        });
+        int channel_id = 0; // for EVK4, EVK3
+        cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
 
         if (params_.mode == "master") {
             this->set_mode_master();
@@ -43,8 +41,6 @@ namespace camera {
         if (params_.record_from_startup) {
             std::stringstream ss;
             ss << "./out_" << params_.id << ".raw";
-            int channel_id = 0; // for EVK4, EVK3
-            cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
             cam_.start_recording(ss.str());
         }
         cam_.start();
