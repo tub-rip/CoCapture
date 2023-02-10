@@ -18,6 +18,8 @@ further dependencies for the cameras:
     - Tested versions are: 2.3.0
 - Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
     - Tested versions are: 7.2.1
+- RealSense, from https://dev.intelrealsense.com/docs/installation
+    - Tested versions are: 2.0
 
 
 ## Installation
