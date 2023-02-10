@@ -2,6 +2,22 @@
 
 namespace Gui {
 
+    void Recorder::resetContentCount() {
+        for(Base* cam : camRefs) {
+            // Prophesee camera
+            if(cam->getType() == PROPHESEE) {
+                PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
+                pCam->setExternalTriggers(0);
+            }
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->setCapturedFrames(0);
+            }
+        }
+    }
+
     std::string Recorder::getCurrTimeRootDirStr() {
         time_t rawTime;
         struct tm * timeInfo;
@@ -14,13 +30,34 @@ namespace Gui {
         return std::string(buf);
     }
 
-    void Recorder::makeCameraSubDirsAndRecord(std::string rootDir) {
-        std::string targetDir = workDir + "/" + rootDir;
+    void Recorder::prepareRecording(std::string rootDir) {
+        currentTargetDir = workDir + "/" + rootDir;
+        for(Base* cam : camRefs) {
+            std::string camDir = currentTargetDir + "/" + cam->getString();
+            boost::filesystem::create_directories(camDir);
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->startupRecorder(camDir + "/" + BASLER_OUTPUT_FILENAME);
+            }
+        }
+    }
+
+    void Recorder::startRecording(std::string rootDir) {
+        resetContentCount();
+
+        prepareRecording(rootDir);
 
         int i = 0;
         for(Base* cam : camRefs) {
-            std::string camDir = targetDir + "/" + cam->getString();
-            boost::filesystem::create_directories(camDir);
+            std::string camDir = currentTargetDir + "/" + cam->getString();
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->startRecording(camDir + "/" + BASLER_OUTPUT_FILENAME);
+            }
 
             // Prophesee camera
             if(cam->getType() == PROPHESEE) {
@@ -28,10 +65,10 @@ namespace Gui {
                 pCam->startRecording(camDir + "/" + PROPHESEE_OUTPUT_FILENAME);
             }
 
-            // Basler camera
-            if(cam->getType() == BASLER) {
-                BaslerWrapper* bCam = (BaslerWrapper*) cam;
-                bCam->startRecording(camDir + "/" + BASLER_OUTPUT_FILENAME);
+            // Realsense camera
+            if(cam->getType() == REALSENSE) {
+                RealSenseWrapper* rCam = (RealSenseWrapper*) cam;
+                rCam->startRecording(camDir + "/" + REALSENSE_FRAME_OUTPUT_FILENAME);
             }
 
             i++;
@@ -51,6 +88,51 @@ namespace Gui {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
                 bCam->stopRecording();
             }
+
+
+            // Realsense camera
+            if(cam->getType() == REALSENSE) {
+                RealSenseWrapper* rCam = (RealSenseWrapper*) cam;
+                rCam->stopRecording();
+            }
+        }
+
+        sanityCheck();
+
+        cleanupRecording();
+    }
+
+    void Recorder::cleanupRecording() {
+        for(Base* cam : camRefs) {
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                bCam->cleanupRecorder();
+            }
+        }
+    }
+
+    void Recorder::sanityCheck() {
+        int i = 0;
+        for(Base* cam : camRefs) {
+            std::string camDir = currentTargetDir + "/" + cam->getString();
+            std::string outputFile;
+
+            // Prophesee camera
+            if(cam->getType() == PROPHESEE) {
+                PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
+                pCam->setExternalTriggers(pCam->getExtTriggerEvts());
+                pCam->resetExtTriggerEvts();
+            }
+
+            // Basler camera
+            if(cam->getType() == BASLER) {
+                BaslerWrapper* bCam = (BaslerWrapper*) cam;
+                cv::VideoCapture capture (camDir + "/" + BASLER_OUTPUT_FILENAME);
+                bCam->setCapturedFrames(capture.get(cv::CAP_PROP_FRAME_COUNT));
+            }
+
+            i++;
         }
     }
 
@@ -82,9 +164,11 @@ namespace Gui {
 
         bool pExists = false;
         bool bExists = false;
+        bool rExists = false;
         for(Base* cam : camRefs) {
             if(cam->getType() == PROPHESEE) { pExists = true; }
             if(cam->getType() == BASLER) { bExists = true; }
+            if(cam->getType() == REALSENSE) { rExists = true; }
         }
 
         if(cameraExists) {
@@ -101,13 +185,18 @@ namespace Gui {
                 ImGui::Spacing();
             }
 
+            if(rExists) {
+                ImGui::TextUnformatted(( "- " + REALSENSE ).c_str());
+                ImGui::Spacing();
+            }
+
             ImGui::Spacing();
 
             std::string rootDir = getCurrTimeRootDirStr();
 
             if(ImGui::Button("Record")) {
                 if(!recording) {
-                    makeCameraSubDirsAndRecord(rootDir);
+                    startRecording(rootDir);
 
                     recording = true; status = "Recording in progress . .";
                 }
@@ -119,7 +208,7 @@ namespace Gui {
                 ImGui::Text("Currently recording. Proceed anyway?");
                 if(ImGui::Selectable("Yes")) {
                     stopRecording();
-                    makeCameraSubDirsAndRecord(rootDir);
+                    startRecording(rootDir);
                 }
                 ImGui::Selectable("No");
                 ImGui::EndPopup();
@@ -139,7 +228,10 @@ namespace Gui {
         }
 
         ImGui::Spacing();
+
         ImGui::TextUnformatted(status.c_str());
+        ImGui::Spacing();
+
         ImGui::End();
     }
 

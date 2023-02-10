@@ -35,6 +35,19 @@ namespace Gui {
         int* getBiasHpfRef() { return &biasHpf; }
         int* getBiasRefrRef() { return &biasRefr; }
 
+        int getExtTriggerEvts() {
+            camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
+            return pCam->get_ext_trigger_evts();
+        }
+
+        void resetExtTriggerEvts() {
+            camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
+            pCam->reset_ext_trigger_evts();
+        }
+
+        void setExternalTriggers(int ext) { externalTriggers = ext; }
+        int getExternalTriggers() { return externalTriggers; }
+
         void startRecording(std::string path) override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->start_recording_to_path(path);
@@ -51,6 +64,7 @@ namespace Gui {
         int biasDiffOn = PROPHESEE_BIAS_DIFF_ON_DEFAULT;
         int biasHpf = PROPHESEE_BIAS_HPF_DEFAULT;
         int biasRefr = PROPHESEE_BIAS_REFR_DEFAULT;
+        int externalTriggers = 0;
     };
 
 }

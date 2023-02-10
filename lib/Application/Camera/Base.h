@@ -2,6 +2,7 @@
 
 #include "../../camera/basler_camera.h"
 #include "../../camera/prophesee_cam.h"
+#include "../../camera/realsense_cam.h"
 
 #include "../Constants.h"
 

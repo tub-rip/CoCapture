@@ -31,7 +31,9 @@ namespace Gui {
             // Basler camera
             if(cam->getType() == BASLER) {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
-                ImGui::TextUnformatted((bCam->getString().c_str()));
+                ImGui::TextUnformatted((bCam->getString() + " : "
+                + std::to_string(bCam->getCapturedFrames()) + " capt. frames")
+                .c_str());
                 ImGui::Spacing();
 
                 ImGui::Checkbox((BASLER_TRIGGER_MODE_LABEL + "##").c_str(), bCam->getTriggerModeRef());
@@ -45,7 +47,10 @@ namespace Gui {
                 // Prophesee camera
             else if(cam->getType() == PROPHESEE) {
                 PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
-                ImGui::TextUnformatted((pCam->getString().c_str()));
+                ImGui::TextUnformatted((pCam->getString() + " : "
+                + std::to_string(pCam->getExternalTriggers()) + " ext. triggers")
+                .c_str());
+
                 ImGui::Spacing();
 
                 ImGui::SliderInt("Off event th. ##", pCam->getBiasDiffOffRef(),
