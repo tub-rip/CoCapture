@@ -25,8 +25,6 @@ namespace camera {
         cd_frame_generator->start(params_.fps, [this](const Metavision::timestamp &ts, const cv::Mat &frame) {
             frame.copyTo(cd_frame_);
         });
-        int channel_id = 0; // for EVK4, EVK3
-        cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
 
         if (params_.mode == "master") {
             this->set_mode_master();
