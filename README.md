@@ -15,7 +15,8 @@ Install SDL2 library with:
 further dependencies for the cameras:
 
 - OpenEB, from https://github.com/prophesee-ai/openeb
-    - Tested versions are: 2.3.0
+    - Tested versions are: 2.3.0, 3.0.2
+      (Please, note that we do not support 4.0 at the moment, as it introduces some breaking changes.)
 - Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
     - Tested versions are: 7.2.1
 - RealSense, from https://dev.intelrealsense.com/docs/installation
