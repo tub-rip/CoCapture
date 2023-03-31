@@ -10,9 +10,10 @@ namespace Gui {
         ~PropheseeWrapper() {}
 
     public:
-        void setupProphesee(Parameters appParams, std::string mode, int index) {
-            cam = new camera::PropheseeCam(PropheseeParams(appParams, mode, index));
-            type = PROPHESEE;
+        void setupProphesee(Parameters appParams, std::string mode, int index, int id) {
+            this->cam = new camera::PropheseeCam(PropheseeParams(appParams, mode, index));
+            this->type = PROPHESEE;
+            this->id = id;
             setupCamera();
         }
 
@@ -34,12 +35,25 @@ namespace Gui {
         int* getBiasHpfRef() { return &biasHpf; }
         int* getBiasRefrRef() { return &biasRefr; }
 
-        void startRecording(std::string path) {
+        int getExtTriggerEvts() {
+            camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
+            return pCam->get_ext_trigger_evts();
+        }
+
+        void resetExtTriggerEvts() {
+            camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
+            pCam->reset_ext_trigger_evts();
+        }
+
+        void setExternalTriggers(int ext) { externalTriggers = ext; }
+        int getExternalTriggers() { return externalTriggers; }
+
+        void startRecording(std::string path) override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->start_recording_to_path(path);
         }
 
-        void stopRecording() {
+        void stopRecording() override {
             camera::PropheseeCam* pCam = (camera::PropheseeCam*) cam;
             pCam->stop_recording();
         }
@@ -50,6 +64,7 @@ namespace Gui {
         int biasDiffOn = PROPHESEE_BIAS_DIFF_ON_DEFAULT;
         int biasHpf = PROPHESEE_BIAS_HPF_DEFAULT;
         int biasRefr = PROPHESEE_BIAS_REFR_DEFAULT;
+        int externalTriggers = 0;
     };
 
 }

@@ -39,9 +39,15 @@ namespace camera {
 
         void set_bias_value(std::string bias_name, int bias_value);
 
-        void start_recording_to_path(std::string path);
+        void start_recording_to_path(std::string path) override;
 
-        void stop_recording();
+        void stop_recording() override;
+
+        void increment_ext_trigger_evts();
+
+        void reset_ext_trigger_evts();
+
+        int get_ext_trigger_evts();
 
     private:
         Metavision::Camera cam_;
@@ -52,6 +58,10 @@ namespace camera {
         cv::Scalar color_bg_ = cv::Scalar{255, 255, 255};
         cv::Scalar color_on_ = cv::Scalar{0, 0, 255};
         cv::Scalar color_off_ = cv::Scalar{255, 0, 0};
+
+        bool is_recording_{false};
+        int ext_trigger_evts_{0};
+        int ext_trigger_evts_cb_id_{false};
     };
 
 

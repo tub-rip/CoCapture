@@ -31,7 +31,13 @@ namespace Gui {
             // Basler camera
             if(cam->getType() == BASLER) {
                 BaslerWrapper* bCam = (BaslerWrapper*) cam;
-                ImGui::TextUnformatted((bCam->getType() + " " + std::to_string(i)).c_str());
+                ImGui::TextUnformatted((bCam->getString() + " : "
+                + std::to_string(bCam->getCapturedFrames()) + " capt. frames")
+                .c_str());
+                ImGui::Spacing();
+
+                ImGui::Checkbox((BASLER_TRIGGER_MODE_LABEL + "##").c_str(), bCam->getTriggerModeRef());
+                ImGui::Spacing();
 
                 ImGui::SliderInt((BASLER_EXPOSURE_LABEL + "##").c_str(), bCam->getExposureTimeRef(),
                                  BASLER_EXPOSURE_MIN, BASLER_EXPOSURE_MAX);
@@ -41,7 +47,11 @@ namespace Gui {
                 // Prophesee camera
             else if(cam->getType() == PROPHESEE) {
                 PropheseeWrapper* pCam = (PropheseeWrapper*) cam;
-                ImGui::TextUnformatted((pCam->getType() + " " + std::to_string(i)).c_str());
+                ImGui::TextUnformatted((pCam->getString() + " : "
+                + std::to_string(pCam->getExternalTriggers()) + " ext. triggers")
+                .c_str());
+
+                ImGui::Spacing();
 
                 ImGui::SliderInt("Off event th. ##", pCam->getBiasDiffOffRef(),
                                  PROPHESEE_BIAS_DIFF_OFF_MIN, PROPHESEE_BIAS_DIFF_OFF_MAX);

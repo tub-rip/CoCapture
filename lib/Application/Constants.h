@@ -35,17 +35,23 @@ namespace Gui {
     // Basler camera
     const std::string BASLER = "basler";
 
+    const std::string BASLER_OUTPUT_FILENAME = "frames.mp4";
+
     const std::string BASLER_EXPOSURE_LABEL = "Exposure time";
     const int BASLER_EXPOSURE_DEFAULT = 5000;
     const int BASLER_EXPOSURE_MIN = 500;
     const int BASLER_EXPOSURE_MAX = 20000;
+
+    const std::string BASLER_TRIGGER_MODE_LABEL = "External trigger";
+
+    const double BASLER_RECORDING_FPS = 30;
 
     // Prophesee camera
     const std::string PROPHESEE = "prophesee";
     const std::string MASTER = "master";
     const std::string SLAVE = "slave";
 
-    const std::string PROPHESEE_RAW_OUTPUT_FILENAME = "output";
+    const std::string PROPHESEE_OUTPUT_FILENAME = "output";
 
 #ifdef PCAM_EVK4
     const std::string PROPHESEE_BIAS_FO_LABEL = "bias_fo";
@@ -99,4 +105,8 @@ namespace Gui {
     const int PROPHESEE_BIAS_REFR_MAX = 100;
 #endif
 
-} // Application
+    // Realsense camera
+    const std::string REALSENSE = "realsense";
+    const std::string REALSENSE_FRAME_OUTPUT_FILENAME = "frame";
+
+}

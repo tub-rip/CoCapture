@@ -37,6 +37,9 @@ if (NOT ${Pylon_FOUND})
     include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPylon.cmake")
 endif ()
 
+find_package(realsense2 REQUIRED)
+include_directories(${realsense_INCLUDE_DIR})
+
 include_directories(
         ${Pylon_INCLUDE_DIRS}
 )
@@ -53,7 +56,7 @@ add_executable(recorder
         lib/Application/Gui.cpp lib/Application/Gui.h lib/Application/Components/Component.h
         lib/Application/Components/Viewpanel.cpp lib/Application/Components/Viewpanel.h
         lib/Application/Components/Sidepanel.cpp lib/Application/Components/Sidepanel.h
-        lib/Application/Components/Recorder.cpp lib/Application/Components/Recorder.h)
+        lib/Application/Components/Recorder.cpp lib/Application/Components/Recorder.h lib/basler_recorder.h lib/camera/realsense_cam.cpp lib/camera/realsense_cam.h lib/Application/Camera/RealSenseWrapper.h)
 
 target_link_libraries(recorder
         ImGui
@@ -65,7 +68,8 @@ target_link_libraries(recorder
         Metavision::HAL_discovery
         Threads::Threads
         ${Pylon_LIBRARIES}
-        ${Boost_LIBRARIES})
+        ${Boost_LIBRARIES}        
+        ${realsense2_LIBRARY})
 
 option(DEFINE_PCAM_EVK4 "ON means Prophesee sensor generation is IMX636, else 4.1" ON)
 if(DEFINE_PCAM_EVK4)

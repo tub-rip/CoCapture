@@ -25,10 +25,6 @@ namespace camera {
         cd_frame_generator->start(params_.fps, [this](const Metavision::timestamp &ts, const cv::Mat &frame) {
             frame.copyTo(cd_frame_);
         });
-        cam_.ext_trigger().add_callback([this](const Metavision::EventExtTrigger *begin,
-                                                                      const Metavision::EventExtTrigger *end) {
-            std::cout << "Trigger event received at "<< begin->t << "us" << std::endl;
-        });
 
         if (params_.mode == "master") {
             this->set_mode_master();
@@ -43,10 +39,15 @@ namespace camera {
         if (params_.record_from_startup) {
             std::stringstream ss;
             ss << "./out_" << params_.id << ".raw";
-            int channel_id = 0; // for EVK4, EVK3
-            cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
             cam_.start_recording(ss.str());
         }
+
+        int channel_id = 0; // for EVK4, EVK3
+        cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
+
+        auto ext_trigger_evts_cb = std::bind(&PropheseeCam::increment_ext_trigger_evts, this);
+        ext_trigger_evts_cb_id_ = cam_.ext_trigger().add_callback( ext_trigger_evts_cb );
+
         cam_.start();
     }
 
@@ -89,10 +90,23 @@ namespace camera {
     void PropheseeCam::set_bias_value(std::string bias_name, int bias_value)
         { cam_.biases().get_facility()->set(bias_name, bias_value); }
 
-    void PropheseeCam::start_recording_to_path(std::string path)
-        { cam_.start_recording(path); }
+    void PropheseeCam::start_recording_to_path(std::string path) {
+        is_recording_ = true;
+        cam_.start_recording(path);
+    }
 
-    void PropheseeCam::stop_recording()
-        { cam_.stop_recording(); }
+    void PropheseeCam::stop_recording() {
+        is_recording_ = false;
+        cam_.stop_recording();
+    }
+
+    void PropheseeCam::increment_ext_trigger_evts()
+        { if(is_recording_) { ext_trigger_evts_++; } }
+
+    void PropheseeCam::reset_ext_trigger_evts()
+        { ext_trigger_evts_ = 0; }
+
+    int PropheseeCam::get_ext_trigger_evts()
+        { return ext_trigger_evts_; }
 
 } // camera

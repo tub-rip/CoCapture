@@ -6,6 +6,7 @@
 
 #include "base.h"
 #include "../basler_event_handler.h"
+#include "../basler_recorder.h"
 
 namespace camera {
 
@@ -27,12 +28,21 @@ namespace camera {
 
         void set_exposure_time(int exposure_time);
 
-        void set_trigger_mode(std::string trigger_mode);
+        void set_trigger_mode(bool on);
+
+        void startup_recorder(std::string file_path, double fps, int width, int height);
+
+        void cleanup_recorder();
+
+        void start_recording_to_path(std::string path) override;
+
+        void stop_recording() override;
 
     private:
         BaslerParams params_;
         Pylon::CBaslerUniversalInstantCamera cam_;
         basler::BaslerEventHandler *event_handler_{};
+        basler::BaslerRecorder *recorder_{};
     };
 
 } // camera

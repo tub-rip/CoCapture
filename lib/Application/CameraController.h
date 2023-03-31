@@ -2,9 +2,11 @@
 
 #include "../camera/basler_camera.h"
 #include "../camera/prophesee_cam.h"
+#include "../camera/realsense_cam.h"
 
 #include "Camera/BaslerWrapper.h"
 #include "Camera/PropheseeWrapper.h"
+#include "Camera/RealSenseWrapper.h"
 
 namespace Gui {
 
@@ -36,6 +38,7 @@ namespace Gui {
         Parameters appParams;
         int numCams;
 
+        rs2::context ctx;
         std::vector<Base*> camRefs;
     };
 

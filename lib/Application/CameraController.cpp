@@ -11,6 +11,9 @@ namespace Gui {
 
     void CameraController::setupCameras() {
         Base* camRef;
+        int bCounter = 0;
+        int pCounter = 0;
+        int rCounter = 0;
 
         for(int i = 0; i < numCams; i++) {
             std::string type = appParams.camera_types[i];
@@ -20,7 +23,7 @@ namespace Gui {
             if(type == BASLER) {
                 BaslerWrapper* bCam = new BaslerWrapper();
 
-                bCam->setupBasler(appParams);
+                bCam->setupBasler(appParams, bCounter++);
                 camRef = bCam;
             }
 
@@ -32,8 +35,18 @@ namespace Gui {
                 // Sets all but the last Prophesee camera to slave mode
                 if(i == lastPropheseeIdx) { mode = MASTER; }
 
-                pCam->setupProphesee(appParams, mode, i);
+                pCam->setupProphesee(appParams, mode, i, pCounter++);
                 camRef = pCam;
+            }
+
+            // Realsense
+            else if(type == REALSENSE) {
+                RealSenseWrapper* rCam = new RealSenseWrapper();
+
+                rCam->setupRealSense(rCounter, ctx);
+                camRef = rCam;
+
+                rCounter++;
             }
 
             camRefs.push_back(camRef);

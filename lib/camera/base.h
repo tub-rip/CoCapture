@@ -35,6 +35,10 @@ namespace camera {
         // Further
         void update_display_frame();
 
+        virtual void start_recording_to_path(std::string path) = 0;
+
+        virtual void stop_recording() = 0;
+
     protected:
         int width_;
         int height_;
