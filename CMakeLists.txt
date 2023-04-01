@@ -68,5 +68,10 @@ target_link_libraries(recorder
         Metavision::HAL_discovery
         Threads::Threads
         ${Pylon_LIBRARIES}
-        ${Boost_LIBRARIES}
+        ${Boost_LIBRARIES}        
         ${realsense2_LIBRARY})
+
+option(DEFINE_PCAM_EVK4 "ON means Prophesee sensor generation is IMX636, else 4.1" ON)
+if(DEFINE_PCAM_EVK4)
+    add_definitions(-DPCAM_EVK4)
+endif(DEFINE_USE_INVERSE_DEPTH)

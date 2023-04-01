@@ -53,6 +53,32 @@ namespace Gui {
 
     const std::string PROPHESEE_OUTPUT_FILENAME = "output";
 
+#ifdef PCAM_EVK4
+    const std::string PROPHESEE_BIAS_FO_LABEL = "bias_fo";
+    const int PROPHESEE_BIAS_FO_DEFAULT = 0;
+    const int PROPHESEE_BIAS_FO_MIN = -35;
+    const int PROPHESEE_BIAS_FO_MAX = 55;
+
+    const std::string PROPHESEE_BIAS_DIFF_OFF_LABEL = "bias_diff_off";
+    const int PROPHESEE_BIAS_DIFF_OFF_DEFAULT = 0;
+    const int PROPHESEE_BIAS_DIFF_OFF_MIN = -35;
+    const int PROPHESEE_BIAS_DIFF_OFF_MAX = 190;
+
+    const std::string PROPHESEE_BIAS_DIFF_ON_LABEL = "bias_diff_on";
+    const int PROPHESEE_BIAS_DIFF_ON_DEFAULT = 0;
+    const int PROPHESEE_BIAS_DIFF_ON_MIN = -85;
+    const int PROPHESEE_BIAS_DIFF_ON_MAX = 140;
+
+    const std::string PROPHESEE_BIAS_HPF_LABEL = "bias_hpf";
+    const int PROPHESEE_BIAS_HPF_DEFAULT = 0;
+    const int PROPHESEE_BIAS_HPF_MIN = 0;
+    const int PROPHESEE_BIAS_HPF_MAX = 120;
+
+    const std::string PROPHESEE_BIAS_REFR_LABEL = "bias_refr";
+    const int PROPHESEE_BIAS_REFR_DEFAULT = 0;
+    const int PROPHESEE_BIAS_REFR_MIN = -20;
+    const int PROPHESEE_BIAS_REFR_MAX = 235;
+#else
     const std::string PROPHESEE_BIAS_FO_LABEL = "bias_fo";
     const int PROPHESEE_BIAS_FO_DEFAULT = 70;
     const int PROPHESEE_BIAS_FO_MIN = 45;
@@ -77,6 +103,7 @@ namespace Gui {
     const int PROPHESEE_BIAS_REFR_DEFAULT = 60;
     const int PROPHESEE_BIAS_REFR_MIN = 20;
     const int PROPHESEE_BIAS_REFR_MAX = 100;
+#endif
 
     // Realsense camera
     const std::string REALSENSE = "realsense";
