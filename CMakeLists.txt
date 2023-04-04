@@ -74,4 +74,4 @@ target_link_libraries(recorder
 option(DEFINE_PCAM_EVK4 "ON means Prophesee sensor generation is IMX636, else 4.1" ON)
 if(DEFINE_PCAM_EVK4)
     add_definitions(-DPCAM_EVK4)
-endif(DEFINE_USE_INVERSE_DEPTH)
+endif(DEFINE_PCAM_EVK4)
