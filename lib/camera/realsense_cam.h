@@ -2,6 +2,7 @@
 
 #include "base.h"
 #include <librealsense2/rs.hpp>
+#include <fstream>
 
 namespace camera {
 
