@@ -28,13 +28,13 @@ namespace camera {
                                             CV_16UC1, (void*)depth.get_data(), cv::Mat::AUTO_STEP);
             cv::imwrite(path_ + frame_postfix, display_depth);
             metadata_to_csv(depth, path_+csv_postfix);
-            if (save_color){
+            if (save_color_){
                 cv::Mat display_color = cv::Mat(cv::Size(color.as<rs2::video_frame>().get_width(), color.as<rs2::video_frame>().get_height()),
                                                 CV_8UC3, (void*)color.get_data(), cv::Mat::AUTO_STEP);
                 cv::imwrite(path_ + "_rgb" + frame_postfix, display_color);
                 metadata_to_csv(color, path_ + "_rgb" + csv_postfix);
               }
-            if (save_ir) {
+            if (save_ir_) {
                 cv::Mat display_infra = cv::Mat(cv::Size(infra.as<rs2::video_frame>().get_width(), infra.as<rs2::video_frame>().get_height()),
                                                 CV_8UC1, (void*)infra.get_data(), cv::Mat::AUTO_STEP);
                 cv::imwrite(path_ + "_infra" + frame_postfix, display_infra);

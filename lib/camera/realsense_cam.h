@@ -12,8 +12,8 @@ namespace camera {
                 record_(false),
                 seq_(0),
                 path_(""),
-                save_ir(true),
-                save_color(true){
+                save_ir_(true),
+                save_color_(true){
             dvc_ = ctx.query_devices()[idx];
 
             rs2::config cfg;
@@ -47,8 +47,8 @@ namespace camera {
         bool record_;
         int seq_;
         std::string path_;
-        bool save_ir;
-        bool save_color;
+        bool save_ir_;
+        bool save_color_;
     };
 
 }
