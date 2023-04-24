@@ -35,4 +35,6 @@ build/*
 *.out
 *.app
 
+*.pyc
+
 CMakeLsists.txt.user
