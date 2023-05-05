@@ -1,45 +1,24 @@
-# rip-cocapture-gui
+# Cocapture-dev
 
-Light-weight viewer and recorder for the co-capture system
+### Application dependencies
+Cocapture uses [Dear ImGui](https://github.com/ocornut/imgui), a bloat-free graphical user interface library for C++ with [SDL2](http://www.libsdl.org/) and [OpenGL3](https://www.opengl.org/) backend.
 
-## Dependencies:
-
-Install OpenGL3 library with:
+Install OpenGL3 with:
 
     sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev  
 
-Install SDL2 library with:
+Install SDL2 with:
 
     sudo apt-get install libsdl2-dev
 
-further dependencies for the cameras:
+### Camera dependencies
+- Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
+    - Version 7.2.1 is required
 
 - OpenEB, from https://github.com/prophesee-ai/openeb
-    - Tested versions are: 2.3.0, 3.0.2
-      (Please, note that we do not support 4.0 at the moment, as it introduces some breaking changes.)
-- Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
-    - Tested versions are: 7.2.1
-- RealSense, from https://dev.intelrealsense.com/docs/installation
-    - Tested versions are: 2.0
+    - Version 2.3.0 or 3.0.2 is required (version 4.0.0 is currently not supported)
 
-
-## Installation
-
-Tested on Ubuntu 20.04
-
-    mkdir build && cd build
-    cmake ..
-    make -j
-
-## Usage
-
-Start recorder with
-
-    ./recorder --cameras <type1> <type2> ...
-
-where `<typeX>` is either `basler` or `prophesee`. So for two Prophesee cameras call:
-
-    ./recorder --cameras prophesee prophesee
-
-Use the flag `--record` to record from startup. For synchronized data streams
-the cameras need to be hardware triggered.
+      
+### Further dependencies
+- OpenCV, from https://github.com/opencv/opencv
+- Boost, from https://www.boost.org/users/download/
