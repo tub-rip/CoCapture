@@ -46,7 +46,7 @@ endif()
 ### PylonSDK
 if(USE_PYLON_SDK)
     add_definitions(-DENABLE_PYLON_SDK)
-    find_package(pylon 7.2.1 REQUIRED)
+    find_package(pylon 7.2.0 REQUIRED)
     target_link_libraries(Cocapture PUBLIC pylon::pylon)
 
     target_sources(Cocapture PUBLIC core/basler/basler_launcher.cpp)
