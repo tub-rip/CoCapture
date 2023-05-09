@@ -22,6 +22,7 @@ namespace camera {
                                       const Metavision::EventCD *ev_end) {
             cd_frame_generator->add_events(ev_begin, ev_end);
         });
+        trigger_event_saver_ = std::make_unique<TriggerEventSaver>();
         cd_frame_generator->start(params_.fps, [this](const Metavision::timestamp &ts, const cv::Mat &frame) {
             frame.copyTo(cd_frame_);
         });
@@ -46,7 +47,13 @@ namespace camera {
         cam_.get_device().get_facility<Metavision::I_TriggerIn>()->enable(channel_id);
 
         auto ext_trigger_evts_cb = std::bind(&PropheseeCam::increment_ext_trigger_evts, this);
-        ext_trigger_evts_cb_id_ = cam_.ext_trigger().add_callback( ext_trigger_evts_cb );
+        ext_trigger_evts_cb_id_ = cam_.ext_trigger().add_callback(ext_trigger_evts_cb);
+
+        cam_.ext_trigger().add_callback(
+                [this](const Metavision::EventExtTrigger *begin,
+                                       const Metavision::EventExtTrigger *end) {
+                    trigger_event_saver_->save_events(begin, end);
+                });
 
         cam_.start();
     }
@@ -84,29 +91,28 @@ namespace camera {
         }
     }
 
-    int PropheseeCam::get_bias_value(std::string bias_name)
-        { return cam_.biases().get_facility()->get(bias_name); }
+    int PropheseeCam::get_bias_value(std::string bias_name) { return cam_.biases().get_facility()->get(bias_name); }
 
-    void PropheseeCam::set_bias_value(std::string bias_name, int bias_value)
-        { cam_.biases().get_facility()->set(bias_name, bias_value); }
+    void PropheseeCam::set_bias_value(std::string bias_name, int bias_value) {
+        cam_.biases().get_facility()->set(bias_name, bias_value);
+    }
 
     void PropheseeCam::start_recording_to_path(std::string path) {
         is_recording_ = true;
+        trigger_event_saver_->set_path(path);
         cam_.start_recording(path);
     }
 
     void PropheseeCam::stop_recording() {
         is_recording_ = false;
+        trigger_event_saver_->stop_writing();
         cam_.stop_recording();
     }
 
-    void PropheseeCam::increment_ext_trigger_evts()
-        { if(is_recording_) { ext_trigger_evts_++; } }
+    void PropheseeCam::increment_ext_trigger_evts() { if (is_recording_) { ext_trigger_evts_++; }}
 
-    void PropheseeCam::reset_ext_trigger_evts()
-        { ext_trigger_evts_ = 0; }
+    void PropheseeCam::reset_ext_trigger_evts() { ext_trigger_evts_ = 0; }
 
-    int PropheseeCam::get_ext_trigger_evts()
-        { return ext_trigger_evts_; }
+    int PropheseeCam::get_ext_trigger_evts() { return ext_trigger_evts_; }
 
 } // camera

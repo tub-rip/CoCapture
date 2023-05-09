@@ -1,6 +1,8 @@
 #ifndef RIP_COCAPTURE_GUI_PROPHESEE_CAM_H
 #define RIP_COCAPTURE_GUI_PROPHESEE_CAM_H
 
+#include <memory>
+
 #include <metavision/sdk/driver/camera.h>
 #include <metavision/sdk/base/utils/log.h>
 #include <metavision/hal/facilities/i_device_control.h>
@@ -12,6 +14,7 @@
 
 #include "base.h"
 #include "../utils.h"
+#include "../trigger_event_saver.h"
 
 
 namespace camera {
@@ -19,7 +22,6 @@ namespace camera {
     class PropheseeCam : public Base {
     public:
         explicit PropheseeCam(PropheseeParams &params) : params_(params) {};
-
         explicit PropheseeCam(PropheseeParams params) : params_(params) {};
 
         void get_display_frame(cv::Mat &display) override;
@@ -62,6 +64,7 @@ namespace camera {
         bool is_recording_{false};
         int ext_trigger_evts_{0};
         int ext_trigger_evts_cb_id_{false};
+        std::unique_ptr<TriggerEventSaver> trigger_event_saver_;
     };
 
 

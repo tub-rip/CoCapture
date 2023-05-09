@@ -56,7 +56,9 @@ add_executable(recorder
         lib/Application/Gui.cpp lib/Application/Gui.h lib/Application/Components/Component.h
         lib/Application/Components/Viewpanel.cpp lib/Application/Components/Viewpanel.h
         lib/Application/Components/Sidepanel.cpp lib/Application/Components/Sidepanel.h
-        lib/Application/Components/Recorder.cpp lib/Application/Components/Recorder.h lib/basler_recorder.h lib/camera/realsense_cam.cpp lib/camera/realsense_cam.h lib/Application/Camera/RealSenseWrapper.h)
+        lib/Application/Components/Recorder.cpp lib/Application/Components/Recorder.h lib/basler_recorder.h
+        lib/camera/realsense_cam.cpp lib/camera/realsense_cam.h lib/Application/Camera/RealSenseWrapper.h
+        lib/trigger_event_saver.cpp lib/trigger_event_saver.h lib/trigger_event_saver.cpp)
 
 target_link_libraries(recorder
         ImGui
