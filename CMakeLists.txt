@@ -71,7 +71,8 @@ target_link_libraries(recorder
         ${Boost_LIBRARIES}        
         ${realsense2_LIBRARY})
 
-option(DEFINE_PCAM_EVK4 "ON means Prophesee sensor generation is IMX636, else 4.1" ON)
+option(DEFINE_PCAM_EVK4 "ON means Prophesee sensor generation is IMX636, else 4.1" OFF)
 if(DEFINE_PCAM_EVK4)
     add_definitions(-DPCAM_EVK4)
 endif(DEFINE_PCAM_EVK4)
+unset(DEFINE_PCAM_EVK4 CACHE)
