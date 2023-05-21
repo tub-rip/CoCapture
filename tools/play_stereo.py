@@ -83,7 +83,7 @@ def init_readers(args, files):
         args.duration = 0.01
 
     return FixedDurationFramerate(
-        files[1], args.duration, args.fps
+        files[0], args.duration, args.fps
     ), FixedDurationFramerate(files[1], args.duration, args.fps)
 
 
