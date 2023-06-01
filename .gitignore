@@ -1,7 +1,3 @@
-.idea/*
-cmake-build-debug/*
-build/*
-
 # Prerequisites
 *.d
 
@@ -35,6 +31,7 @@ build/*
 *.out
 *.app
 
-*.pyc
-
-CMakeLsists.txt.user
+# IDE directories
+build/
+cmake-build-debug/
+.idea/
