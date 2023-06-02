@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <atomic>
+#include <fstream>
 
 #include <opencv2/opencv.hpp>
 #include <librealsense2/rs.hpp>
