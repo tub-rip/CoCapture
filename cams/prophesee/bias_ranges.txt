@@ -1,0 +1,13 @@
+Gen4.1
+bias_diff_off 25 65
+bias_diff_on 95 140
+bias_fo 45 110
+bias_hpf 0 120
+bias_refr 30 100
+
+Gen4.2
+bias_diff_off -35 190
+bias_diff_on -85 140
+bias_fo -35 55
+bias_hpf 0 120
+bias_refr -20 235

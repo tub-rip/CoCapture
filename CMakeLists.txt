@@ -1,80 +1,68 @@
 cmake_minimum_required(VERSION 3.22)
-project(rip_cocapture_gui)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(OpenCV REQUIRED)
-find_package(Threads REQUIRED)
+### rip-cocapture-gui
+project(rip-cocapture-gui)
+add_library(rip-cocapture-gui STATIC)
+target_include_directories(rip-cocapture-gui PUBLIC cams gui cam_interfaces wrappers)
 
-set(boost_components_to_find program_options filesystem timer chrono thread)
-find_package(Boost COMPONENTS ${boost_components_to_find} REQUIRED)
-include_directories(${boost_components_to_find})
+### Recorder
+add_executable(recorder src/recorder.cpp)
+target_link_libraries(recorder PUBLIC rip-cocapture-gui)
 
-add_library(ImGui STATIC)
+### Enable dependencies here
+set(USE_METAVISION_SDK TRUE)
+set(USE_PYLON_SDK TRUE)
+
+### Metavision SDK
+if(USE_METAVISION_SDK)
+    add_definitions(-DENABLE_METAVISION_SDK)
+    find_package(MetavisionSDK COMPONENTS core driver REQUIRED)
+    target_link_libraries(rip-cocapture-gui PUBLIC MetavisionSDK::core MetavisionSDK::driver Metavision::HAL_discovery)
+    target_sources(rip-cocapture-gui PUBLIC cams/prophesee/prophesee_camera.cpp cam_interfaces/prophesee/prophesee_interface.cpp)
+    target_sources(rip-cocapture-gui PUBLIC gui/prophesee/prophesee_gui.cpp wrappers/prophesee/prophesee_wrapper.cpp)
+    target_include_directories(rip-cocapture-gui PUBLIC cams/prophesee gui/prophesee cam_interfaces/prophesee wrappers/prophesee)
+endif()
+
+### Pylon SDK
+if(USE_PYLON_SDK)
+    add_definitions(-DENABLE_PYLON_SDK)
+    find_package(pylon 7.2.1 REQUIRED)
+    target_link_libraries(rip-cocapture-gui PUBLIC pylon::pylon)
+    target_sources(rip-cocapture-gui PUBLIC cams/basler/basler_camera.cpp cam_interfaces/basler/basler_interface.cpp)
+    target_sources(rip-cocapture-gui PUBLIC gui/basler/basler_gui.cpp wrappers/basler/basler_wrapper.cpp)
+    target_include_directories(rip-cocapture-gui PUBLIC cams/basler gui/basler cam_interfaces/basler wrappers/basler)
+endif()
+
+### Dear ImGui
+add_library(DearImGui STATIC)
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 
-target_sources(ImGui
-        PRIVATE
-        lib/Application/imgui/imgui.cpp lib/Application/imgui/imgui_draw.cpp
-        lib/Application/imgui/imgui_tables.cpp lib/Application/imgui/imgui_widgets.cpp
-        lib/Application/imgui/backend/imgui_impl_sdl.cpp lib/Application/imgui/backend/imgui_impl_opengl3.cpp
-        lib/Application/imgui/imgui_demo.cpp)
+set(IMGUI_SRC_DIR lib/imgui)
+file(GLOB_RECURSE IMGUI_SRC_FILES ${IMGUI_SRC_DIR}/*.cpp)
+target_sources(DearImGui PUBLIC ${IMGUI_SRC_FILES})
+set(IMGUI_INCLUDE_DIRS ${IMGUI_SRC_DIR} ${IMGUI_SRC_DIR}/backends)
 
-target_include_directories(ImGui
-        PUBLIC
-        lib/Application/imgui lib/Application/imgui/backend
-        ${OPENGL_INCLUDE_DIR} ${SDL2_INCLUDE_DIRS})
+target_include_directories(DearImGui PUBLIC
+        ${IMGUI_INCLUDE_DIRS}
+        ${SDL2_INCLUDE_DIRS}
+        ${OPENGL_INCLUDE_DIR})
 
-target_link_libraries(ImGui
-        PUBLIC
+target_link_libraries(DearImGui PUBLIC
         ${CMAKE_DL_LIBS}
-        ${OPENGL_LIBRARIES} ${SDL2_LIBRARIES})
+        ${SDL2_LIBRARIES}
+        ${OPENGL_LIBRARIES})
 
-find_package(MetavisionSDK COMPONENTS core driver ui REQUIRED)
+target_link_libraries(rip-cocapture-gui PUBLIC DearImGui)
+target_sources(rip-cocapture-gui PUBLIC gui/imgui_helper.cpp)
+target_include_directories(rip-cocapture-gui PUBLIC gui)
 
-find_package(Pylon QUIET)
-if (NOT ${Pylon_FOUND})
-    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindPylon.cmake")
-endif ()
+### OpenCV
+find_package(OpenCV REQUIRED)
+target_link_libraries(rip-cocapture-gui PUBLIC ${OpenCV_LIBRARIES})
 
-find_package(realsense2 REQUIRED)
-include_directories(${realsense_INCLUDE_DIR})
-
-include_directories(
-        ${Pylon_INCLUDE_DIRS}
-)
-
-add_executable(recorder
-        app/recorder.cpp
-        lib/basler_event_handler.h lib/utils.h lib/parameters.h lib/constants.h lib/camera/base.cpp
-        lib/camera/base.h lib/camera/prophesee_cam.cpp lib/camera/prophesee_cam.h lib/constants.cpp
-        lib/utils.cpp lib/camera/basler_camera.cpp lib/camera/basler_camera.h
-        lib/Application/Camera/Base.cpp lib/Application/Camera/Base.h
-        lib/Application/CameraController.cpp lib/Application/CameraController.h
-        lib/Application/Camera/BaslerWrapper.h
-        lib/Application/Constants.h lib/Application/Camera/PropheseeWrapper.h
-        lib/Application/Gui.cpp lib/Application/Gui.h lib/Application/Components/Component.h
-        lib/Application/Components/Viewpanel.cpp lib/Application/Components/Viewpanel.h
-        lib/Application/Components/Sidepanel.cpp lib/Application/Components/Sidepanel.h
-        lib/Application/Components/Recorder.cpp lib/Application/Components/Recorder.h lib/basler_recorder.h
-        lib/camera/realsense_cam.cpp lib/camera/realsense_cam.h lib/Application/Camera/RealSenseWrapper.h
-        lib/trigger_event_saver.cpp lib/trigger_event_saver.h lib/trigger_event_saver.cpp)
-
-target_link_libraries(recorder
-        ImGui
-        ${OpenCV_LIBRARIES}
-        Boost::program_options
-        MetavisionSDK::core
-        MetavisionSDK::driver
-        MetavisionSDK::ui
-        Metavision::HAL_discovery
-        Threads::Threads
-        ${Pylon_LIBRARIES}
-        ${Boost_LIBRARIES}        
-        ${realsense2_LIBRARY})
-
-option(DEFINE_PCAM_EVK4 "ON means Prophesee sensor generation is IMX636, else 4.1" OFF)
-if(DEFINE_PCAM_EVK4)
-    add_definitions(-DPCAM_EVK4)
-endif(DEFINE_PCAM_EVK4)
-unset(DEFINE_PCAM_EVK4 CACHE)
+### Boost
+find_package(Boost COMPONENTS filesystem REQUIRED)
+target_link_libraries(rip-cocapture-gui PUBLIC Boost::filesystem)
