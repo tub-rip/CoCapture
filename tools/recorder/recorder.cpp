@@ -1,22 +1,15 @@
-#include <chrono>
+#include "recorder.h"
 
-#include "imgui_helper.h"
-#include "prophesee_wrapper.h"
-#include "basler_wrapper.h"
+namespace rcg::tools {
 
-using namespace rcg;
-
-class Recorder {
-public:
-    Recorder() : is_recording_(false), timer_duration_s_({0, 0}), timer_on_(false) {
+    Recorder::Recorder() : is_recording_(false), timer_duration_s_({0, 0}), timer_on_(false) {
         memset(output_dir_, 0, gui::BUF_SIZE);
         memset(output_tag_, 0, gui::BUF_SIZE);
     }
 
-    ~Recorder() {}
+    Recorder::~Recorder() {}
 
-public:
-    std::string GetCurrentTimeStamp() {
+    std::string Recorder::GetCurrentTimeStamp() {
         time_t raw_time;
         struct tm* time_info;
         char time_stamp[gui::BUF_SIZE];
@@ -29,11 +22,11 @@ public:
         return std::string {time_stamp};
     }
 
-    void RegisterWrapper(wrappers::ICameraWrapper& camera_wrapper, bool& show) {
+    void Recorder::RegisterWrapper(wrappers::ICameraWrapper& camera_wrapper, bool& show) {
         camera_wrappers_.push_back({camera_wrapper, show});
     }
 
-    bool StartRecording(const char* output_dir) {
+    bool Recorder::StartRecording(const char* output_dir) {
         if(is_recording_) {
             return false;
         }
@@ -49,7 +42,7 @@ public:
         return true;
     }
 
-    bool StopRecording() {
+    bool Recorder::StopRecording() {
         if(!is_recording_) {
             return false;
         }
@@ -65,7 +58,7 @@ public:
         return true;
     }
 
-    void Show(bool* show = nullptr) {
+    void Recorder::Show(bool* show) {
         if(show == nullptr || *(show)) {
             ImGui::Begin("Recorder", show, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
             ImGui::Spacing();
@@ -134,7 +127,7 @@ public:
             // Update timer
             if(timer_on_) {
                 timer_duration_s_.first = timer_duration_s_.second - std::chrono::duration_cast<std::chrono::seconds>
-                                                                     (std::chrono::steady_clock::now() - timer_start_).count();
+                        (std::chrono::steady_clock::now() - timer_start_).count();
 
                 if(timer_duration_s_.first == 0) {
                     StopRecording();
@@ -186,53 +179,4 @@ public:
         }
     }
 
-private:
-    std::vector<std::pair<wrappers::ICameraWrapper&, bool&>> camera_wrappers_;
-    bool is_recording_;
-    bool is_available_;
-    char output_dir_[gui::BUF_SIZE];
-    char output_tag_[gui::BUF_SIZE];
-    std::chrono::time_point<std::chrono::steady_clock> timer_start_;
-    std::pair<int, int> timer_duration_s_;
-    bool timer_on_;
-};
-
-int main() {
-    gui::Initialize();
-
-    ImGui::GetIO().IniFilename = nullptr;
-    ImGui::StyleColorsLight();
-
-    SDL_DisplayMode display_mode;
-    SDL_GetCurrentDisplayMode(0, &display_mode);
-    gui::CreateWindow("Recorder", display_mode.w, display_mode.h);
-
-    // Set up camera(s)
-    wrappers::prophesee::PropheseeWrapper psee_wrapper_1 {"00042177", 0};
-    bool show_psee_1 = false;
-
-    wrappers::basler::BaslerWrapper basler_wrapper_1 {"24162143", 0};
-    bool show_basler_1 = false;
-
-    // Set up recorder
-    Recorder recorder;
-    bool show_recorder = true;
-
-    // Register camera(s) to the recorder
-    recorder.RegisterWrapper(psee_wrapper_1, show_psee_1);
-    recorder.RegisterWrapper(basler_wrapper_1, show_basler_1);
-
-    bool done = false;
-    while(!done) {
-        gui::HandleEvent(done);
-        gui::NewFrame();
-
-        // Display recorder
-        recorder.Show(&show_recorder);
-
-        gui::EndFrame();
-    }
-
-    gui::DestroyWindow();
-    gui::Terminate();
-}
+} // rcg::tools

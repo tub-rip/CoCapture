@@ -45,6 +45,7 @@ namespace rcg::cams::basler {
 
     public:
         static void AnalyzeRecording(const char* output_dir);
+        static std::vector<std::string> ListConnectedCameras();
 
     private:
         Pylon::CBaslerUniversalInstantCamera camera_;

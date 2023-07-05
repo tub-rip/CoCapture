@@ -7,9 +7,13 @@ project(rip-cocapture-gui)
 add_library(rip-cocapture-gui STATIC)
 target_include_directories(rip-cocapture-gui PUBLIC cams gui cam_interfaces wrappers)
 
-### Recorder
-add_executable(recorder src/recorder.cpp)
-target_link_libraries(recorder PUBLIC rip-cocapture-gui)
+### main
+add_executable(main src/main.cpp)
+target_link_libraries(main PUBLIC rip-cocapture-gui)
+
+### tools
+target_sources(rip-cocapture-gui PUBLIC tools/recorder/recorder.cpp)
+target_include_directories(rip-cocapture-gui PUBLIC tools/recorder)
 
 ### Enable dependencies here
 set(USE_METAVISION_SDK TRUE)
@@ -64,5 +68,5 @@ find_package(OpenCV REQUIRED)
 target_link_libraries(rip-cocapture-gui PUBLIC ${OpenCV_LIBRARIES})
 
 ### Boost
-find_package(Boost COMPONENTS filesystem REQUIRED)
-target_link_libraries(rip-cocapture-gui PUBLIC Boost::filesystem)
+find_package(Boost COMPONENTS filesystem  program_options REQUIRED)
+target_link_libraries(rip-cocapture-gui PUBLIC Boost::filesystem Boost::program_options)

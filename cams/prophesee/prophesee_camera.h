@@ -8,11 +8,12 @@
 #include <metavision/sdk/core/utils/cd_frame_generator.h>
 #include <metavision/hal/facilities/i_ll_biases.h>
 #include <metavision/hal/facilities/i_hw_identification.h>
-#include <metavision/hal/facilities/i_device_control.h>
+#include <metavision/hal/facilities/i_camera_synchronization.h>
 #include <metavision/hal/facilities/i_trigger_in.h>
 #include <metavision/hal/device/device_discovery.h>
 
 #include "trigger_event_saver.h"
+#include "event_signal_processor.h"
 
 namespace rcg::cams::prophesee {
 
@@ -41,8 +42,10 @@ namespace rcg::cams::prophesee {
         int GetCDFrameHeight();
         int GetBiasValue(const char* bias_name);
         bool SetBiasValue(const char* bias_name, int bias_value);
+        std::map<std::string, std::pair<int, int>> GetBiasRanges();
         std::string GetMode();
         bool SetMode(const char* mode);
+        EventSignalProcessor* GetEventSignalProcessor();
 
     public:
         bool IsStarted() {
@@ -63,13 +66,13 @@ namespace rcg::cams::prophesee {
         bool StopRecording();
 
     public:
-        static std::vector<std::string> ListSerialNumbers();
-        static std::map<std::string, std::pair<int, int>> ReadBiasRanges(const char* bias_file, const char* camera_generation);
         static void AnalyzeRecording(const char* output_dir);
+        static std::vector<std::string> ListConnectedCameras();
 
     private:
         Metavision::Camera camera_;
         std::unique_ptr<Metavision::CDFrameGenerator> cd_frame_generator_;
+        std::unique_ptr<EventSignalProcessor> event_signal_processor_;
         cv::Mat cd_frame_;
         std::mutex cd_frame_mutex_;
         TriggerEventSaver trigger_event_saver_;
@@ -77,7 +80,7 @@ namespace rcg::cams::prophesee {
         bool is_recording_;
         Metavision::I_LL_Biases* biases_;
         Metavision::I_HW_Identification* hw_identification_;
-        Metavision::I_DeviceControl* device_control_;
+        Metavision::I_CameraSynchronization* camera_synchronization_;
         Metavision::I_TriggerIn* trigger_in_;
     };
 
