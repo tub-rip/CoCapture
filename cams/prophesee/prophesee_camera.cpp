@@ -7,15 +7,15 @@ namespace rcg::cams::prophesee {
     PropheseeCamera::PropheseeCamera(const char* serial_number, int display_accumulation_time_us,
                                      cv::Scalar background_color, cv::Scalar on_color, cv::Scalar off_color) :
 
-    camera_             (Metavision::Camera::from_serial(serial_number)),
-    cd_frame_generator_ (std::make_unique<Metavision::CDFrameGenerator>
-                        (camera_.geometry().width(), camera_.geometry().height())),
-    is_started_         (false),
-    is_recording_       (false),
-    biases_             (camera_.get_device().get_facility<Metavision::I_LL_Biases>()),
-    hw_identification_  (camera_.get_device().get_facility<Metavision::I_HW_Identification>()),
-    device_control_     (camera_.get_device().get_facility<Metavision::I_DeviceControl>()),
-    trigger_in_         (camera_.get_device().get_facility<Metavision::I_TriggerIn>())
+    camera_                 (Metavision::Camera::from_serial(serial_number)),
+    cd_frame_generator_     (std::make_unique<Metavision::CDFrameGenerator>
+                            (camera_.geometry().width(), camera_.geometry().height())),
+    is_started_             (false),
+    is_recording_           (false),
+    biases_                 (camera_.get_device().get_facility<Metavision::I_LL_Biases>()),
+    hw_identification_      (camera_.get_device().get_facility<Metavision::I_HW_Identification>()),
+    camera_synchronization_ (camera_.get_device().get_facility<Metavision::I_CameraSynchronization>()),
+    trigger_in_             (camera_.get_device().get_facility<Metavision::I_TriggerIn>())
 
     {
         cd_frame_generator_->set_display_accumulation_time_us(display_accumulation_time_us);
@@ -23,6 +23,10 @@ namespace rcg::cams::prophesee {
         camera_.cd().add_callback([this] (const Metavision::EventCD* begin, const Metavision::EventCD* end) {
             cd_frame_generator_->add_events(begin, end);
         });
+
+        if(std::stof(GetGeneration()) >= 4.1) {
+            event_signal_processor_ = std::make_unique<EventSignalProcessor>(&camera_);
+        }
     }
 
     std::string PropheseeCamera::GetSerialNumber() {
@@ -30,7 +34,8 @@ namespace rcg::cams::prophesee {
     }
 
     std::string PropheseeCamera::GetGeneration() {
-        return hw_identification_->get_sensor_info().as_string();
+        return std::to_string(hw_identification_->get_sensor_info().major_version_) + "." +
+               std::to_string(hw_identification_->get_sensor_info().minor_version_);
     }
 
     std::string PropheseeCamera::GetPluginName() {
@@ -53,20 +58,47 @@ namespace rcg::cams::prophesee {
         return biases_->set(bias_name, bias_value);
     }
 
+    std::map<std::string, std::pair<int, int>> PropheseeCamera::GetBiasRanges() {
+        Metavision::LL_Bias_Info bias_diff_off_info;
+        biases_->get_bias_info("bias_diff_off", bias_diff_off_info);
+
+        Metavision::LL_Bias_Info bias_diff_on_info;
+        biases_->get_bias_info("bias_diff_on", bias_diff_on_info);
+
+        Metavision::LL_Bias_Info bias_fo_info;
+        biases_->get_bias_info("bias_fo", bias_fo_info);
+
+        Metavision::LL_Bias_Info bias_hpf_info;
+        biases_->get_bias_info("bias_hpf", bias_hpf_info);
+
+        Metavision::LL_Bias_Info bias_refr_info;
+        biases_->get_bias_info("bias_refr", bias_refr_info);
+
+        return {{"bias_diff_off", bias_diff_off_info.get_bias_recommended_range()},
+                {"bias_diff_on", bias_diff_on_info.get_bias_recommended_range()},
+                {"bias_fo", bias_fo_info.get_bias_recommended_range()},
+                {"bias_hpf", bias_hpf_info.get_bias_recommended_range()},
+                {"bias_refr", bias_refr_info.get_bias_recommended_range()}};
+    }
+
     std::string PropheseeCamera::GetMode() {
-        Metavision::I_DeviceControl::SyncMode mode = device_control_->get_mode();
-        if(mode == Metavision::I_DeviceControl::SyncMode::STANDALONE) { return std::string {MODE_STANDALONE}; }
-        else if(mode == Metavision::I_DeviceControl::SyncMode::MASTER) { return std::string {MODE_MASTER}; }
-        else if(mode == Metavision::I_DeviceControl::SyncMode::SLAVE) { return std::string {MODE_SLAVE}; }
+        Metavision::I_CameraSynchronization::SyncMode mode = camera_synchronization_->get_mode();
+        if(mode == Metavision::I_CameraSynchronization::SyncMode::STANDALONE) { return std::string {MODE_STANDALONE}; }
+        else if(mode == Metavision::I_CameraSynchronization::SyncMode::MASTER) { return std::string {MODE_MASTER}; }
+        else if(mode == Metavision::I_CameraSynchronization::SyncMode::SLAVE) { return std::string {MODE_SLAVE}; }
         else { return {}; }
     }
 
     bool PropheseeCamera::SetMode(const char* mode) {
         std::string mode_str = std::string {mode};
-        if(mode_str == "Standalone") { return device_control_->set_mode_standalone(); }
-        else if(mode_str == "Master") { return device_control_->set_mode_master(); }
-        else if(mode_str == "Slave") { return device_control_->set_mode_slave(); }
+        if(mode_str == "Standalone") { return camera_synchronization_->set_mode_standalone(); }
+        else if(mode_str == "Master") { return camera_synchronization_->set_mode_master(); }
+        else if(mode_str == "Slave") { return camera_synchronization_->set_mode_slave(); }
         else { return false; }
+    }
+
+    EventSignalProcessor* PropheseeCamera::GetEventSignalProcessor() {
+        return event_signal_processor_.get();
     }
 
     bool PropheseeCamera::Start(int fps) {
@@ -104,21 +136,11 @@ namespace rcg::cams::prophesee {
     }
 
     bool PropheseeCamera::EnableTriggerIn() {
-        if(GetPluginName().find("evk3") != std::string::npos ||
-           GetPluginName().find("evk4") != std::string::npos) {
-            return trigger_in_->enable(0);
-        } else {
-            return false;
-        }
+        return trigger_in_->enable(Metavision::I_TriggerIn::Channel::Main);
     }
 
     bool PropheseeCamera::DisableTriggerIn() {
-        if(GetPluginName().find("evk3") != std::string::npos ||
-           GetPluginName().find("evk4") != std::string::npos) {
-            return trigger_in_->disable(0);
-        } else {
-            return false;
-        }
+        return trigger_in_->disable(Metavision::I_TriggerIn::Channel::Main);
     }
 
     bool PropheseeCamera::StartRecording(const char* output_dir) {
@@ -135,7 +157,7 @@ namespace rcg::cams::prophesee {
             trigger_event_saver_.AddEvents(begin, end);
         });
         trigger_event_saver_.SetCallBackId(callback_id);
-        camera_.start_recording(output_dir_str + "/output");
+        camera_.start_recording(output_dir_str + "/output.raw");
         is_recording_ = true;
 
         return true;
@@ -153,56 +175,6 @@ namespace rcg::cams::prophesee {
         trigger_event_saver_.CloseFile();
 
         return true;
-    }
-
-    std::vector<std::string> PropheseeCamera::ListSerialNumbers() {
-        std::vector<std::string> serial_numbers;
-
-        for(Metavision::CameraDescription& desc : Metavision::DeviceDiscovery::list_available_sources()) {
-            serial_numbers.push_back(desc.serial_);
-        }
-
-        return serial_numbers;
-    }
-
-    std::map<std::string, std::pair<int, int>> PropheseeCamera::ReadBiasRanges(const char* bias_file, const char* camera_generation) {
-        std::fstream bias_ranges_file;
-        bias_ranges_file.open(bias_file, std::ios::in);
-
-        std::map<std::string, std::pair<int, int>> bias_ranges;
-        bool found_ranges = false;
-        std::string entry;
-
-        while(std::getline(bias_ranges_file, entry)) {
-            if(entry.find(camera_generation) != std::string::npos) {
-                found_ranges = true;
-                continue;
-            }
-
-            if(!found_ranges) {
-                continue;
-            }
-
-            if(found_ranges && entry.empty()) {
-                break;
-            }
-
-            std::stringstream ss(entry);
-            std::string element;
-            std::vector<std::string> entry_vector;
-            while(std::getline(ss, element, ' ')) {
-                entry_vector.push_back(element);
-            }
-            std::string bias_name = entry_vector.front();
-            entry_vector.erase(entry_vector.begin());
-            std::pair<int, int> bias_range = {std::stoi(entry_vector.front()),
-                                              std::stoi(entry_vector.back())};
-            bias_ranges.insert({bias_name, bias_range});
-        }
-
-        bias_ranges_file.close();
-
-        return bias_ranges;
     }
 
     void PropheseeCamera::AnalyzeRecording(const char* output_dir) {
@@ -223,6 +195,14 @@ namespace rcg::cams::prophesee {
         }
 
         recording_info << "Trigger events: " << std::to_string(trigger_events_count);
+    }
+
+    std::vector<std::string> PropheseeCamera::ListConnectedCameras() {
+        std::vector<std::string> serial_numbers;
+        for(const auto& camera_description : Metavision::DeviceDiscovery::list_available_sources()) {
+            serial_numbers.push_back(camera_description.serial_);
+        }
+        return serial_numbers;
     }
 
 } // rcg::cams::prophesee

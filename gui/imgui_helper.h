@@ -2,6 +2,7 @@
 #define RIP_COCAPTURE_GUI_IMGUI_HELPER_H
 
 #include <string>
+#include <vector>
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -22,6 +23,7 @@ namespace rcg::gui {
     void UpdateTexture(GLuint* texture_id_ref, unsigned char* image_data, int image_width, int image_height);
     void DeleteTexture(GLuint* texture_id_ref);
     void DisplayImage(GLuint* texture_id_ref, const char* title, int image_width, int image_height, bool* show = nullptr);
+    bool VectorOfStringsItemGetter(void* data, int idx, const char** out_text);
 
 } // rcg::gui
 

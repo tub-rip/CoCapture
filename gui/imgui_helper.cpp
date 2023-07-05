@@ -131,4 +131,10 @@ namespace rcg::gui {
         }
     }
 
+    bool VectorOfStringsItemGetter(void* data, int idx, const char** out_text) {
+        std::vector<std::string>* str_vec = (std::vector<std::string>*) data;
+        *out_text = str_vec->at(idx).c_str();
+        return true;
+    }
+
 } // rcg::gui
