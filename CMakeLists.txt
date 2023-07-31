@@ -18,6 +18,7 @@ target_include_directories(rip-cocapture-gui PUBLIC tools/recorder)
 ### Enable dependencies here
 set(USE_METAVISION_SDK TRUE)
 set(USE_PYLON_SDK TRUE)
+set(USE_REALSENSE_SDK TRUE)
 
 ### Metavision SDK
 if(USE_METAVISION_SDK)
@@ -37,6 +38,18 @@ if(USE_PYLON_SDK)
     target_sources(rip-cocapture-gui PUBLIC cams/basler/basler_camera.cpp cam_interfaces/basler/basler_interface.cpp)
     target_sources(rip-cocapture-gui PUBLIC gui/basler/basler_gui.cpp wrappers/basler/basler_wrapper.cpp)
     target_include_directories(rip-cocapture-gui PUBLIC cams/basler gui/basler cam_interfaces/basler wrappers/basler)
+endif()
+
+### RealSense SDK
+if(USE_REALSENSE_SDK)
+    add_definitions(-DENABLE_REALSENSE_SDK)
+    find_package(realsense2 REQUIRED)
+    find_package(Threads REQUIRED)
+    target_link_libraries(rip-cocapture-gui PUBLIC ${realsense2_LIBRARY} Threads::Threads)
+    target_sources(rip-cocapture-gui PUBLIC cams/realsense/realsense_camera.cpp cam_interfaces/realsense/realsense_interface.cpp)
+    target_sources(rip-cocapture-gui PUBLIC cams/realsense/l5.cpp)
+    target_sources(rip-cocapture-gui PUBLIC gui/realsense/realsense_gui.cpp wrappers/realsense/realsense_wrapper.cpp)
+    target_include_directories(rip-cocapture-gui PUBLIC cams/realsense gui/realsense cam_interfaces/realsense wrappers/realsense)
 endif()
 
 ### Dear ImGui
