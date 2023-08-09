@@ -64,9 +64,9 @@ namespace rcg::cams::prophesee {
         bool DisableTriggerIn();
         bool StartRecording(const char* output_dir);
         bool StopRecording();
+        void AnalyzeRecording(const char* output_dir);
 
     public:
-        static void AnalyzeRecording(const char* output_dir);
         static std::vector<std::string> ListConnectedCameras();
 
     private:
@@ -78,6 +78,8 @@ namespace rcg::cams::prophesee {
         TriggerEventSaver trigger_event_saver_;
         bool is_started_;
         bool is_recording_;
+        long start_recording_ts_;
+        long stop_recording_ts_;
         Metavision::I_LL_Biases* biases_;
         Metavision::I_HW_Identification* hw_identification_;
         Metavision::I_CameraSynchronization* camera_synchronization_;

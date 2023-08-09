@@ -156,6 +156,7 @@ namespace rcg::cams::prophesee {
                                                                             const Metavision::EventExtTrigger* end) {
             trigger_event_saver_.AddEvents(begin, end);
         });
+        start_recording_ts_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
         trigger_event_saver_.SetCallBackId(callback_id);
         camera_.start_recording(output_dir_str + "/output.raw");
         is_recording_ = true;
@@ -172,6 +173,7 @@ namespace rcg::cams::prophesee {
         is_recording_ = false;
         size_t callback_id = trigger_event_saver_.GetCallBackId();
         camera_.ext_trigger().remove_callback(callback_id);
+        stop_recording_ts_ = std::chrono::high_resolution_clock::now().time_since_epoch().count();
         trigger_event_saver_.CloseFile();
 
         return true;
@@ -194,7 +196,11 @@ namespace rcg::cams::prophesee {
             ++trigger_events_count;
         }
 
-        recording_info << "Trigger events: " << std::to_string(trigger_events_count);
+        recording_info << "Trigger events: " << std::to_string(trigger_events_count) << std::endl;
+
+        // Save timestamps
+        recording_info << "Start timestamp: " << std::to_string(start_recording_ts_) << std::endl;
+        recording_info << "Stop timestamp: " << std::to_string(stop_recording_ts_);
     }
 
     std::vector<std::string> PropheseeCamera::ListConnectedCameras() {

@@ -9,7 +9,7 @@ namespace rcg::cams::realsense {
     is_started_    (false),
     is_recording_  (false),
     frame_sequence_(0),
-    syncer_        (2)
+    syncer_        (3)
 
     {
         rs2::device_list devices = GetContext().query_devices();
@@ -52,8 +52,8 @@ namespace rcg::cams::realsense {
             rs2::video_stream_profile video_stream_profile = stream_profile.as<rs2::video_stream_profile>();
 
             if(sensor_name.find("Depth") != std::string::npos) {
-                // Infrared stream
-                if(video_stream_profile.format()  == RS2_FORMAT_Y8 &&
+                // Depth and infrared stream
+                if((video_stream_profile.format()  == RS2_FORMAT_Z16 || video_stream_profile.format() == RS2_FORMAT_Y8) &&
                    video_stream_profile.width()   == 640 &&
                    video_stream_profile.height()  == 480 &&
                    video_stream_profile.fps()     == 30) {
@@ -73,12 +73,6 @@ namespace rcg::cams::realsense {
         return stream_profiles;
     }
 
-    void L5::OutputIRFrame(cv::Mat& ir_frame) {
-        ir_frame_mutex_.lock();
-        ir_frame = ir_frame_;
-        ir_frame_mutex_.unlock();
-    }
-
     rs2::device& L5::GetDevice() {
         return device_;
     }
@@ -94,6 +88,16 @@ namespace rcg::cams::realsense {
 
             // Unite matching frames to a composite frame
             rs2::frameset fset = syncer_.wait_for_frames();
+
+            // Depth Frame
+            rs2::frame depth_frame = fset.first_or_default(RS2_STREAM_DEPTH, RS2_FORMAT_Z16);
+            cv::Mat depth_mat;
+            if(depth_frame) {
+                depth_mat = cv::Mat {cv::Size(depth_frame.as<rs2::video_frame>().get_width(), depth_frame.as<rs2::video_frame>().get_height()),
+                                     CV_16UC1,
+                                     (void*) depth_frame.get_data(),
+                                     cv::Mat::AUTO_STEP};
+            }
 
             // Infrared frame
             rs2::frame infrared_frame = fset.first_or_default(RS2_STREAM_INFRARED, RS2_FORMAT_Y8);
@@ -118,6 +122,22 @@ namespace rcg::cams::realsense {
             // Save frames
             is_recording_mutex_.lock();
             if(is_recording_) {
+                if(depth_frame) {
+                    std::string file_name = output_dir_ + "/" + "depth" + "-" + std::to_string(frame_sequence_);
+                    cv::imwrite(file_name + ".png", depth_mat);
+                    MetadataToCSV(depth_frame, file_name + ".csv");
+
+                    double min_v;
+                    double max_v;
+                    cv::minMaxLoc(depth_mat, &min_v, &max_v);
+
+                    std::fstream csv;
+                    csv.open(file_name + ".csv", std::ios::app);
+                    csv << "Min Value" << "," << std::to_string(min_v) << "\n"
+                        << "Max Value" << "," << std::to_string(max_v) << "\n";
+                    csv.close();
+                }
+
                 if(infrared_frame) {
                     std::string file_name = output_dir_ + "/" + "infrared" + "-" + std::to_string(frame_sequence_);
                     cv::imwrite(file_name + ".png", infrared_mat);
@@ -134,11 +154,14 @@ namespace rcg::cams::realsense {
             }
             is_recording_mutex_.unlock();
 
-            // Output infrared frame for visualization
-            if(infrared_frame) {
-                ir_frame_mutex_.lock();
-                infrared_mat.copyTo(ir_frame_);
-                ir_frame_mutex_.unlock();
+            // Output depth frame for visualization
+            if(depth_frame) {
+                depth_frame_mutex_.lock();
+                depth_frame_ = cv::Mat {cv::Size(depth_frame.as<rs2::video_frame>().get_width(), depth_frame.as<rs2::video_frame>().get_height()),
+                                        CV_8UC3,
+                                        (void*) depth_frame.apply_filter(colorizer_).get_data(),
+                                        cv::Mat::AUTO_STEP};
+                depth_frame_mutex_.unlock();
             }
         }
     }
@@ -187,12 +210,9 @@ namespace rcg::cams::realsense {
     }
 
     void L5::OutputFrame(cv::Mat& frame) {
-        OutputIRFrame(frame);
-
-        if(!frame.empty()) {
-            cv::equalizeHist(frame, frame);
-            cv::applyColorMap(frame, frame, cv::COLORMAP_JET);
-        }
+        depth_frame_mutex_.lock();
+        frame = depth_frame_;
+        depth_frame_mutex_.unlock();
     }
 
     std::pair<int, int> L5::GetOutputFrameDimensions() {

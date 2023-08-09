@@ -17,9 +17,6 @@ namespace rcg::cams::realsense {
         std::vector<rs2::stream_profile> GetPrefStreamProfiles(rs2::sensor& sensor);
 
     public:
-        void OutputIRFrame(cv::Mat& ir_frame);
-
-    public:
         rs2::device& GetDevice() override;
         void Stream() override;
         bool IsStarted() override;
@@ -40,8 +37,8 @@ namespace rcg::cams::realsense {
 
         std::thread sensors_thread_;
 
-        cv::Mat ir_frame_;
-        std::mutex ir_frame_mutex_;
+        cv::Mat depth_frame_;
+        std::mutex depth_frame_mutex_;
 
         bool is_started_;
         std::mutex is_started_mutex_;
