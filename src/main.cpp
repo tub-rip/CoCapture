@@ -11,6 +11,10 @@
 #include "basler_wrapper.h"
 #endif //ENABLE_PYLON_SDK
 
+#ifdef ENABLE_REALSENSE_SDK
+#include "realsense_wrapper.h"
+#endif //ENABLE_REALSENSE_SDK
+
 using namespace rcg;
 
 int main(int argc, char** argv) {
@@ -42,13 +46,21 @@ int main(int argc, char** argv) {
     }
     #endif //ENABLE_METAVISION_SDK
 
-    // Find connected Basler  cameras
+    // Find connected Basler cameras
     #ifdef ENABLE_PYLON_SDK
     std::vector<std::pair<std::string, int>> basler_cameras;
     for(const auto& serial_number : cams::basler::BaslerCamera::ListConnectedCameras()) {
         basler_cameras.emplace_back(serial_number, camera_index++);
     }
     #endif //ENABLE_PYLON_SDK
+
+    // Find connected RealSense cameras
+    #ifdef ENABLE_REALSENSE_SDK
+    std::vector<std::pair<std::string, int>> realsense_cameras;
+    for(const auto& serial_number : cams::realsense::RealSenseCamera::ListConnectedCameras()) {
+        realsense_cameras.emplace_back(serial_number, camera_index++);
+    }
+    #endif //ENABLE_REALSENSE_SDK
 
     // List connected cameras
     if(variables_map.count("list") || variables_map.count("l")) {
@@ -66,6 +78,13 @@ int main(int argc, char** argv) {
             std::cout << "[" << basler_camera.second << "]" << " " << "basler" << " / " << basler_camera.first << std::endl;
         }
         #endif //ENABLE_PYLON_SDK
+
+        #ifdef ENABLE_REALSENSE_SDK
+        for(const auto& realsense_camera : realsense_cameras) {
+            std::cout << " " << " ";
+            std::cout << "[" << realsense_camera.second << "]" << " " << "realsense" << " / " << realsense_camera.first << std::endl;
+        }
+        #endif //ENABLE_REALSENSE_SDK
     }
 
     if(!variables_map.count("pick") && !variables_map.count("p")) {
@@ -102,6 +121,7 @@ int main(int argc, char** argv) {
     #endif //ENABLE_METAVISION_SDK
 
     // Set up Basler cameras
+    #ifdef ENABLE_PYLON_SDK
     std::vector<std::pair<std::unique_ptr<wrappers::basler::BaslerWrapper>, std::unique_ptr<bool>>> basler_wrappers;
     int basler_camera_index {0};
     for(const auto& picked_index : variables_map["pick"].as<std::vector<int>>()) {
@@ -113,6 +133,22 @@ int main(int argc, char** argv) {
             }
         }
     }
+    #endif //ENABLE_PYLON_SDK
+
+    // Set up RealSense cameras
+    #ifdef ENABLE_REALSENSE_SDK
+    std::vector<std::pair<std::unique_ptr<wrappers::realsense::RealSenseWrapper>, std::unique_ptr<bool>>> realsense_wrappers;
+    int realsense_camera_index {0};
+    for(const auto& picked_index : variables_map["pick"].as<std::vector<int>>()) {
+        for(const auto& realsense_camera : realsense_cameras) {
+            if(realsense_camera.second == picked_index) {
+                realsense_wrappers.push_back({std::move(std::make_unique<wrappers::realsense::RealSenseWrapper>(realsense_camera.first.c_str(), realsense_camera_index++)),
+                                              std::move(std::make_unique<bool>(false))});
+                recorder.RegisterWrapper(*realsense_wrappers.back().first, *realsense_wrappers.back().second);
+            }
+        }
+    }
+    #endif //ENABLE_REALSENSE_SDK
 
     // Program loop
     bool done = false;

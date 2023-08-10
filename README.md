@@ -2,7 +2,7 @@
 
 Light-weight viewer and recorder for the co-capture system
 
-![Screenshot from 2023-07-05 10-55-54](https://github.com/tub-rip/rip-cocapture-gui/assets/115785598/197ac573-fb37-41e3-b911-8c1f4081a7db)
+![Screenshot from 2023-07-31 11-14-38](https://github.com/tub-rip/rip-cocapture-gui/assets/115785598/42705bea-76f4-4358-878d-3ac09549b3dd)
 
 ## Dependencies
 
@@ -23,6 +23,9 @@ Install SDL2 library with:
 
 - Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
     - Version 7.2.1 is required
+ 
+- RealSense, from https://dev.intelrealsense.com/docs/installation
+    - Version 2.0 is required
 
 ### Further dependencies:
 - OpenCV, from https://github.com/opencv/opencv
