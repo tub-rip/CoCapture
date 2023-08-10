@@ -12,6 +12,7 @@ namespace rcg::cams::realsense {
     syncer_        (3)
 
     {
+        colorizer_.set_option(RS2_OPTION_HISTOGRAM_EQUALIZATION_ENABLED, 0.f);
         rs2::device_list devices = GetContext().query_devices();
 
         for(rs2::device device : devices) {
