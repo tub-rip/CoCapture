@@ -21,7 +21,7 @@ Install SDL2 library with:
 
 #### Dependencies for the cameras:
 
-Below are links for the dependencies required for different cameras. You only need to install the dependencies for the cameras you are using. You have to 'deactivate' linking unused libraries by setting the flags in the CMakeLists.txt, e.g.  change `set(USE_METAVISION_SDK TRUE)` to `set(USE_METAVISION_SDK FALSE)`, if you do not want to use Prophesee cameras.
+Below are links for the dependencies required for different cameras. You only need to install the dependencies for the cameras you are using. You have to 'deactivate' linking unused libraries by setting the flags in the CMakeLists.txt, e.g. change `set(USE_METAVISION_SDK TRUE)` to `set(USE_METAVISION_SDK FALSE)`, if you do not want to use Prophesee cameras.
 
 - OpenEB, from https://github.com/prophesee-ai/openeb
     - Version >4.2.0 is required
@@ -77,4 +77,4 @@ Note: To specify the version of the software you are using, the default value YY
 
 ## Contribution
 
-Contributions are very welcome, for example plugins for other camera vendors or open issues. Just make a PR.
+Contributions are very welcome, for example, plugins for other camera vendors or open issues. Just make a PR.
