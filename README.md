@@ -1,6 +1,6 @@
-# rip-cocapture-gui
+# CoCapture
 
-Light-weight viewer and recorder for the co-capture system
+Light-weight viewer and recorder for multi-camera systems including event cameras.
 
 ![Screenshot from 2023-07-05 10-55-54](https://github.com/tub-rip/rip-cocapture-gui/assets/115785598/197ac573-fb37-41e3-b911-8c1f4081a7db)
 
@@ -62,7 +62,9 @@ You can also install the packages from apt if applicable.
 
 ## Publications and Citation
 
-If you use rip-cocapture-gui for your research, please consider citing it as follows:
+Publications using CoCapture are recorded in [Publications](./docs/publications.md). If you use CoCapture for your paper, you can also add it to this table by a pull request.
+
+If you use CoCapture for your research, please consider citing it as follows:
 
 ```
 @misc{rip-cocapture-gui,
@@ -78,4 +80,4 @@ Note: To specify the version of framework you are using, the default value YYYY-
 
 ## Contribution
 
-Contributions are very welcome, for example plugins for other camera vendors.
+Contributions are very welcome, for example plugins for other camera vendors or open issues. Just make a PR.
