@@ -73,7 +73,7 @@ If you use CoCapture for your research, please consider citing it as follows:
 }
 ```
 
-Note: To specify the version of framework you are using, the default value YYYY-MM-DD in the note field should be replaced with the date of the last change of the framework you are using, i.e. the date of the latest commit.
+Note: To specify the version of the software you are using, the default value YYYY-MM-DD in the note field should be replaced with the date of the last change of the software you are using, i.e. the date of the latest commit.
 
 ## Contribution
 
