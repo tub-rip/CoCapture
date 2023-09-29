@@ -6,9 +6,6 @@ Light-weight viewer and recorder for multi-camera systems including event camera
 
 ## Installation
 
-1. Install the dependencies
-2. Compile the program
-
 Tested on Ubuntu 20.04
 
 ### 1. Dependencies
