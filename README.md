@@ -66,7 +66,7 @@ If you use CoCapture for your research, please consider citing it as follows:
 ```
 @misc{rip-cocapture-gui,
 	title = {CoCapture},
-	author = {Hamann, Friedhelm and Febryanto, Filbert and Ghosh, Suman and Shiba, Shintaro and Gallego, Guillermo},
+	author = {Hamann, Friedhelm and Febryanto, Filbert and Ghosh, Suman and Cavinato, Valentina and Gallego, Guillermo},
 	year = {2023},
 	howpublished = {\url{https://github.com/tub-rip/rip-cocapture-gui}},
 	note = {Accessed: YYYY-MM-DD},
