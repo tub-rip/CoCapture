@@ -102,6 +102,7 @@ int main(int argc, char** argv) {
     #endif //ENABLE_METAVISION_SDK
 
     // Set up Basler cameras
+    #ifdef ENABLE_PYLON_SDK
     std::vector<std::pair<std::unique_ptr<wrappers::basler::BaslerWrapper>, std::unique_ptr<bool>>> basler_wrappers;
     int basler_camera_index {0};
     for(const auto& picked_index : variables_map["pick"].as<std::vector<int>>()) {
@@ -113,6 +114,7 @@ int main(int argc, char** argv) {
             }
         }
     }
+    # endif // ENABLE_PYLON_SDK
 
     // Program loop
     bool done = false;

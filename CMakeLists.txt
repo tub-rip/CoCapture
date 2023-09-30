@@ -17,7 +17,7 @@ target_include_directories(rip-cocapture-gui PUBLIC tools/recorder)
 
 ### Enable dependencies here
 set(USE_METAVISION_SDK TRUE)
-set(USE_PYLON_SDK TRUE)
+set(USE_PYLON_SDK FALSE)
 
 ### Metavision SDK
 if(USE_METAVISION_SDK)
@@ -32,7 +32,7 @@ endif()
 ### Pylon SDK
 if(USE_PYLON_SDK)
     add_definitions(-DENABLE_PYLON_SDK)
-    find_package(pylon 7.2.1 REQUIRED)
+    find_package(pylon REQUIRED COMPONENTS 7.2.0)
     target_link_libraries(rip-cocapture-gui PUBLIC pylon::pylon)
     target_sources(rip-cocapture-gui PUBLIC cams/basler/basler_camera.cpp cam_interfaces/basler/basler_interface.cpp)
     target_sources(rip-cocapture-gui PUBLIC gui/basler/basler_gui.cpp wrappers/basler/basler_wrapper.cpp)
