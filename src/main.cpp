@@ -54,6 +54,14 @@ int main(int argc, char** argv) {
     }
     #endif //ENABLE_PYLON_SDK
 
+    // Find connected Flir cameras
+    #ifdef ENABLE_SPINNAKER_SDK
+    std::vector<std::pair<std::string, int>> flir_cameras;
+    for(const auto& serial_number : cams::flir::FlirCamera::ListConnectedCameras()) {
+        flir_cameras.emplace_back(serial_number, camera_index++);
+    }
+    #endif // ENABLE_SPINNAKER_SDK
+
     // List connected cameras
     if(variables_map.count("list") || variables_map.count("l")) {
         std::cout << "Connected cameras:" << std::endl;
@@ -69,6 +77,13 @@ int main(int argc, char** argv) {
             std::cout << " " << " ";
             std::cout << "[" << basler_camera.second << "]" << " " << "basler" << " / " << basler_camera.first << std::endl;
         }
+        #endif //ENABLE_PYLON_SDK
+
+        #ifdef ENABLE_SPINNAKER_SDK
+                for(const auto& flir_camera : flir_cameras) {
+                    std::cout << " " << " ";
+                    std::cout << "[" << flir_camera.second << "]" << " " << "flir" << " / " << flir_camera.first << std::endl;
+                }
         #endif //ENABLE_PYLON_SDK
     }
 
@@ -121,7 +136,17 @@ int main(int argc, char** argv) {
     # endif // ENABLE_PYLON_SDK
 
     # ifdef ENABLE_SPINNAKER_SDK
-
+    //std::vector<std::pair<std::unique_ptr<wrappers::flir::FlirWrapper>, std::unique_ptr<bool>>> flir_wrappers;
+    //int flir_camera_index {0};
+    //for(const auto& picked_index : variables_map["pick"].as<std::vector<int>>()) {
+    //    for(const auto& flir_camera : flir_cameras) {
+    //        if(basler_camera.second == picked_index) {
+    //            basler_wrappers.push_back({std::move(std::make_unique<wrappers::basler::BaslerWrapper>(basler_camera.first.c_str(), basler_camera_index++)),
+    //                                       std::move(std::make_unique<bool>(false))});
+    //            recorder.RegisterWrapper(*basler_wrappers.back().first, *basler_wrappers.back().second);
+    //        }
+    //    }
+    //}
     #endif
 
     // Program loop

@@ -2,8 +2,7 @@
 #ifndef RIP_COCAPTURE_GUI_FLIR_CAMERA_H
 #define RIP_COCAPTURE_GUI_FLIR_CAMERA_H
 
-//#include <pylon/PylonIncludes.h>
-//#include <pylon/FlirUniversalInstantCamera.h>
+#include <Spinnaker.h>
 #include <opencv2/opencv.hpp>
 
 namespace rcg::cams::flir {

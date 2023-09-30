@@ -161,17 +161,18 @@ namespace rcg::cams::flir {
     }
 
     std::vector<std::string> FlirCamera::ListConnectedCameras() {
-        //Pylon::PylonAutoInitTerm pylon_auto_init_term;
-        //Pylon::CTlFactory& tl_factory = Pylon::CTlFactory::GetInstance();
-        //Pylon::DeviceInfoList device_info_list;
-        //tl_factory.EnumerateDevices(device_info_list);
-//
-        //std::vector<std::string> serial_numbers;
-        //for(Pylon::DeviceInfoList::const_iterator it = device_info_list.begin(); it != device_info_list.end(); ++it) {
-        //    serial_numbers.push_back(std::string {it->GetSerialNumber()});
-        //}
-//
-        //return serial_numbers;
+        Spinnaker::SystemPtr system = Spinnaker::System::GetInstance();
+        Spinnaker::CameraList camList = system->GetCameras();
+        unsigned int numCameras = camList.GetSize();
+
+        std::vector<std::string> serial_numbers;
+        for(unsigned int i = 0; i < numCameras; ++i) {
+            Spinnaker::CameraPtr pCam = camList.GetByIndex(i);
+            Spinnaker::GenApi::CStringPtr serial = pCam->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
+            serial_numbers.push_back(serial->GetValue().c_str());
+            return serial_numbers;
+        }
+        return serial_numbers;
     }
 
 } // rcg::cams::flir
