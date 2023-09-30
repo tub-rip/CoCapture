@@ -11,36 +11,39 @@ namespace rcg::cams::flir {
     FlirCamera::FlirCamera(const char *serial_number) :
 
     is_started_  (false),
-    is_recording_(false)
+    is_recording_(false),
+    system_(Spinnaker::System::GetInstance())
 
     {
-        //Pylon::PylonInitialize();
-        //camera_.Attach(Pylon::CTlFactory::GetInstance().CreateDevice(Pylon::CDeviceInfo().SetSerialNumber(serial_number)));
-        //image_event_handler_ = new ImageEventHandler();
-        //camera_.RegisterImageEventHandler(image_event_handler_,
-        //                                  Pylon::RegistrationMode_Append,
-        //                                  Pylon::Cleanup_Delete);
+            Spinnaker::CameraList cam_list = system_->GetCameras();
 
-        //camera_.Open();
+            for (size_t i = 0; i < cam_list.GetSize(); ++i) {
+                Spinnaker::CameraPtr current_cam = cam_list.GetByIndex(i);
+                Spinnaker::GenApi::CStringPtr current_serial =
+                        current_cam->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
 
-        // @TODO: Allow following settings to be modified programmatically
-        //camera_.TriggerActivation.SetValue("RisingEdge");
-        //camera_.AcquisitionFrameRateEnable.SetValue(true);
-        //camera_.AcquisitionFrameRate.SetValue(30);
+                if (std::strcmp(serial_number, current_serial->GetValue().c_str()) == 0) {
+                    camera_ = current_cam;
+                    break;
+                }
+            }
+            // TODO: Set hardware parameters
+
+            cam_list.Clear();
     }
 
     FlirCamera::~FlirCamera() {
-        //camera_.Close();
-        //camera_.DestroyDevice();
-        //Pylon::PylonTerminate();
+        system_->ReleaseInstance();
     }
 
     std::string FlirCamera::GetSerialNumber() {
         //return std::string {camera_.GetDeviceInfo().GetSerialNumber()};
+        return "0";
     }
 
     std::string FlirCamera::GetModelName() {
         //return std::string {camera_.GetDeviceInfo().GetModelName()};
+        return "0";
     }
 
     std::string FlirCamera::GetVendorName() {
@@ -162,16 +165,17 @@ namespace rcg::cams::flir {
 
     std::vector<std::string> FlirCamera::ListConnectedCameras() {
         Spinnaker::SystemPtr system = Spinnaker::System::GetInstance();
-        Spinnaker::CameraList camList = system->GetCameras();
-        unsigned int numCameras = camList.GetSize();
+        Spinnaker::CameraList cam_list = system->GetCameras();
 
         std::vector<std::string> serial_numbers;
-        for(unsigned int i = 0; i < numCameras; ++i) {
-            Spinnaker::CameraPtr pCam = camList.GetByIndex(i);
-            Spinnaker::GenApi::CStringPtr serial = pCam->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
+        for(unsigned int i = 0; i < cam_list.GetSize(); ++i) {
+            Spinnaker::CameraPtr cam = cam_list.GetByIndex(i);
+            Spinnaker::GenApi::CStringPtr serial = cam->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
             serial_numbers.push_back(serial->GetValue().c_str());
             return serial_numbers;
         }
+        cam_list.Clear();
+        system->ReleaseInstance();
         return serial_numbers;
     }
 

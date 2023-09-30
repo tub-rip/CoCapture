@@ -46,8 +46,8 @@ namespace rcg::cams::flir {
         static std::vector<std::string> ListConnectedCameras();
 
     private:
-        //Pylon::CFlirUniversalInstantCamera camera_;
-        //ImageEventHandler* image_event_handler_;
+        Spinnaker::SystemPtr system_;
+        Spinnaker::CameraPtr camera_;
 
         bool is_started_;
         bool is_recording_;

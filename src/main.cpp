@@ -136,17 +136,17 @@ int main(int argc, char** argv) {
     # endif // ENABLE_PYLON_SDK
 
     # ifdef ENABLE_SPINNAKER_SDK
-    //std::vector<std::pair<std::unique_ptr<wrappers::flir::FlirWrapper>, std::unique_ptr<bool>>> flir_wrappers;
-    //int flir_camera_index {0};
-    //for(const auto& picked_index : variables_map["pick"].as<std::vector<int>>()) {
-    //    for(const auto& flir_camera : flir_cameras) {
-    //        if(basler_camera.second == picked_index) {
-    //            basler_wrappers.push_back({std::move(std::make_unique<wrappers::basler::BaslerWrapper>(basler_camera.first.c_str(), basler_camera_index++)),
-    //                                       std::move(std::make_unique<bool>(false))});
-    //            recorder.RegisterWrapper(*basler_wrappers.back().first, *basler_wrappers.back().second);
-    //        }
-    //    }
-    //}
+    std::vector<std::pair<std::unique_ptr<wrappers::flir::FlirWrapper>, std::unique_ptr<bool>>> flir_wrappers;
+    int flir_camera_index {0};
+    for(const auto& picked_index : variables_map["pick"].as<std::vector<int>>()) {
+        for(const auto& flir_camera : flir_cameras) {
+            if(flir_camera.second == picked_index) {
+                flir_wrappers.push_back({std::move(std::make_unique<wrappers::flir::FlirWrapper>(flir_camera.first.c_str(), flir_camera_index++)),
+                                           std::move(std::make_unique<bool>(false))});
+                recorder.RegisterWrapper(*flir_wrappers.back().first, *flir_wrappers.back().second);
+            }
+        }
+    }
     #endif
 
     // Program loop
