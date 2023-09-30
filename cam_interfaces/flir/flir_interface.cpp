@@ -6,10 +6,10 @@
 
 namespace rcg::cam_interfaces::flir {
 
-//FlirInterface::FlirInterface(cams::flir::FlirCamera* flir_camera, int id) {
-//    flir_camera_ = flir_camera;
-//    identifier_ = "flir" + std::to_string(id);
-//}
+    FlirInterface::FlirInterface(cams::flir::FlirCamera* flir_camera, int id) {
+        flir_camera_ = flir_camera;
+        identifier_ = "flir" + std::to_string(id);
+    }
 
     FlirInterface::~FlirInterface() {}
 

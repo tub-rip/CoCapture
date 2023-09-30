@@ -3,13 +3,13 @@
 #define RIP_COCAPTURE_GUI_FLIR_INTERFACE_H
 
 #include "cam_interface.h"
-
+#include "flir_camera.h"
 
 namespace rcg::cam_interfaces::flir {
 
     class FlirInterface : public ICamera {
     public:
-        //FlirInterface(cams::flir::FlirCamera* flir_camera, int id);
+        FlirInterface(cams::flir::FlirCamera* flir_camera, int id);
         ~FlirInterface();
 
     public:
@@ -25,7 +25,7 @@ namespace rcg::cam_interfaces::flir {
         bool IsRecording() override;
 
     private:
-        //cams::flir::FlirCamera* flir_camera_;
+        cams::flir::FlirCamera* flir_camera_;
         std::string identifier_;
         std::string output_dir_;
     };

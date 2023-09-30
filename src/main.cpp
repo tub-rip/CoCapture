@@ -120,9 +120,9 @@ int main(int argc, char** argv) {
     }
     # endif // ENABLE_PYLON_SDK
 
-# ifdef ENABLE_SPINNAKER_SDK
+    # ifdef ENABLE_SPINNAKER_SDK
 
-#endif
+    #endif
 
     // Program loop
     bool done = false;
