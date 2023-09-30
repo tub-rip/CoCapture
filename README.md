@@ -2,7 +2,7 @@
 
 Light-weight viewer and recorder for multi-camera systems including event cameras.
 
-![Screenshot from 2023-07-05 10-55-54](https://github.com/tub-rip/rip-cocapture-gui/assets/115785598/197ac573-fb37-41e3-b911-8c1f4081a7db)
+![Screenshot from 2023-07-05 10-55-54](docs/images/cocapture_example.png)
 
 ## Installation
 
