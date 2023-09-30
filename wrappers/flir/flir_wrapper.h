@@ -1,0 +1,8 @@
+//
+// Created by friedhelm on 30.09.23.
+//
+
+#ifndef RIP_COCAPTURE_GUI_FLIR_WRAPPER_H
+#define RIP_COCAPTURE_GUI_FLIR_WRAPPER_H
+
+#endif //RIP_COCAPTURE_GUI_FLIR_WRAPPER_H

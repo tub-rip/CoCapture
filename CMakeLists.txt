@@ -41,10 +41,11 @@ endif ()
 if (USE_SPINNAKER_SDK)
     add_definitions(-DENABLE_SPINNAKER_SDK)
     list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
-
-    #set(Spinnaker_DIR "/opt/spinnaker")
     find_package(Spinnaker REQUIRED)
-
+    target_link_libraries(rip-cocapture-gui PUBLIC ${Spinnaker_LIBRARIES})
+    target_sources(rip-cocapture-gui PUBLIC cams/flir/flir_camera.cpp cam_interfaces/flir/flir_interface.cpp)
+    target_sources(rip-cocapture-gui PUBLIC gui/flir/flir_gui.cpp wrappers/flir/flir_wrapper.cpp)
+    target_include_directories(rip-cocapture-gui PUBLIC cams/flir gui/flir cam_interfaces/flir wrappers/flir)
 endif ()
 
 

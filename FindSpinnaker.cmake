@@ -34,3 +34,5 @@ endif()
 
 # Export the variables
 mark_as_advanced(Spinnaker_INCLUDE_DIR Spinnaker_LIBRARIES)
+
+include_directories("/opt/spinnaker/include")

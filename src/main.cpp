@@ -11,6 +11,10 @@
 #include "basler_wrapper.h"
 #endif //ENABLE_PYLON_SDK
 
+#ifdef ENABLE_SPINNAKER_SDK
+#include "flir_wrapper.h"
+#endif // ENABLE_SPINNAKER_SDK
+
 using namespace rcg;
 
 int main(int argc, char** argv) {
@@ -115,6 +119,10 @@ int main(int argc, char** argv) {
         }
     }
     # endif // ENABLE_PYLON_SDK
+
+# ifdef ENABLE_SPINNAKER_SDK
+
+#endif
 
     // Program loop
     bool done = false;
