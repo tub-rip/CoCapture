@@ -17,7 +17,7 @@ target_include_directories(rip-cocapture-gui PUBLIC tools/recorder)
 
 ### Enable dependencies here
 set(USE_METAVISION_SDK TRUE)
-set(USE_PYLON_SDK FALSE)
+set(USE_PYLON_SDK TRUE)
 
 ### Metavision SDK
 if(USE_METAVISION_SDK)
