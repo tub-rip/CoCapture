@@ -132,7 +132,7 @@ namespace rcg::cams::flir {
     }
 
     void FlirCamera::OutputFrame(cv::Mat& image_frame) {
-
+        return image_handler_->OutputFrame(image_frame);
     }
 
     bool FlirCamera::StartRecording(const char* output_dir) {
