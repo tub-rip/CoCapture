@@ -27,6 +27,16 @@ namespace rcg::cams::flir {
                     break;
                 }
             }
+            if (!camera_->IsInitialized()) {
+                camera_->Init();
+            }
+
+            height_ = this->GetImageFrameHeight();
+            width_ = this->GetImageFrameWidth();
+            image_handler_ = new ImageEventHandler(height_, width_);
+
+            camera_->RegisterEventHandler(*image_handler_);
+
             // TODO: Set hardware parameters
 
             cam_list.Clear();
@@ -37,61 +47,63 @@ namespace rcg::cams::flir {
     }
 
     std::string FlirCamera::GetSerialNumber() {
-        //return std::string {camera_.GetDeviceInfo().GetSerialNumber()};
-        return "0";
+        Spinnaker::GenApi::CStringPtr serial =
+                camera_->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
+        return serial->GetValue().c_str();
     }
 
     std::string FlirCamera::GetModelName() {
-        //return std::string {camera_.GetDeviceInfo().GetModelName()};
-        return "0";
+        return "Flir";
     }
 
     std::string FlirCamera::GetVendorName() {
-        //return std::string {camera_.GetDeviceInfo().GetVendorName()};
+        return "Flir";
     }
 
     int FlirCamera::GetImageFrameWidth() {
-        //return camera_.Width.GetValue();
+        if (camera_ && camera_->IsValid()) {
+            Spinnaker::GenApi::CIntegerPtr widthNode = camera_->GetNodeMap().GetNode("Width");
+            if (Spinnaker::GenApi::IsReadable(widthNode)) {
+                return static_cast<int>(widthNode->GetValue());
+            }
+        }
+        return -1;
     }
 
     int FlirCamera::GetImageFrameHeight() {
-        //return camera_.Height.GetValue();
+        if (camera_ && camera_->IsValid()) {
+            Spinnaker::GenApi::CIntegerPtr heightNode = camera_->GetNodeMap().GetNode("Height");
+            if (Spinnaker::GenApi::IsReadable(heightNode)) {
+                return static_cast<int>(heightNode->GetValue());
+            }
+        }
+        return -1;
     }
 
     int FlirCamera::GetExposureTime() {
-        //return camera_.ExposureTime.GetValue();
+        return 0;
     }
 
     bool FlirCamera::SetExposureTime(int exposure_time_us) {
-        //camera_.ExposureTime.SetValue(exposure_time_us);
-        return true;
+        return false;
     }
 
     bool FlirCamera::GetTriggerMode() {
-        //if(camera_.TriggerMode.GetValue() == Flir_UniversalCameraParams::TriggerMode_On) {
-        //    return true;
-        //} else {
-        //    return false;
-        //}
+        return false;
     }
 
     bool FlirCamera::SetTriggerMode(bool trigger_mode) {
-        //if(trigger_mode) {
-        //    camera_.TriggerMode.SetValue(Flir_UniversalCameraParams::TriggerMode_On);
-        //} else {
-        //    camera_.TriggerMode.SetValue(Flir_UniversalCameraParams::TriggerMode_Off);
-        //}
-
-        return true;
+        return false;
     }
 
     bool FlirCamera::GetReverseX() {
         //return camera_.ReverseX.GetValue();
+        return false;
     }
 
     bool FlirCamera::SetReverseX(bool reverse_x) {
         //camera_.ReverseX.SetValue(reverse_x);
-        return true;
+        return false;
     }
 
     bool FlirCamera::Start() {
@@ -99,13 +111,10 @@ namespace rcg::cams::flir {
             return false;
         }
 
-        //camera_.StartGrabbing(Pylon::GrabStrategy_OneByOne, Pylon::GrabLoop_ProvidedByInstantCamera);
-
-        // Wait until the image event handler stabilizes
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-
+        if (camera_ && !camera_->IsStreaming()) {
+            camera_->BeginAcquisition();
+        }
         is_started_ = true;
-
         return true;
     }
 
@@ -114,15 +123,16 @@ namespace rcg::cams::flir {
             return false;
         }
 
-        //camera_.StopGrabbing();
-
+        if (camera_ && camera_->IsStreaming()) {
+            camera_->EndAcquisition();
+        }
         is_started_ = false;
 
         return true;
     }
 
     void FlirCamera::OutputFrame(cv::Mat& image_frame) {
-        //image_event_handler_->OutputFrame(image_frame);
+
     }
 
     bool FlirCamera::StartRecording(const char* output_dir) {
@@ -178,7 +188,6 @@ namespace rcg::cams::flir {
         system->ReleaseInstance();
         return serial_numbers;
     }
-
 } // rcg::cams::flir
 
 #endif //ENABLE_SPINNAKER_SDK

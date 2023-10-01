@@ -5,6 +5,8 @@
 #include <Spinnaker.h>
 #include <opencv2/opencv.hpp>
 
+#include "image_event_handler.h"
+
 namespace rcg::cams::flir {
 
     class FlirCamera {
@@ -51,6 +53,11 @@ namespace rcg::cams::flir {
 
         bool is_started_;
         bool is_recording_;
+
+        int height_;
+        int width_;
+
+        ImageEventHandler* image_handler_;
     };
 
 } // rcg::cams::flir
