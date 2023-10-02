@@ -19,8 +19,13 @@ namespace rcg::cams::flir {
         void OutputFrame(cv::Mat& output_frame) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             if (frame_received_) {
-                output_frame = cv::Mat(height_, width_, CV_8UC3, frame_->GetData(),
-                                      frame_->GetStride());
+                //std::cout << frame_->GetPixelFormat() << std::endl;
+                //cv::Mat
+
+                output_frame = cv::Mat(frame_->GetHeight() + frame_->GetYPadding(),
+                                frame_->GetWidth() + frame_->GetXPadding(), CV_8UC3);
+                output_frame.data = (uchar*)frame_->GetData();
+                //cv::cvtColor(bayer_frame, output_frame, cv::COLOR_BayerRG2BGR);
             } else {
                 output_frame = cv::Mat::zeros(height_, width_, CV_8UC3);
             }

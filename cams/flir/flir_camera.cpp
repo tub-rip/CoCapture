@@ -31,6 +31,20 @@ namespace rcg::cams::flir {
                 camera_->Init();
             }
 
+            //Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
+            //Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
+            //Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
+            //        pixel_format_handle->GetEntryByName("BGR8");
+
+            //if (Spinnaker::GenApi::IsAvailable(format_bgr8_handle)
+            //    && Spinnaker::GenApi::IsReadable(format_bgr8_handle)) {
+            //int64_t format_rgb8 = format_bgr8_handle->GetValue();
+            //pixel_format_handle->SetIntValue(format_rgb8);
+            //}
+            //else {
+            //    std::cout << "Could not set correct pixel format for Flir camera." << std::endl;
+            //}
+
             height_ = this->GetImageFrameHeight();
             width_ = this->GetImageFrameWidth();
             image_handler_ = new ImageEventHandler(height_, width_);

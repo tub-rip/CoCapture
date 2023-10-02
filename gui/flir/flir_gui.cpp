@@ -54,8 +54,13 @@ namespace rcg::gui::flir {
         // Display image frame
         if(show_visualization_) {
             flir_camera_->OutputFrame(image_frame_);
-            UpdateTexture(&image_frame_texture_id_, image_frame_.data, image_frame_width_, image_frame_height_);
-            DisplayImage(&image_frame_texture_id_, window_viz_label_.c_str(), image_frame_width_, image_frame_height_, &show_visualization_);
+
+            UpdateTexture(&image_frame_texture_id_,
+                          image_frame_.data, image_frame_width_,
+                          image_frame_height_);
+            DisplayImage(&image_frame_texture_id_, window_viz_label_.c_str(),
+                         image_frame_width_, image_frame_height_,
+                         &show_visualization_);
         }
 
         if(show == nullptr || *(show)) {
