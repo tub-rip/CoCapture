@@ -86,7 +86,7 @@ namespace rcg::gui {
         glGenTextures(1, texture_id_ref);
         glBindTexture(GL_TEXTURE_2D, *texture_id_ref);
 
-        unsigned char empty[image_width * image_height * 3];
+        unsigned char* empty = new unsigned char[image_width * image_height * 3];
         memset(empty, 0, image_width * image_height * 3);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -95,6 +95,7 @@ namespace rcg::gui {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8,
                      image_width, image_height, 0,
                      GL_RGB, GL_UNSIGNED_BYTE, empty);
+        delete[] empty;
     }
 
     void UpdateTexture(GLuint* texture_id_ref, unsigned char* image_data, int image_width, int image_height) {
