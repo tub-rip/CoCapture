@@ -27,23 +27,29 @@ namespace rcg::cams::flir {
                     break;
                 }
             }
+
             if (!camera_->IsInitialized()) {
                 camera_->Init();
             }
 
-            //Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
-            //Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
-            //Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
-            //        pixel_format_handle->GetEntryByName("BGR8");
+            Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
 
-            //if (Spinnaker::GenApi::IsAvailable(format_bgr8_handle)
-            //    && Spinnaker::GenApi::IsReadable(format_bgr8_handle)) {
-            //int64_t format_rgb8 = format_bgr8_handle->GetValue();
-            //pixel_format_handle->SetIntValue(format_rgb8);
-            //}
-            //else {
-            //    std::cout << "Could not set correct pixel format for Flir camera." << std::endl;
-            //}
+            //Spinnaker::GenApi::CEnumerationPtr imageTransformSelector = node_map.GetNode("ReverseX");
+            //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("On");
+            //imageTransformSelector->SetIntValue(reverseXTransform->GetValue());
+
+            Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
+            Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
+                    pixel_format_handle->GetEntryByName("RGB8");
+
+            if (Spinnaker::GenApi::IsAvailable(format_bgr8_handle)
+                && Spinnaker::GenApi::IsReadable(format_bgr8_handle)) {
+            int64_t format_rgb8 = format_bgr8_handle->GetValue();
+            pixel_format_handle->SetIntValue(format_rgb8);
+            }
+            else {
+                std::cout << "Could not set correct pixel format for Flir camera." << std::endl;
+            }
 
             height_ = this->GetImageFrameHeight();
             width_ = this->GetImageFrameWidth();
@@ -54,6 +60,12 @@ namespace rcg::cams::flir {
             // TODO: Set hardware parameters
 
             cam_list.Clear();
+
+            if (camera_ && !camera_->IsStreaming()) {
+                camera_->BeginAcquisition();
+            }
+
+            is_started_ = true;
     }
 
     FlirCamera::~FlirCamera() {
@@ -121,14 +133,10 @@ namespace rcg::cams::flir {
     }
 
     bool FlirCamera::Start() {
+        // TODO: What needs to go here from Constructor?
         if(is_started_) {
             return false;
         }
-
-        if (camera_ && !camera_->IsStreaming()) {
-            camera_->BeginAcquisition();
-        }
-        is_started_ = true;
         return true;
     }
 
