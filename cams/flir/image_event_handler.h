@@ -15,6 +15,15 @@ namespace rcg::cams::flir {
             frame_ = cv::Mat(image->GetHeight() + image->GetYPadding(),
                              image->GetWidth() + image->GetXPadding(), CV_8UC1);
             frame_.data = (uchar*)image->GetData();
+
+            if(is_recording_) {
+                cv::Mat rgb_frame = cv::Mat(height_, width_, CV_8UC3);
+                rgb_frame.data = frame_.data;
+                cv::Mat bgr_frame;
+                cv::cvtColor(rgb_frame, bgr_frame, cv::COLOR_RGB2BGR);
+                video_writer_.write(bgr_frame);
+            }
+
             frame_received_ = true;
         }
 
@@ -37,7 +46,7 @@ namespace rcg::cams::flir {
                                              cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
                                              30,
                                              cv::Size(width_, height_),
-                                             false};
+                                             true};
             is_recording_ = true;
         }
 
