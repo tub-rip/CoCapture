@@ -97,6 +97,7 @@ namespace rcg::cams::flir {
         }
 
         void StopRecording() override {
+            // TODO: GUI becomes non-reactive while images are stored
             std::unique_lock<std::mutex> lock(frame_mutex_);
             is_recording_ = false;
 
