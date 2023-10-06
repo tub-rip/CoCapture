@@ -28,11 +28,33 @@ namespace rcg::cams::flir {
             }
             //frame_received_ = false;
         }
+
+        void StartRecording(const char* output_dir) {
+            std::unique_lock<std::mutex> lock(frame_mutex_);
+
+            std::string output_dir_str {output_dir};
+            if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
+
+            video_writer_ = cv::VideoWriter {output_dir_str + "/frames.mp4",
+                                             cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
+                                             30,
+                                             cv::Size(width_, height_),
+                                             false};
+            is_recording_ = true;
+        }
+
+        void StopRecording() {
+            std::unique_lock<std::mutex> lock(frame_mutex_);
+            is_recording_ = false;
+            video_writer_.release();
+        }
     private:
         Spinnaker::ImagePtr frame_;
         std::mutex frame_mutex_;
         bool frame_received_;
         int height_, width_;
+        cv::VideoWriter video_writer_;
+        bool is_recording_;
     };
 }
 

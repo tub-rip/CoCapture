@@ -38,6 +38,23 @@ namespace rcg::cams::flir {
             //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("On");
             //imageTransformSelector->SetIntValue(reverseXTransform->GetValue());
 
+            Spinnaker::GenApi::CEnumerationPtr ptrExposureAuto = node_map.GetNode("ExposureAuto");
+            if (!IsReadable(ptrExposureAuto) ||
+                !IsWritable(ptrExposureAuto))
+            {
+                std::cout << "FLIR: Unable to enable automatic exposure (node retrieval)" << std::endl;
+            } else {
+                Spinnaker::GenApi::CEnumEntryPtr ptrExposureAutoContinuous =
+                        ptrExposureAuto->GetEntryByName("Continuous");
+                if (!IsReadable(ptrExposureAutoContinuous))
+                {
+                    std::cout << "Unable to enable automatic exposure (enum entry retrieval)" << std::endl;
+                } else {
+                    ptrExposureAuto->SetIntValue(ptrExposureAutoContinuous->GetValue());
+                }
+            }
+
+
             Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
             Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
                     pixel_format_handle->GetEntryByName("RGB8");
@@ -107,7 +124,13 @@ namespace rcg::cams::flir {
     }
 
     int FlirCamera::GetExposureTime() {
-        return 0;
+        Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
+        double exposure_time = 0;
+        Spinnaker::GenApi::CFloatPtr exposureTimeNode = node_map.GetNode("ExposureTime");
+        if (IsAvailable(exposureTimeNode) && IsReadable(exposureTimeNode)) {
+            exposure_time = exposureTimeNode->GetValue();
+        }
+        return exposure_time;
     }
 
     bool FlirCamera::SetExposureTime(int exposure_time_us) {
@@ -115,6 +138,12 @@ namespace rcg::cams::flir {
     }
 
     bool FlirCamera::GetTriggerMode() {
+        Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
+        std::string trigger_mode = "nan";
+        Spinnaker::GenApi::CFloatPtr node = node_map.GetNode("TriggerMode");
+        if (IsAvailable(node) && IsReadable(node)) {
+            trigger_mode = node->GetValue();
+        }
         return false;
     }
 
@@ -161,11 +190,8 @@ namespace rcg::cams::flir {
         if(is_recording_) {
             return false;
         }
-
-        //image_event_handler_->StartRecording(output_dir);
-
+        image_handler_->StartRecording(output_dir);
         is_recording_ = true;
-
         return true;
     }
 
@@ -173,11 +199,8 @@ namespace rcg::cams::flir {
         if(!is_recording_) {
             return false;
         }
-
-        //image_event_handler_->StopRecording();
-
+        image_handler_->StopRecording();
         is_recording_ = false;
-
         return true;
     }
 
