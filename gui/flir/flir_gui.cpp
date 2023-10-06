@@ -59,7 +59,7 @@ namespace rcg::gui::flir {
                           image_frame_.data, image_frame_width_,
                           image_frame_height_);
             DisplayImage(&image_frame_texture_id_, window_viz_label_.c_str(),
-                         image_frame_width_, image_frame_height_,
+                         image_frame_width_/4, image_frame_height_/4,
                          &show_visualization_);
         }
 
