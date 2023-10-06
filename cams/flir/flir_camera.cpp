@@ -70,7 +70,7 @@ namespace rcg::cams::flir {
 
             height_ = this->GetImageFrameHeight();
             width_ = this->GetImageFrameWidth();
-            image_handler_ = new ImageEventHandler(height_, width_);
+            image_handler_ = new Mp4ImageEventHandler(height_, width_);
 
             camera_->RegisterEventHandler(*image_handler_);
 

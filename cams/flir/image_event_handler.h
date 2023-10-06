@@ -3,12 +3,16 @@
 #define RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H
 
 namespace rcg::cams::flir {
-    class ImageEventHandler : public Spinnaker::ImageEventHandler {
+    class ImageEventHandlerBase : public Spinnaker::ImageEventHandler {
     public:
-        ImageEventHandler(int height, int width) :
-            frame_received_(false),
-            height_(height),
-            width_(width) {}
+        ImageEventHandlerBase(int height, int width) :
+                frame_received_(false),
+                height_(height),
+                width_(width),
+                is_recording_(false) {}
+
+        virtual void StartRecording(const char* output_dir) = 0;
+        virtual void StopRecording() = 0;
 
         void OnImageEvent(Spinnaker::ImagePtr image) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
@@ -16,7 +20,7 @@ namespace rcg::cams::flir {
                              image->GetWidth() + image->GetXPadding(), CV_8UC1);
             frame_.data = (uchar*)image->GetData();
 
-            if(is_recording_) {
+            if (is_recording_) {
                 cv::Mat rgb_frame = cv::Mat(height_, width_, CV_8UC3);
                 rgb_frame.data = frame_.data;
                 cv::Mat bgr_frame;
@@ -35,6 +39,19 @@ namespace rcg::cams::flir {
                 output_frame = cv::Mat::zeros(height_, width_, CV_8UC3);
             }
         }
+
+    protected:
+        cv::Mat frame_;
+        std::mutex frame_mutex_;
+        bool frame_received_;
+        int height_, width_;
+        cv::VideoWriter video_writer_;
+        bool is_recording_;
+    };
+
+    class Mp4ImageEventHandler : public ImageEventHandlerBase {
+    public:
+        Mp4ImageEventHandler(int height, int width) : ImageEventHandlerBase(height, width) {}
 
         void StartRecording(const char* output_dir) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
@@ -55,15 +72,8 @@ namespace rcg::cams::flir {
             is_recording_ = false;
             video_writer_.release();
         }
-    private:
-        //Spinnaker::ImagePtr frame_;
-        cv::Mat frame_;
-        std::mutex frame_mutex_;
-        bool frame_received_;
-        int height_, width_;
-        cv::VideoWriter video_writer_;
-        bool is_recording_;
     };
+
 }
 
 #endif //RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H

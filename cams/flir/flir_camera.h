@@ -57,7 +57,7 @@ namespace rcg::cams::flir {
         int height_;
         int width_;
 
-        ImageEventHandler* image_handler_;
+        ImageEventHandlerBase* image_handler_;
     };
 
 } // rcg::cams::flir
