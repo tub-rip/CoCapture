@@ -13,6 +13,7 @@ namespace rcg::cams::flir {
 
         virtual void StartRecording(const char* output_dir) = 0;
         virtual void StopRecording() = 0;
+        virtual void WriteFrame(cv::Mat& frame) = 0;
 
         void OnImageEvent(Spinnaker::ImagePtr image) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
@@ -25,7 +26,7 @@ namespace rcg::cams::flir {
                 rgb_frame.data = frame_.data;
                 cv::Mat bgr_frame;
                 cv::cvtColor(rgb_frame, bgr_frame, cv::COLOR_RGB2BGR);
-                video_writer_.write(bgr_frame);
+                this->WriteFrame(bgr_frame);
             }
 
             frame_received_ = true;
@@ -45,7 +46,6 @@ namespace rcg::cams::flir {
         std::mutex frame_mutex_;
         bool frame_received_;
         int height_, width_;
-        cv::VideoWriter video_writer_;
         bool is_recording_;
     };
 
@@ -72,6 +72,13 @@ namespace rcg::cams::flir {
             is_recording_ = false;
             video_writer_.release();
         }
+
+        void WriteFrame(cv::Mat& frame) {
+            video_writer_.write(frame);
+        }
+
+    private:
+        cv::VideoWriter video_writer_;
     };
 
 }
