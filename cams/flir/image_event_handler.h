@@ -81,6 +81,48 @@ namespace rcg::cams::flir {
         cv::VideoWriter video_writer_;
     };
 
+
+    class PngImageEventHandler : public ImageEventHandlerBase {
+    public:
+        PngImageEventHandler(int height, int width, int buffer_size) : ImageEventHandlerBase(height, width), buffer_size_(buffer_size) {
+            image_buffer_.reserve(buffer_size_);
+        }
+
+        void StartRecording(const char* output_dir) override {
+            std::unique_lock<std::mutex> lock(frame_mutex_);
+            std::string output_dir_str {output_dir};
+            if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
+            output_dir_ = output_dir;
+            is_recording_ = true;
+        }
+
+        void StopRecording() override {
+            std::unique_lock<std::mutex> lock(frame_mutex_);
+            is_recording_ = false;
+
+            for (const auto& frame : image_buffer_) {
+                std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
+                cv::imwrite(filename, frame);
+                frame_counter_++;
+            }
+
+            image_buffer_.clear();
+        }
+
+        void WriteFrame(cv::Mat& frame) override {
+            if (is_recording_ && image_buffer_.size() < buffer_size_) {
+                image_buffer_.push_back(frame.clone());
+            }
+        }
+
+    private:
+        std::vector<cv::Mat> image_buffer_;
+        std::string output_dir_;
+        int buffer_size_;
+        int frame_counter_ = 0;
+    };
+
+
 }
 
 #endif //RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H

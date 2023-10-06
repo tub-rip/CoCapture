@@ -1,6 +1,5 @@
 #ifdef ENABLE_SPINNAKER_SDK
 
-#include <chrono>
 #include <thread>
 #include <fstream>
 
@@ -15,6 +14,8 @@ namespace rcg::cams::flir {
     system_(Spinnaker::System::GetInstance())
 
     {
+            bool WRITE_TO_PNG = true;  // Otherwise, write to mp4, TODO: connect to GUI
+
             Spinnaker::CameraList cam_list = system_->GetCameras();
 
             for (size_t i = 0; i < cam_list.GetSize(); ++i) {
@@ -70,7 +71,12 @@ namespace rcg::cams::flir {
 
             height_ = this->GetImageFrameHeight();
             width_ = this->GetImageFrameWidth();
-            image_handler_ = new Mp4ImageEventHandler(height_, width_);
+
+            if (WRITE_TO_PNG) {
+                image_handler_ = new PngImageEventHandler(height_, width_, 200);
+            } else {
+                image_handler_ = new Mp4ImageEventHandler(height_, width_);
+            }
 
             camera_->RegisterEventHandler(*image_handler_);
 
