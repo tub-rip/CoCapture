@@ -12,21 +12,19 @@ namespace rcg::cams::flir {
 
         void OnImageEvent(Spinnaker::ImagePtr image) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
-            frame_ = image;
+            frame_ = cv::Mat(image->GetHeight() + image->GetYPadding(),
+                             image->GetWidth() + image->GetXPadding(), CV_8UC1);
+            frame_.data = (uchar*)image->GetData();
             frame_received_ = true;
         }
 
         void OutputFrame(cv::Mat& output_frame) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             if (frame_received_) {
-                output_frame = cv::Mat(frame_->GetHeight() + frame_->GetYPadding(),
-                                frame_->GetWidth() + frame_->GetXPadding(), CV_8UC1);
-                output_frame.data = (uchar*)frame_->GetData();
-                //cv::cvtColor(bayer_frame, output_frame, cv::COLOR_BayerRG2BGR);
+                output_frame = frame_;
             } else {
                 output_frame = cv::Mat::zeros(height_, width_, CV_8UC3);
             }
-            //frame_received_ = false;
         }
 
         void StartRecording(const char* output_dir) {
@@ -49,7 +47,8 @@ namespace rcg::cams::flir {
             video_writer_.release();
         }
     private:
-        Spinnaker::ImagePtr frame_;
+        //Spinnaker::ImagePtr frame_;
+        cv::Mat frame_;
         std::mutex frame_mutex_;
         bool frame_received_;
         int height_, width_;
