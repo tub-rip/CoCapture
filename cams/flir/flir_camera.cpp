@@ -79,6 +79,7 @@ namespace rcg::cams::flir {
         }
 
         camera_->RegisterEventHandler(*image_handler_);
+        this->SetTriggerMode(false);
 
         cam_list.Clear();
     }
@@ -149,7 +150,7 @@ namespace rcg::cams::flir {
     }
 
     bool FlirCamera::SetTriggerMode(bool trigger_mode) {
-        std::string new_mode = trigger_mode ? "Off" : "On";
+        std::string new_mode = trigger_mode ? "On" : "Off";
         Spinnaker::GenApi::INodeMap& nodeMap = camera_->GetNodeMap();
         Spinnaker::GenApi::CEnumerationPtr triggerMode = nodeMap.GetNode("TriggerMode");
         if (IsAvailable(triggerMode) && IsWritable(triggerMode)) {
