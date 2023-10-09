@@ -58,6 +58,7 @@ namespace rcg::cams::flir {
         int width_;
 
         ImageEventHandlerBase* image_handler_;
+        std::mutex init_mutex_;
     };
 
 } // rcg::cams::flir

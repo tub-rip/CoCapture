@@ -18,13 +18,11 @@ namespace rcg::cam_interfaces::flir {
     }
 
     bool FlirInterface::Start() {
-        //return flir_camera_->Start();
-        return false;
+        return flir_camera_->Start();
     }
 
     bool FlirInterface::Stop() {
-        //return flir_camera_->Stop();
-        return false;
+        return flir_camera_->Stop();
     }
 
     bool FlirInterface::StartRecording(const char* output_dir) {
@@ -33,29 +31,27 @@ namespace rcg::cam_interfaces::flir {
 
         output_dir_ += "/" + identifier_;
         boost::filesystem::create_directory(output_dir_);
-        //return flir_camera_->StartRecording(output_dir_.c_str());
-        return false;
+        return flir_camera_->StartRecording(output_dir_.c_str());
     }
 
     bool FlirInterface::StopRecording() {
-        //bool stop_recording {flir_camera_->StopRecording()};
-//
-        //if(stop_recording) {
-        //    flir_camera_->AnalyzeRecording(output_dir_.c_str());
-        //}
+        bool stop_recording {flir_camera_->StopRecording()};
 
-        //return stop_recording;
+        if(stop_recording) {
+            flir_camera_->AnalyzeRecording(output_dir_.c_str());
+        }
+
+        return stop_recording;
         return false;
     }
 
     bool FlirInterface::IsStarted() {
-        //return flir_camera_->IsStarted();
+        return flir_camera_->IsStarted();
         return false;
     }
 
     bool FlirInterface::IsRecording() {
-        //return flir_camera_->IsRecording();
-        return false;
+        return flir_camera_->IsRecording();
     }
 
 } // rcg::cam_interfaces::flir

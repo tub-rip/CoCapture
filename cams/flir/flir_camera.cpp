@@ -14,81 +14,73 @@ namespace rcg::cams::flir {
     system_(Spinnaker::System::GetInstance())
 
     {
-            bool WRITE_TO_PNG = true;  // Otherwise, write to mp4, TODO: connect to GUI
+        std::unique_lock<std::mutex> lock(init_mutex_);
+        bool WRITE_TO_PNG = true;  // Otherwise, write to mp4, TODO: connect to GUI
+        Spinnaker::CameraList cam_list = system_->GetCameras();
 
-            Spinnaker::CameraList cam_list = system_->GetCameras();
+        for (size_t i = 0; i < cam_list.GetSize(); ++i) {
+            Spinnaker::CameraPtr current_cam = cam_list.GetByIndex(i);
+            Spinnaker::GenApi::CStringPtr current_serial =
+                    current_cam->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
 
-            for (size_t i = 0; i < cam_list.GetSize(); ++i) {
-                Spinnaker::CameraPtr current_cam = cam_list.GetByIndex(i);
-                Spinnaker::GenApi::CStringPtr current_serial =
-                        current_cam->GetTLDeviceNodeMap().GetNode("DeviceSerialNumber");
-
-                if (std::strcmp(serial_number, current_serial->GetValue().c_str()) == 0) {
-                    camera_ = current_cam;
-                    break;
-                }
+            if (std::strcmp(serial_number, current_serial->GetValue().c_str()) == 0) {
+                camera_ = current_cam;
+                break;
             }
+        }
 
-            if (!camera_->IsInitialized()) {
-                camera_->Init();
-            }
+        if (!camera_->IsInitialized()) {
+            camera_->Init();
+        }
 
-            Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
+        Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
 
-            //Spinnaker::GenApi::CEnumerationPtr imageTransformSelector = node_map.GetNode("ReverseX");
-            //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("On");
-            //imageTransformSelector->SetIntValue(reverseXTransform->GetValue());
+        //Spinnaker::GenApi::CEnumerationPtr imageTransformSelector = node_map.GetNode("ReverseX");
+        //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("On");
+        //imageTransformSelector->SetIntValue(reverseXTransform->GetValue());
 
-            Spinnaker::GenApi::CEnumerationPtr ptrExposureAuto = node_map.GetNode("ExposureAuto");
-            if (!IsReadable(ptrExposureAuto) ||
-                !IsWritable(ptrExposureAuto))
+        Spinnaker::GenApi::CEnumerationPtr ptrExposureAuto = node_map.GetNode("ExposureAuto");
+        if (!IsReadable(ptrExposureAuto) ||
+            !IsWritable(ptrExposureAuto))
+        {
+            std::cout << "FLIR: Unable to enable automatic exposure (node retrieval)" << std::endl;
+        } else {
+            Spinnaker::GenApi::CEnumEntryPtr ptrExposureAutoContinuous =
+                    ptrExposureAuto->GetEntryByName("Continuous");
+            if (!IsReadable(ptrExposureAutoContinuous))
             {
-                std::cout << "FLIR: Unable to enable automatic exposure (node retrieval)" << std::endl;
+                std::cout << "Unable to enable automatic exposure (enum entry retrieval)" << std::endl;
             } else {
-                Spinnaker::GenApi::CEnumEntryPtr ptrExposureAutoContinuous =
-                        ptrExposureAuto->GetEntryByName("Continuous");
-                if (!IsReadable(ptrExposureAutoContinuous))
-                {
-                    std::cout << "Unable to enable automatic exposure (enum entry retrieval)" << std::endl;
-                } else {
-                    ptrExposureAuto->SetIntValue(ptrExposureAutoContinuous->GetValue());
-                }
+                ptrExposureAuto->SetIntValue(ptrExposureAutoContinuous->GetValue());
             }
+        }
 
 
-            Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
-            Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
-                    pixel_format_handle->GetEntryByName("RGB8");
+        Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
+        Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
+                pixel_format_handle->GetEntryByName("RGB8");
 
-            if (Spinnaker::GenApi::IsAvailable(format_bgr8_handle)
-                && Spinnaker::GenApi::IsReadable(format_bgr8_handle)) {
-            int64_t format_rgb8 = format_bgr8_handle->GetValue();
-            pixel_format_handle->SetIntValue(format_rgb8);
-            }
-            else {
-                std::cout << "Could not set correct pixel format for Flir camera." << std::endl;
-            }
+        if (Spinnaker::GenApi::IsAvailable(format_bgr8_handle)
+            && Spinnaker::GenApi::IsReadable(format_bgr8_handle)) {
+        int64_t format_rgb8 = format_bgr8_handle->GetValue();
+        pixel_format_handle->SetIntValue(format_rgb8);
+        }
+        else {
+            std::cout << "Could not set correct pixel format for Flir camera." << std::endl;
+        }
 
-            height_ = this->GetImageFrameHeight();
-            width_ = this->GetImageFrameWidth();
+        height_ = this->GetImageFrameHeight();
+        width_ = this->GetImageFrameWidth();
 
-            if (WRITE_TO_PNG) {
-                image_handler_ = new PngImageEventHandler(height_, width_, 200);
-            } else {
-                image_handler_ = new Mp4ImageEventHandler(height_, width_);
-            }
+        if (WRITE_TO_PNG) {
+            image_handler_ = new PngImageEventHandler(height_, width_, 200);
+        } else {
+            image_handler_ = new Mp4ImageEventHandler(height_, width_);
+        }
 
-            camera_->RegisterEventHandler(*image_handler_);
+        camera_->RegisterEventHandler(*image_handler_);
 
-            // TODO: Set hardware parameters
-
-            cam_list.Clear();
-
-            if (camera_ && !camera_->IsStreaming()) {
-                camera_->BeginAcquisition();
-            }
-
-            is_started_ = true;
+        cam_list.Clear();
     }
 
     FlirCamera::~FlirCamera() {
@@ -168,10 +160,17 @@ namespace rcg::cams::flir {
     }
 
     bool FlirCamera::Start() {
-        // TODO: What needs to go here from Constructor?
         if(is_started_) {
             return false;
         }
+
+        std::unique_lock<std::mutex> lock(init_mutex_);
+
+        if (camera_ && !camera_->IsStreaming()) {
+            camera_->BeginAcquisition();
+        }
+
+        is_started_ = true;
         return true;
     }
 
