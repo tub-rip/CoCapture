@@ -36,7 +36,7 @@ namespace rcg::cams::flir {
         Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
 
         //Spinnaker::GenApi::CEnumerationPtr imageTransformSelector = node_map.GetNode("ReverseX");
-        //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("On");
+        //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("Set");
         //imageTransformSelector->SetIntValue(reverseXTransform->GetValue());
 
         Spinnaker::GenApi::CEnumerationPtr ptrExposureAuto = node_map.GetNode("ExposureAuto");
@@ -85,6 +85,8 @@ namespace rcg::cams::flir {
     }
 
     FlirCamera::~FlirCamera() {
+        this->Stop();
+        camera_->DeInit();
         system_->ReleaseInstance();
     }
 
@@ -129,10 +131,31 @@ namespace rcg::cams::flir {
         if (IsAvailable(exposureTimeNode) && IsReadable(exposureTimeNode)) {
             exposure_time = exposureTimeNode->GetValue();
         }
-        return exposure_time;
+        return (int)exposure_time;
+    }
+
+    int FlirCamera::GetMaxExposureTime() {
+        Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
+        double max_exposure_time = 0;
+        Spinnaker::GenApi::CFloatPtr exposureTimeNode = node_map.GetNode("ExposureTime");
+        if (IsAvailable(exposureTimeNode) && IsReadable(exposureTimeNode)) {
+            max_exposure_time = exposureTimeNode->GetMax();
+        }
+        return (int)max_exposure_time;
     }
 
     bool FlirCamera::SetExposureTime(int exposure_time_us) {
+        Spinnaker::GenApi::INodeMap& nodeMap = camera_->GetNodeMap();
+        Spinnaker::GenApi::CEnumerationPtr exposureAuto = nodeMap.GetNode("ExposureAuto");
+        if (IsAvailable(exposureAuto) && IsWritable(exposureAuto)) {
+            exposureAuto->FromString("Off");
+        }
+
+        Spinnaker::GenApi::CFloatPtr exposureTime = nodeMap.GetNode("ExposureTime");
+        if (IsAvailable(exposureTime) && IsWritable(exposureTime)) {
+            exposureTime->SetValue(exposure_time_us);
+        }
+
         return false;
     }
 

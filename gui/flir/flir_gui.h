@@ -31,7 +31,7 @@ namespace rcg::gui::flir {
         int image_frame_height_;
 
         // Settings
-        //int exposure_time_;
+        int exposure_time_;
         bool trigger_mode_;
         bool reverse_x_;
 
@@ -47,7 +47,7 @@ namespace rcg::gui::flir {
         std::string button_start_recording_label_;
         std::string button_stop_recording_label_;
         std::string collapsing_header_general_label_;
-        //std::string slider_exposure_time_label_;
+        std::string slider_exposure_time_label_;
         std::string checkbox_trigger_mode_label_;
         std::string checkbox_reverse_x_label_;
         std::string input_text_output_dir_label_;

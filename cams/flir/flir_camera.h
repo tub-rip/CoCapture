@@ -21,6 +21,7 @@ namespace rcg::cams::flir {
         int GetImageFrameWidth();
         int GetImageFrameHeight();
         int GetExposureTime();
+        int GetMaxExposureTime();
         bool SetExposureTime(int exposure_time_us);
         bool GetTriggerMode();
         bool SetTriggerMode(bool trigger_mode);

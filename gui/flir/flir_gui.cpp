@@ -22,7 +22,7 @@ namespace rcg::gui::flir {
         image_frame_height_ = flir_camera_->GetImageFrameHeight();
 
         // Settings
-        //exposure_time_ = flir_camera_->GetExposureTime();
+        exposure_time_ = flir_camera_->GetExposureTime();
         trigger_mode_ = flir_camera->GetTriggerMode();
         reverse_x_ = flir_camera_->GetReverseX();
 
@@ -38,7 +38,7 @@ namespace rcg::gui::flir {
         button_start_recording_label_ = "Record" + ("###" + identifier_ + "button_start_recording");
         button_stop_recording_label_ = "End" + ("###" + identifier_ + "button_stop_recording");
         collapsing_header_general_label_ = "General" + ("###" + identifier_ + "collapsing_header_general");
-        //slider_exposure_time_label_ = "###" + identifier_ + "slider_exposure_time";
+        slider_exposure_time_label_ = "###" + identifier_ + "slider_exposure_time";
         checkbox_trigger_mode_label_ = "###" + identifier_ + "checkbox_trigger_mode";
         checkbox_reverse_x_label_ = "###" + identifier_ + "checkbox_reverse_x";
         input_text_output_dir_label_ = "###" + identifier_ + "input_text_output_dir";
@@ -106,11 +106,14 @@ namespace rcg::gui::flir {
 
                     // Settings
                     ImGui::BeginDisabled(flir_camera_->IsRecording());
-                    //ImGui::Text("exposure_time");
+                    ImGui::Text("exposure_time");
                     ImGui::SameLine();
-                    //if(ImGui::SliderInt(slider_exposure_time_label_.c_str(), &exposure_time_, 500, 20000)) {
-                    //    flir_camera_->SetExposureTime(exposure_time_);
-                    //}
+                    //ImGui::Text(("start_exposure_time " + std::to_string(exposure_time_) + "us").c_str());
+                    int max_exposure_time = flir_camera_->GetMaxExposureTime();
+                    if(ImGui::SliderInt(slider_exposure_time_label_.c_str(), &exposure_time_,
+                                        500, max_exposure_time)) {
+                        flir_camera_->SetExposureTime(exposure_time_);
+                    }
                     ImGui::Spacing();
 
                     ImGui::Text("trigger_mode ");
