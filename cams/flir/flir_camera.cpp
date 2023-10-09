@@ -139,8 +139,8 @@ namespace rcg::cams::flir {
         Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
         std::string trigger_mode = "nan";
         Spinnaker::GenApi::CFloatPtr node = node_map.GetNode("TriggerMode");
-        std::cout << "IsAvailable: " << IsAvailable(node) << std::endl;
-        std::cout << "IsReadable: " << IsReadable(node) << std::endl;
+        //std::cout << "IsAvailable: " << IsAvailable(node) << std::endl;
+        //std::cout << "IsReadable: " << IsReadable(node) << std::endl;
         if (IsAvailable(node) && IsReadable(node)) {
             trigger_mode = node->GetValue();
         }
@@ -221,17 +221,7 @@ namespace rcg::cams::flir {
     }
 
     void FlirCamera::AnalyzeRecording(const char* output_dir) {
-        std::string output_dir_str = std::string {output_dir};
-        if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
-
-        std::fstream recording_info;
-        recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
-
-        // Count frames
-        cv::VideoCapture video_capture {output_dir_str + "/frames.mp4"};
-        int frames_count = video_capture.get(cv::CAP_PROP_FRAME_COUNT);
-
-        recording_info << "Frames: " << std::to_string(frames_count);
+        image_handler_->AnalyzeRecording(output_dir);
     }
 
     std::vector<std::string> FlirCamera::ListConnectedCameras() {

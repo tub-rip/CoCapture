@@ -42,9 +42,9 @@ namespace rcg::cams::flir {
         void OutputFrame(cv::Mat& image_frame);
         bool StartRecording(const char* output_dir);
         bool StopRecording();
+        void AnalyzeRecording(const char* output_dir);
 
     public:
-        static void AnalyzeRecording(const char* output_dir);
         static std::vector<std::string> ListConnectedCameras();
 
     private:

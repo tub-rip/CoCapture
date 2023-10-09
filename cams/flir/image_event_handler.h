@@ -2,6 +2,8 @@
 #ifndef RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H
 #define RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H
 
+#include <filesystem>
+
 namespace rcg::cams::flir {
     class ImageEventHandlerBase : public Spinnaker::ImageEventHandler {
     public:
@@ -14,6 +16,7 @@ namespace rcg::cams::flir {
         virtual void StartRecording(const char* output_dir) = 0;
         virtual void StopRecording() = 0;
         virtual void WriteFrame(cv::Mat& frame) = 0;
+        virtual void AnalyzeRecording(const char* output_dir) = 0;
 
         void OnImageEvent(Spinnaker::ImagePtr image) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
@@ -67,14 +70,28 @@ namespace rcg::cams::flir {
             is_recording_ = true;
         }
 
-        void StopRecording() {
+        void StopRecording() override {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             is_recording_ = false;
             video_writer_.release();
         }
 
-        void WriteFrame(cv::Mat& frame) {
+        void WriteFrame(cv::Mat& frame) override {
             video_writer_.write(frame);
+        }
+
+        void AnalyzeRecording(const char* output_dir) override {
+            std::string output_dir_str = std::string {output_dir};
+            if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
+
+            std::fstream recording_info;
+            recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
+
+            // Count frames
+            cv::VideoCapture video_capture {output_dir_str + "/frames.mp4"};
+            int frames_count = video_capture.get(cv::CAP_PROP_FRAME_COUNT);
+
+            recording_info << "Frames: " << std::to_string(frames_count);
         }
 
     private:
@@ -114,6 +131,27 @@ namespace rcg::cams::flir {
             if (is_recording_ && image_buffer_.size() < buffer_size_) {
                 image_buffer_.push_back(frame.clone());
             }
+        }
+
+        void AnalyzeRecording(const char* output_dir) override {
+            std::string output_dir_str = std::string{output_dir};
+            if(output_dir_str.back() == '/') {
+                output_dir_str.pop_back();
+            }
+
+            std::fstream recording_info;
+            recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
+
+            // Count PNG files in the directory
+            int frames_count = 0;
+            for (const auto& entry : std::filesystem::directory_iterator(output_dir_str)) {
+                if (entry.path().extension() == ".png") {
+                    frames_count++;
+                }
+            }
+
+            recording_info << "Frames: " << std::to_string(frames_count);
+            recording_info.close();
         }
 
     private:
