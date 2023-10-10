@@ -48,53 +48,6 @@ namespace rcg::cams::flir {
         Spinnaker::ImageProcessor processor_;
     };
 
-    //class Mp4ImageEventHandler : public ImageEventHandlerBase {
-    //public:
-    //    Mp4ImageEventHandler(int height, int width) : ImageEventHandlerBase(height, width) {}
-//
-    //    void StartRecording(const char* output_dir) {
-    //        std::unique_lock<std::mutex> lock(frame_mutex_);
-//
-    //        std::string output_dir_str {output_dir};
-    //        if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
-//
-    //        video_writer_ = cv::VideoWriter {output_dir_str + "/frames.mp4",
-    //                                         cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
-    //                                         30,
-    //                                         cv::Size(width_, height_),
-    //                                         true};
-    //        is_recording_ = true;
-    //    }
-//
-    //    void StopRecording() override {
-    //        std::unique_lock<std::mutex> lock(frame_mutex_);
-    //        is_recording_ = false;
-    //        video_writer_.release();
-    //    }
-//
-    //    void WriteFrame(cv::Mat& frame) override {
-    //        video_writer_.write(frame);
-    //    }
-//
-    //    void AnalyzeRecording(const char* output_dir) override {
-    //        std::string output_dir_str = std::string {output_dir};
-    //        if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
-//
-    //        std::fstream recording_info;
-    //        recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
-//
-    //        // Count frames
-    //        cv::VideoCapture video_capture {output_dir_str + "/frames.mp4"};
-    //        int frames_count = video_capture.get(cv::CAP_PROP_FRAME_COUNT);
-//
-    //        recording_info << "Frames: " << std::to_string(frames_count);
-    //    }
-//
-    //private:
-    //    cv::VideoWriter video_writer_;
-    //};
-
-
     class PngImageEventHandler : public ImageEventHandlerBase {
     public:
         PngImageEventHandler(int height, int width, int buffer_size) : ImageEventHandlerBase(height, width), buffer_size_(buffer_size) {
