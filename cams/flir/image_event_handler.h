@@ -21,32 +21,26 @@ namespace rcg::cams::flir {
         void OnImageEvent(Spinnaker::ImagePtr image) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
 
-            //frame_ = cv::Mat(image->GetHeight() + image->GetYPadding(),
-            //                 image->GetWidth() + image->GetXPadding(), CV_8UC1);
-            //frame_.data = (uchar*)image->GetData();
-
             if (is_recording_) {
-                //cv::Mat rgb_frame = cv::Mat(height_, width_, CV_8UC3);
-                //rgb_frame.data = frame_.data;
-                //cv::Mat bgr_frame;
-                //cv::cvtColor(rgb_frame, bgr_frame, cv::COLOR_RGB2BGR);
                 this->WriteFrame(image);
             }
-
+            frame_ = image;
             frame_received_ = true;
         }
 
         void OutputFrame(cv::Mat& output_frame) {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             if (frame_received_) {
-                output_frame = frame_;
+                Spinnaker::ImagePtr tmp = processor_.Convert(frame_,
+                                                             Spinnaker::PixelFormat_RGB8);
+                output_frame = cv::Mat(height_, width_, CV_8UC3, tmp->GetData());
             } else {
                 output_frame = cv::Mat::zeros(height_, width_, CV_8UC3);
             }
         }
 
     protected:
-        cv::Mat frame_;
+        Spinnaker::ImagePtr frame_;
         std::mutex frame_mutex_;
         bool frame_received_;
         int height_, width_;
@@ -122,7 +116,6 @@ namespace rcg::cams::flir {
 
             for (const auto& frame : image_buffer_) {
                 std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
-                //cv::imwrite(filename, frame);
                 processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
                 frame->Save(filename.c_str());
                 frame_counter_++;
@@ -134,7 +127,6 @@ namespace rcg::cams::flir {
 
         void WriteFrame(Spinnaker::ImagePtr& frame) override {
             if (is_recording_ && image_buffer_.size() < buffer_size_) {
-                //image_buffer_.push_back(frame);
                 image_buffer_.push_back(Spinnaker::Image::Create(frame));
             }
         }
@@ -161,14 +153,11 @@ namespace rcg::cams::flir {
         }
 
     private:
-        //std::vector<cv::Mat> image_buffer_;
         std::vector<Spinnaker::ImagePtr> image_buffer_;
         std::string output_dir_;
         int buffer_size_;
         int frame_counter_ = 0;
     };
-
-
 }
 
 #endif //RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H
