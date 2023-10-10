@@ -16,6 +16,7 @@ namespace rcg::gui::flir {
         serial_number_ = flir_camera_->GetSerialNumber();
         model_name_ = flir_camera_->GetModelName();
         vendor_name_ = flir_camera_->GetVendorName();
+        max_exposure_time_ = flir_camera_->GetMaxExposureTime();
 
         // Image Frame
         image_frame_width_ = flir_camera_->GetImageFrameWidth();
@@ -108,10 +109,8 @@ namespace rcg::gui::flir {
                     ImGui::BeginDisabled(flir_camera_->IsRecording());
                     ImGui::Text("exposure_time");
                     ImGui::SameLine();
-                    //ImGui::Text(("start_exposure_time " + std::to_string(exposure_time_) + "us").c_str());
-                    int max_exposure_time = flir_camera_->GetMaxExposureTime();
                     if(ImGui::SliderInt(slider_exposure_time_label_.c_str(), &exposure_time_,
-                                        500, max_exposure_time)) {
+                                        500, max_exposure_time_)) {
                         flir_camera_->SetExposureTime(exposure_time_);
                     }
                     ImGui::Spacing();

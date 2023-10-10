@@ -167,14 +167,26 @@ namespace rcg::cams::flir {
 
     bool FlirCamera::SetTriggerMode(bool trigger_mode) {
         std::string new_mode = trigger_mode ? "On" : "Off";
-        Spinnaker::GenApi::INodeMap& nodeMap = camera_->GetNodeMap();
-        Spinnaker::GenApi::CEnumerationPtr triggerMode = nodeMap.GetNode("TriggerMode");
+        Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
+        Spinnaker::GenApi::CEnumerationPtr triggerMode = node_map.GetNode("TriggerMode");
         if (IsAvailable(triggerMode) && IsWritable(triggerMode)) {
             triggerMode->SetIntValue(triggerMode->GetEntryByName(new_mode.c_str())->GetValue());
-            return true;
         } else {
             return false;
         }
+
+        if (!trigger_mode) {
+            return true;
+        }
+
+        // In case of activating the trigger, we need to set this too
+        Spinnaker::GenApi::CEnumerationPtr trigger_overlap = node_map.GetNode("TriggerOverlap");
+        if (IsAvailable(trigger_overlap) && IsWritable(trigger_overlap)) {
+            trigger_overlap->SetIntValue(trigger_overlap->GetEntryByName("ReadOut")->GetValue());
+        } else {
+            return false;
+        }
+        return true;
     }
 
     bool FlirCamera::GetReverseX() {

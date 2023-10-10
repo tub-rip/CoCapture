@@ -24,6 +24,7 @@ namespace rcg::gui::flir {
         std::string serial_number_;
         std::string model_name_;
         std::string vendor_name_;
+        int max_exposure_time_;
 
         // Image Frame
         cv::Mat image_frame_;
