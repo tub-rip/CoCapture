@@ -115,6 +115,8 @@ namespace rcg::cams::prophesee {
             is_started_ = true;
         }
 
+        this->EnableTriggerIn();
+
         return cd_frame_generator_start && camera_start;
     }
 
