@@ -15,7 +15,6 @@ namespace rcg::cams::flir {
 
     {
         std::unique_lock<std::mutex> lock(init_mutex_);
-        bool WRITE_TO_PNG = true;  // Otherwise, write to mp4, TODO: connect to GUI
         Spinnaker::CameraList cam_list = system_->GetCameras();
 
         for (size_t i = 0; i < cam_list.GetSize(); ++i) {
@@ -35,78 +34,48 @@ namespace rcg::cams::flir {
 
         Spinnaker::GenApi::INodeMap & node_map = camera_->GetNodeMap();
 
-        //Spinnaker::GenApi::CEnumerationPtr imageTransformSelector = node_map.GetNode("ReverseX");
-        //Spinnaker::GenApi::CEnumEntryPtr reverseXTransform = imageTransformSelector->GetEntryByName("Set");
-        //imageTransformSelector->SetIntValue(reverseXTransform->GetValue());
-
-        //Spinnaker::GenApi::CEnumerationPtr frame_rate_auto = node_map.GetNode("AcquisitionFrameRateAuto");
-        //if (IsAvailable(frame_rate_auto) && IsWritable(frame_rate_auto)) {
-        //    frame_rate_auto->SetIntValue(frame_rate_auto->GetEntryByName("Continuous")->GetValue());
-        //}
-
-        Spinnaker::GenApi::CEnumerationPtr ptrExposureAuto = node_map.GetNode("ExposureAuto");
-        if (!IsReadable(ptrExposureAuto) ||
-            !IsWritable(ptrExposureAuto))
-        {
-            std::cout << "FLIR: Unable to enable automatic exposure (node retrieval)" << std::endl;
-        } else {
-            Spinnaker::GenApi::CEnumEntryPtr ptrExposureAutoContinuous =
-                    ptrExposureAuto->GetEntryByName("Off");
-            if (!IsReadable(ptrExposureAutoContinuous))
-            {
-                std::cout << "Unable to enable automatic exposure (enum entry retrieval)" << std::endl;
-            } else {
-                ptrExposureAuto->SetIntValue(ptrExposureAutoContinuous->GetValue());
-            }
-        }
-
-        //Spinnaker::GenApi::CEnumerationPtr pixel_format_handle = node_map.GetNode("PixelFormat");
-        //Spinnaker::GenApi::CEnumEntryPtr format_bgr8_handle =
-        //        pixel_format_handle->GetEntryByName("RGB8");
-
-        //if (Spinnaker::GenApi::IsAvailable(format_bgr8_handle)
-        //    && Spinnaker::GenApi::IsReadable(format_bgr8_handle)) {
-        //int64_t format_rgb8 = format_bgr8_handle->GetValue();
-        //pixel_format_handle->SetIntValue(format_rgb8);
-        //}
-        //else {
-        //    std::cout << "Could not set correct pixel format for Flir camera." << std::endl;
-        //}
-
         height_ = this->GetImageFrameHeight();
         width_ = this->GetImageFrameWidth();
 
-        if (WRITE_TO_PNG) {
-            image_handler_ = new PngImageEventHandler(height_, width_, 600);
-        }
-        //else {
-        //    image_handler_ = new Mp4ImageEventHandler(height_, width_);
-        //}
+        image_handler_ = new PngImageEventHandler(height_, width_, 600);
 
+        // Trigger Mode
+        Spinnaker::GenApi::CEnumerationPtr triggerMode = node_map.GetNode("TriggerMode");
+        if (IsAvailable(triggerMode) && IsWritable(triggerMode)) {
+            triggerMode->SetIntValue(triggerMode->GetEntryByName("Off")->GetValue());
+        }
+
+        // Trigger Source
         Spinnaker::GenApi::CEnumerationPtr trigger_source = node_map.GetNode("TriggerSource");
         if (IsAvailable(trigger_source) && IsWritable(trigger_source)) {
             trigger_source->SetIntValue(trigger_source->GetEntryByName("Line2")->GetValue());
         }
 
+        // Trigger Activation
         Spinnaker::GenApi::CEnumerationPtr trigger_activation = node_map.GetNode("TriggerActivation");
         if (IsAvailable(trigger_activation) && IsWritable(trigger_activation)) {
             trigger_activation->SetIntValue(trigger_activation->GetEntryByName("RisingEdge")->GetValue());
         }
 
+        // Trigger Overlap
         Spinnaker::GenApi::CEnumerationPtr trigger_overlap = node_map.GetNode("TriggerOverlap");
         if (IsAvailable(trigger_overlap) && IsWritable(trigger_overlap)) {
             trigger_overlap->SetIntValue(trigger_overlap->GetEntryByName("ReadOut")->GetValue());
         }
 
-        //Spinnaker::GenApi::CEnumerationPtr auto_exp_upper_limit = node_map.GetNode("TriggerActivation");
-        //if (IsAvailable(trigger_activation) && IsWritable(trigger_activation)) {
-        //    trigger_activation->SetIntValue(trigger_activation->GetEntryByName("RisingEdge")->GetValue());
-        //}
+        // Exposure Auto
+        Spinnaker::GenApi::CEnumerationPtr exposure_auto = node_map.GetNode("ExposureAuto");
+        if (IsAvailable(exposure_auto) && IsWritable(exposure_auto)) {
+            exposure_auto->SetIntValue(exposure_auto->GetEntryByName("Off")->GetValue());
+        }
+
+        // Exposure Time
+        Spinnaker::GenApi::CFloatPtr exposure_time = node_map.GetNode("ExposureTime");
+        if (IsAvailable(exposure_time) && IsWritable(exposure_time)) {
+            exposure_time->SetValue(8000);
+        }
 
         camera_->RegisterEventHandler(*image_handler_);
-        this->SetTriggerMode(false);
-        this->SetExposureTime(4000);
-
         cam_list.Clear();
     }
 
@@ -190,12 +159,9 @@ namespace rcg::cams::flir {
         Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
         std::string trigger_mode = "nan";
         Spinnaker::GenApi::CFloatPtr node = node_map.GetNode("TriggerMode");
-        //std::cout << "IsAvailable: " << IsAvailable(node) << std::endl;
-        //std::cout << "IsReadable: " << IsReadable(node) << std::endl;
         if (IsAvailable(node) && IsReadable(node)) {
             trigger_mode = node->GetValue();
         }
-        // TODO: Implement correctly.
         return false;
     }
 
