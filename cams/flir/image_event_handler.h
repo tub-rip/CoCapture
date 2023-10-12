@@ -3,6 +3,7 @@
 #define RIP_COCAPTURE_GUI_FLIR_IMAGE_EVENT_HANDLER_H
 
 #include <filesystem>
+#include <future>
 
 namespace rcg::cams::flir {
     class ImageEventHandlerBase : public Spinnaker::ImageEventHandler {
@@ -67,11 +68,19 @@ namespace rcg::cams::flir {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             is_recording_ = false;
 
+            std::vector<std::future<void>> futures;
+
             for (const auto& frame : image_buffer_) {
-                std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
-                processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
-                frame->Save(filename.c_str());
+                futures.emplace_back(std::async(std::launch::async, [this, frame]() {
+                    std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
+                    processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
+                    frame->Save(filename.c_str());
+                }));
                 frame_counter_++;
+            }
+
+            for (auto& future : futures) {
+                future.wait();
             }
 
             image_buffer_.clear();
