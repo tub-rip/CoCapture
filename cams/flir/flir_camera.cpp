@@ -1,6 +1,5 @@
 #ifdef ENABLE_SPINNAKER_SDK
 
-#include <thread>
 #include <fstream>
 
 #include "flir_camera.h"
