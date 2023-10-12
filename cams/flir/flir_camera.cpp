@@ -37,7 +37,7 @@ namespace rcg::cams::flir {
         height_ = this->GetImageFrameHeight();
         width_ = this->GetImageFrameWidth();
 
-        image_handler_ = new PngImageEventHandler(height_, width_, 600);
+        image_handler_ = new PngImageEventHandler(height_, width_, 1000);
 
         // Trigger Mode
         Spinnaker::GenApi::CEnumerationPtr triggerMode = node_map.GetNode("TriggerMode");
@@ -189,15 +189,15 @@ namespace rcg::cams::flir {
         return true;
     }
 
-    bool FlirCamera::GetReverseX() {
-        //return camera_.ReverseX.GetValue();
-        return false;
-    }
+    //bool FlirCamera::GetReverseX() {
+    //    //return camera_.ReverseX.GetValue();
+    //    return false;
+    //}
 
-    bool FlirCamera::SetReverseX(bool reverse_x) {
-        //camera_.ReverseX.SetValue(reverse_x);
-        return false;
-    }
+    //bool FlirCamera::SetReverseX(bool reverse_x) {
+    //    //camera_.ReverseX.SetValue(reverse_x);
+    //    return false;
+    //}
 
     bool FlirCamera::Start() {
         if(is_started_) {

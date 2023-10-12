@@ -25,7 +25,7 @@ namespace rcg::gui::flir {
         // Settings
         exposure_time_ = flir_camera_->GetExposureTime();
         trigger_mode_ = flir_camera->GetTriggerMode();
-        reverse_x_ = flir_camera_->GetReverseX();
+        //reverse_x_ = flir_camera_->GetReverseX();
 
         // GUI
         GenerateTexture(&image_frame_texture_id_, image_frame_width_, image_frame_height_);
@@ -41,7 +41,7 @@ namespace rcg::gui::flir {
         collapsing_header_general_label_ = "General" + ("###" + identifier_ + "collapsing_header_general");
         slider_exposure_time_label_ = "###" + identifier_ + "slider_exposure_time";
         checkbox_trigger_mode_label_ = "###" + identifier_ + "checkbox_trigger_mode";
-        checkbox_reverse_x_label_ = "###" + identifier_ + "checkbox_reverse_x";
+        //checkbox_reverse_x_label_ = "###" + identifier_ + "checkbox_reverse_x";
         input_text_output_dir_label_ = "###" + identifier_ + "input_text_output_dir";
 
         memset(input_text_output_dir_, 0, BUF_SIZE);
@@ -122,11 +122,11 @@ namespace rcg::gui::flir {
                     }
                     ImGui::Spacing();
 
-                    ImGui::Text("reverse_x    ");
-                    ImGui::SameLine();
-                    if(ImGui::Checkbox(checkbox_reverse_x_label_.c_str(), &reverse_x_)) {
-                        flir_camera_->SetReverseX(reverse_x_);
-                    }
+                    //ImGui::Text("reverse_x    ");
+                    //ImGui::SameLine();
+                    //if(ImGui::Checkbox(checkbox_reverse_x_label_.c_str(), &reverse_x_)) {
+                    //    flir_camera_->SetReverseX(reverse_x_);
+                    //}
                     ImGui::Spacing();
                     ImGui::EndDisabled();
 

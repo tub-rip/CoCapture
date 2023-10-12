@@ -34,7 +34,7 @@ namespace rcg::gui::flir {
         // Settings
         int exposure_time_;
         bool trigger_mode_;
-        bool reverse_x_;
+        //bool reverse_x_;
 
         // GUI
         GLuint image_frame_texture_id_;
@@ -50,7 +50,7 @@ namespace rcg::gui::flir {
         std::string collapsing_header_general_label_;
         std::string slider_exposure_time_label_;
         std::string checkbox_trigger_mode_label_;
-        std::string checkbox_reverse_x_label_;
+        //std::string checkbox_reverse_x_label_;
         std::string input_text_output_dir_label_;
 
         char input_text_output_dir_[BUF_SIZE];
