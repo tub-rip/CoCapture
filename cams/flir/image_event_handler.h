@@ -12,14 +12,16 @@ namespace rcg::cams::flir {
                 frame_received_(false),
                 height_(height),
                 width_(width),
-                is_recording_(false) {}
+                is_recording_(false) {
+            processor_.SetColorProcessing(Spinnaker::SPINNAKER_COLOR_PROCESSING_ALGORITHM_HQ_LINEAR);
+        }
 
         virtual void StartRecording(const char* output_dir) = 0;
         virtual void StopRecording() = 0;
         virtual void WriteFrame(Spinnaker::ImagePtr& frame) = 0;
         virtual void AnalyzeRecording(const char* output_dir) = 0;
 
-        void OnImageEvent(Spinnaker::ImagePtr image) {
+        void OnImageEvent(Spinnaker::ImagePtr image) override {
             std::unique_lock<std::mutex> lock(frame_mutex_);
 
             if (is_recording_) {
@@ -68,19 +70,27 @@ namespace rcg::cams::flir {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             is_recording_ = false;
 
-            std::vector<std::future<void>> futures;
+            //std::vector<std::future<void>> futures;
+
+            //for (const auto& frame : image_buffer_) {
+            //    futures.emplace_back(std::async(std::launch::async, [this, frame]() {
+            //        std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
+            //        Spinnaker::ImagePtr converted = processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
+            //        converted->Save(filename.c_str());
+            //    }));
+            //    frame_counter_++;
+            //}
+
+            //for (auto& future : futures) {
+            //    future.wait();
+            //}
 
             for (const auto& frame : image_buffer_) {
-                futures.emplace_back(std::async(std::launch::async, [this, frame]() {
-                    std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
-                    processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
-                    frame->Save(filename.c_str());
-                }));
+                std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
+                processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
+                Spinnaker::ImagePtr converted = processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
+                converted->Save(filename.c_str());
                 frame_counter_++;
-            }
-
-            for (auto& future : futures) {
-                future.wait();
             }
 
             image_buffer_.clear();
