@@ -66,35 +66,21 @@ namespace rcg::cams::flir {
         }
 
         void StopRecording() override {
-            // TODO: GUI becomes non-reactive while images are stored
             std::unique_lock<std::mutex> lock(frame_mutex_);
             is_recording_ = false;
 
-            //std::vector<std::future<void>> futures;
-
-            //for (const auto& frame : image_buffer_) {
-            //    futures.emplace_back(std::async(std::launch::async, [this, frame]() {
-            //        std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
-            //        Spinnaker::ImagePtr converted = processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
-            //        converted->Save(filename.c_str());
-            //    }));
-            //    frame_counter_++;
-            //}
-
-            //for (auto& future : futures) {
-            //    future.wait();
-            //}
-
-            for (const auto& frame : image_buffer_) {
-                std::string filename = output_dir_ + "/frame_" + std::to_string(frame_counter_) + ".png";
+            #pragma omp parallel for
+            for (int frame_id=0; frame_id < image_buffer_.size(); ++frame_id) {
+                auto& frame = image_buffer_[frame_id];
+                std::string frame_id_name = std::to_string(frame_id);
+                frame_id_name.insert(frame_id_name.begin(), 6 - frame_id_name.size(),'0');
+                std::string filename = output_dir_ + "/frame_" + frame_id_name + ".png";
                 processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
                 Spinnaker::ImagePtr converted = processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
                 converted->Save(filename.c_str());
-                frame_counter_++;
             }
 
             image_buffer_.clear();
-            frame_counter_ = 0;
         }
 
         void WriteFrame(Spinnaker::ImagePtr& frame) override {
@@ -128,7 +114,6 @@ namespace rcg::cams::flir {
         std::vector<Spinnaker::ImagePtr> image_buffer_;
         std::string output_dir_;
         int buffer_size_;
-        int frame_counter_ = 0;
     };
 }
 

@@ -46,6 +46,11 @@ if (USE_SPINNAKER_SDK)
     target_sources(rip-cocapture-gui PUBLIC cams/flir/flir_camera.cpp cam_interfaces/flir/flir_interface.cpp)
     target_sources(rip-cocapture-gui PUBLIC gui/flir/flir_gui.cpp wrappers/flir/flir_wrapper.cpp)
     target_include_directories(rip-cocapture-gui PUBLIC cams/flir gui/flir cam_interfaces/flir wrappers/flir)
+
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(rip-cocapture-gui PUBLIC OpenMP::OpenMP_CXX)
+    endif()
 endif ()
 
 
