@@ -75,7 +75,6 @@ namespace rcg::cams::prophesee {
         std::unique_ptr<EventSignalProcessor> event_signal_processor_;
         cv::Mat cd_frame_;
         std::mutex cd_frame_mutex_;
-        TriggerEventSaver trigger_event_saver_;
         bool is_started_;
         bool is_recording_;
         Metavision::I_LL_Biases* biases_;

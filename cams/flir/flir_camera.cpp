@@ -36,7 +36,7 @@ namespace rcg::cams::flir {
         height_ = this->GetImageFrameHeight();
         width_ = this->GetImageFrameWidth();
 
-        image_handler_ = new PngImageEventHandler(height_, width_, 1000);
+        image_handler_ = new PngImageEventHandler(height_, width_, 2000);
 
         // Trigger Mode
         Spinnaker::GenApi::CEnumerationPtr triggerMode = node_map.GetNode("TriggerMode");
