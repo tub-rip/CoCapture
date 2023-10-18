@@ -102,7 +102,7 @@ namespace rcg::cams::flir {
             }
 
             std::fstream recording_info;
-            recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
+            recording_info.open(output_dir_str + "/recording_info.yaml", std::ios::out);
 
             // Count PNG files in the directory
             int frames_count = 0;
