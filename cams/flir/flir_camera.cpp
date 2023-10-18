@@ -249,7 +249,8 @@ namespace rcg::cams::flir {
     }
 
     void FlirCamera::AnalyzeRecording(const char* output_dir) {
-        image_handler_->AnalyzeRecording(output_dir);
+        int exposure_time = this->GetExposureTime();
+        image_handler_->AnalyzeRecording(output_dir, exposure_time);
     }
 
     std::vector<std::string> FlirCamera::ListConnectedCameras() {

@@ -5,6 +5,9 @@
 #include <filesystem>
 #include <future>
 
+#include <boost/filesystem.hpp>
+
+
 namespace rcg::cams::flir {
     class ImageEventHandlerBase : public Spinnaker::ImageEventHandler {
     public:
@@ -19,7 +22,7 @@ namespace rcg::cams::flir {
         virtual void StartRecording(const char* output_dir) = 0;
         virtual void StopRecording() = 0;
         virtual void WriteFrame(Spinnaker::ImagePtr& frame) = 0;
-        virtual void AnalyzeRecording(const char* output_dir) = 0;
+        virtual void AnalyzeRecording(const char* output_dir, int exposure_time) = 0;
 
         void OnImageEvent(Spinnaker::ImagePtr image) override {
             std::unique_lock<std::mutex> lock(frame_mutex_);
@@ -69,12 +72,15 @@ namespace rcg::cams::flir {
             std::unique_lock<std::mutex> lock(frame_mutex_);
             is_recording_ = false;
 
-            #pragma omp parallel for
+            std::string img_dir = output_dir_ + "/imgs";
+            boost::filesystem::create_directory(img_dir);
+
+            #pragma omp parallel for default(none) shared(image_buffer_, output_dir_, processor_)
             for (int frame_id=0; frame_id < image_buffer_.size(); ++frame_id) {
                 auto& frame = image_buffer_[frame_id];
                 std::string frame_id_name = std::to_string(frame_id);
                 frame_id_name.insert(frame_id_name.begin(), 6 - frame_id_name.size(),'0');
-                std::string filename = output_dir_ + "/frame_" + frame_id_name + ".png";
+                std::string filename = output_dir_ + "/imgs/frame_" + frame_id_name + ".png";
                 processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
                 Spinnaker::ImagePtr converted = processor_.Convert(frame, Spinnaker::PixelFormat_RGB8);
                 converted->Save(filename.c_str());
@@ -89,7 +95,7 @@ namespace rcg::cams::flir {
             }
         }
 
-        void AnalyzeRecording(const char* output_dir) override {
+        void AnalyzeRecording(const char* output_dir, int exposure_time) override {
             std::string output_dir_str = std::string{output_dir};
             if(output_dir_str.back() == '/') {
                 output_dir_str.pop_back();
@@ -100,13 +106,15 @@ namespace rcg::cams::flir {
 
             // Count PNG files in the directory
             int frames_count = 0;
-            for (const auto& entry : std::filesystem::directory_iterator(output_dir_str)) {
+            for (const auto& entry : std::filesystem::directory_iterator(output_dir_str + "/imgs")) {
                 if (entry.path().extension() == ".png") {
                     frames_count++;
                 }
             }
 
-            recording_info << "Frames: " << std::to_string(frames_count);
+            recording_info << "num_frames: " << std::to_string(frames_count) << std::endl;
+            recording_info << "exposure_time: " << exposure_time << std::endl;
+
             recording_info.close();
         }
 
