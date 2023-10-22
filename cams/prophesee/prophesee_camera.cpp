@@ -18,6 +18,7 @@ namespace rcg::cams::prophesee {
     trigger_in_             (camera_.get_device().get_facility<Metavision::I_TriggerIn>())
 
     {
+        this->EnableTriggerIn();
         cd_frame_generator_->set_display_accumulation_time_us(display_accumulation_time_us);
         cd_frame_generator_->set_colors(background_color, on_color, off_color, true);
         camera_.cd().add_callback([this] (const Metavision::EventCD* begin, const Metavision::EventCD* end) {
@@ -150,13 +151,6 @@ namespace rcg::cams::prophesee {
 
         std::string output_dir_str = std::string {output_dir};
         if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
-
-        trigger_event_saver_.OpenFile((output_dir_str + "/trigger_events.txt").c_str());
-        size_t callback_id = camera_.ext_trigger().add_callback([this] (const Metavision::EventExtTrigger* begin,
-                                                                            const Metavision::EventExtTrigger* end) {
-            trigger_event_saver_.AddEvents(begin, end);
-        });
-        trigger_event_saver_.SetCallBackId(callback_id);
         camera_.start_recording(output_dir_str + "/output.raw");
         is_recording_ = true;
 
@@ -170,10 +164,6 @@ namespace rcg::cams::prophesee {
 
         camera_.stop_recording();
         is_recording_ = false;
-        size_t callback_id = trigger_event_saver_.GetCallBackId();
-        camera_.ext_trigger().remove_callback(callback_id);
-        trigger_event_saver_.CloseFile();
-
         return true;
     }
 
