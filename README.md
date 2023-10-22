@@ -23,18 +23,15 @@ Install SDL2 library with:
 
 Below are links for the dependencies required for different cameras. You only need to install the dependencies for the cameras you are using. You have to 'deactivate' linking unused libraries by setting the flags in the CMakeLists.txt, e.g. change `set(USE_METAVISION_SDK TRUE)` to `set(USE_METAVISION_SDK FALSE)`, if you do not want to use Prophesee cameras.
 
-- OpenEB, from https://github.com/prophesee-ai/openeb
-    - tested version: 4.2.0, (>4 required)
+- [OpenEB](https://github.com/prophesee-ai/openeb): tested version: 4.2.0, (>4 required)
 
-- Pylon, from https://www.baslerweb.com/de/downloads/downloads-software/
-    - tested version: 7.2.0, 7.2.1
+- [Pylon](https://www.baslerweb.com/de/downloads/downloads-software/): tested version: 7.2.0, 7.2.1
 
-- Spinnaker, from https://www.flir.com/products/spinnaker-sdk/
-    - tested Version: 3.1.0.79
+- [Spinnaker](https://www.flir.com/products/spinnaker-sdk/): tested Version: 3.1.0.79
 
 #### Further dependencies:
-- OpenCV, from https://github.com/opencv/opencv
-- Boost, from https://www.boost.org/users/download/
+- [OpenCV](https://github.com/opencv/opencv)
+- [Boost](https://www.boost.org/users/download/)
 
 You can also install the packages from apt if applicable.
 
