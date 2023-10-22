@@ -147,7 +147,6 @@ namespace rcg::cams::flir {
 
         Spinnaker::GenApi::CFloatPtr exposureTime = nodeMap.GetNode("ExposureTime");
         if (IsAvailable(exposureTime) && IsWritable(exposureTime)) {
-            //exposureTime->SetValue(exposure_time_us);
             exposureTime->SetValue(exposure_time_us);
         }
 
@@ -187,16 +186,6 @@ namespace rcg::cams::flir {
         }
         return true;
     }
-
-    //bool FlirCamera::GetReverseX() {
-    //    //return camera_.ReverseX.GetValue();
-    //    return false;
-    //}
-
-    //bool FlirCamera::SetReverseX(bool reverse_x) {
-    //    //camera_.ReverseX.SetValue(reverse_x);
-    //    return false;
-    //}
 
     bool FlirCamera::Start() {
         if(is_started_) {

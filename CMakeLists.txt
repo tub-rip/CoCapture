@@ -18,7 +18,7 @@ target_include_directories(rip-cocapture-gui PUBLIC tools/recorder)
 ### Enable dependencies here
 set(USE_METAVISION_SDK TRUE) # for Prophesee cameras
 set(USE_PYLON_SDK FALSE) # for Basler cameras
-set(USE_SPINNAKER_SDK TRUE) # for Flir cameras
+set(USE_SPINNAKER_SDK FALSE) # for Flir cameras
 
 if (USE_METAVISION_SDK)
     add_definitions(-DENABLE_METAVISION_SDK)

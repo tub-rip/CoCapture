@@ -25,8 +25,6 @@ namespace rcg::cams::flir {
         bool SetExposureTime(int exposure_time_us);
         bool GetTriggerMode();
         bool SetTriggerMode(bool trigger_mode);
-        //bool GetReverseX();
-        //bool SetReverseX(bool reverse_x);
 
     public:
         bool IsStarted() {

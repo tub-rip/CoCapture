@@ -95,6 +95,7 @@ namespace rcg::gui {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8,
                      image_width, image_height, 0,
                      GL_RGB, GL_UNSIGNED_BYTE, empty);
+
         delete[] empty;
     }
 
