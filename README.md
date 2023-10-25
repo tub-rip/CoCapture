@@ -1,6 +1,6 @@
 # CoCapture
 
-Light-weight viewer and recorder for multi-camera systems including event cameras.
+GUI for viewing and recording with multi-camera systems including event cameras.
 
 ![Screenshot from 2023-07-05 10-55-54](docs/images/cocapture_example.png)
 

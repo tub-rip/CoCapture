@@ -90,7 +90,7 @@ namespace rcg::cams::flir {
         }
 
         void WriteFrame(Spinnaker::ImagePtr& frame) override {
-            if (is_recording_ && image_buffer_.size() < buffer_size_) {
+            if (is_recording_) {
                 image_buffer_.push_back(Spinnaker::Image::Create(frame));
             }
         }
