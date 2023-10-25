@@ -38,6 +38,12 @@ namespace rcg::cams::flir {
 
         image_handler_ = new PngImageEventHandler(height_, width_, 2000);
 
+        // Decimation Vertical
+        Spinnaker::GenApi::CIntegerPtr decimation_vertical = node_map.GetNode("DecimationVertical");
+        if (IsAvailable(decimation_vertical) && IsWritable(decimation_vertical)) {
+            decimation_vertical->SetValue(2);
+        }
+
         // Trigger Mode
         Spinnaker::GenApi::CEnumerationPtr triggerMode = node_map.GetNode("TriggerMode");
         if (IsAvailable(triggerMode) && IsWritable(triggerMode)) {
