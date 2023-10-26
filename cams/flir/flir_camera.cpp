@@ -161,10 +161,11 @@ namespace rcg::cams::flir {
 
     bool FlirCamera::GetTriggerMode() {
         Spinnaker::GenApi::INodeMap& node_map = camera_->GetNodeMap();
-        std::string trigger_mode = "nan";
-        Spinnaker::GenApi::CFloatPtr node = node_map.GetNode("TriggerMode");
+        Spinnaker::GenApi::CEnumerationPtr node = node_map.GetNode("TriggerMode");
         if (IsAvailable(node) && IsReadable(node)) {
-            trigger_mode = node->GetValue();
+            Spinnaker::GenICam::gcstring trigger_mode = node->ToString();
+            std::cout << trigger_mode << std::endl;
+            return trigger_mode == "On";
         }
         return false;
     }
