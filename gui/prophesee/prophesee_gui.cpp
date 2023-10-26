@@ -244,7 +244,6 @@ namespace rcg::gui::prophesee {
                     ImGui::BeginDisabled(!prophesee_camera_->IsRecording());
                     if(ImGui::Button(button_stop_recording_label_.c_str())) {
                         prophesee_camera_->StopRecording();
-                        prophesee_camera_->AnalyzeRecording(output_dir_.c_str());
                     }
                     ImGui::EndDisabled();
                     ImGui::Spacing();

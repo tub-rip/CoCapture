@@ -3,6 +3,35 @@
 #include "prophesee_camera.h"
 
 namespace rcg::cams::prophesee {
+    size_t get_trigger_event_count(const std::string& event_file) {
+        Metavision::Camera camera;
+        try {
+            auto hints = Metavision::FileConfigHints().real_time_playback(false);
+            camera     = Metavision::Camera::from_file(event_file, hints);
+        } catch (Metavision::CameraException &e) {
+            return 0;
+        }
+
+        size_t num_ext_triggers = 0;
+
+        try {
+            Metavision::ExtTrigger &ext_trigger = camera.ext_trigger();
+            ext_trigger.add_callback([&num_ext_triggers](const Metavision::EventExtTrigger *begin,
+                                                         const Metavision::EventExtTrigger *end) {
+                num_ext_triggers += std::distance(begin, end);
+            });
+        } catch (...) {
+            return 0;
+        }
+
+        camera.start();
+        while (camera.is_running()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+        camera.stop();
+        return num_ext_triggers;
+    }
+
 
     PropheseeCamera::PropheseeCamera(const char* serial_number, int display_accumulation_time_us,
                                      cv::Scalar background_color, cv::Scalar on_color, cv::Scalar off_color) :
@@ -169,21 +198,16 @@ namespace rcg::cams::prophesee {
 
     void PropheseeCamera::AnalyzeRecording(const char* output_dir) {
         std::string output_dir_str = std::string {output_dir};
+        std::cout << "From AnalyzeRecording: " << output_dir_str << std::endl;
+
         if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
+
+        std::string event_path = output_dir_str + "/output.raw";
+
+        int trigger_events_count = get_trigger_event_count(event_path);
 
         std::fstream recording_info;
         recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
-
-        // Count trigger events
-        std::fstream trigger_events_file;
-        trigger_events_file.open(output_dir_str + "/trigger_events.txt", std::ios::in);
-
-        int trigger_events_count {0};
-        std::string trigger_event;
-        while(std::getline(trigger_events_file, trigger_event)) {
-            ++trigger_events_count;
-        }
-
         recording_info << "Trigger events: " << std::to_string(trigger_events_count);
     }
 
