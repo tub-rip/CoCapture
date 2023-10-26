@@ -198,14 +198,9 @@ namespace rcg::cams::prophesee {
 
     void PropheseeCamera::AnalyzeRecording(const char* output_dir) {
         std::string output_dir_str = std::string {output_dir};
-        std::cout << "From AnalyzeRecording: " << output_dir_str << std::endl;
-
         if(output_dir_str.back() == '/') { output_dir_str.pop_back(); }
-
         std::string event_path = output_dir_str + "/output.raw";
-
         int trigger_events_count = get_trigger_event_count(event_path);
-
         std::fstream recording_info;
         recording_info.open(output_dir_str + "/recording_info.txt", std::ios::out);
         recording_info << "Trigger events: " << std::to_string(trigger_events_count);
